@@ -6,6 +6,9 @@ import * as cp from 'child_process';
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
+var g_installedImages:string[] = [];
+var g_availableImages:string[] = [];
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -25,7 +28,13 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
-        vscode.window.showInformationMessage('Main Menu Shall Be Opened Here!');
+        vscode.window.showQuickPick(["Install Image", "XXX"]).then( selected => {
+            if (selected == "Install Image") {
+                // XXX - remove installed images from available images
+                // XXX - check if any available images that are not installed
+                vscode.window.showQuickPick(g_availableImages).then( selected => {});
+            }
+        })
     });
 
     context.subscriptions.push(disposable1);
@@ -33,9 +42,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     checkDockerInstall().then(installed => {
         if (installed) {
-            queryCompatibleImages().then(images => {
-                vscode.window.showInformationMessage(images[1]);
-            });
+            queryInstalledImages();
+            queryCompatibleImages();
         } else {
             vscode.window.showInformationMessage('Docker is not installed!!');
         }
@@ -63,22 +71,52 @@ function checkDockerInstall(): Promise<boolean> {
     });
 }
 
-function queryCompatibleImages(): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-        const child = cp.spawn('docker', `search xvsc`.split(' '));
-        const stdout = collectData(child.stdout, 'utf8');
-        const stderr = collectData(child.stderr, 'utf8');
-        child.on('error', err => {
-            reject(err);
-        });
+function queryCompatibleImages() {
+    const child = cp.spawn('docker', ['search', 'xvsc']);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+        g_installedImages = [];
+    });
 
-        child.on('close', code => {
-            if (code) {
-                reject(stderr.join('') || code);
-            } else {
-                resolve(stdout.join('').split(/\r?\n/));
+    child.on('close', code => {
+        if (code) {
+            g_availableImages = [];
+        } else {
+
+            g_availableImages = [];
+            var lines: string[] = stdout.join('').split(/\r?\n/);
+            for (var element of lines) {
+                if (!element.startsWith("NAME")) {
+                    var i: string = element.split(" ")[0]
+                    g_availableImages.push(i);                    
+                }
             }
-        });
+        }
+    });
+}
+
+function queryInstalledImages() {
+    const child = cp.spawn('docker', ['images']);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+        g_installedImages = [];
+    });
+
+    child.on('close', code => {
+        if (code) {
+            g_installedImages = [];
+        } else {
+
+            g_installedImages = [];
+            var lines: string[] = stdout.join('').split(/\r?\n/);
+            for (var element of lines) {
+                if (!element.startsWith("REPOSITORY")) {
+                    g_installedImages.push(element.split(" ")[0]);                    
+                }
+            }
+        }
     });
 }
 
