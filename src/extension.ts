@@ -53,7 +53,7 @@ function checkDockerInstall(): Promise<boolean> {
 
 function queryCompatibleImages(): Promise<string[]> {
     return new Promise((resolve, reject) => {
-        const child = cp.spawn('docker', `search dockiot`.split(' '));
+        const child = cp.spawn('docker', `search xvsc`.split(' '));
         const stdout = collectData(child.stdout, 'utf8');
         const stderr = collectData(child.stderr, 'utf8');
         child.on('error', err => {
