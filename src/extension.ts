@@ -21,11 +21,11 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable1 = vscode.commands.registerCommand('extension.sayHello', () => {
+    let disposable1 = vscode.commands.registerCommand('extension.init', () => {
         // The code you place here will be executed every time your command is executed
 
         // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World! XXX');
+        vscode.window.showInformationMessage('Docker for IoT is ready!');
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "Docker";
+    item.text = "Docker for IoT";
     item.command = "extension.openMainMenu";
     item.show();
 
