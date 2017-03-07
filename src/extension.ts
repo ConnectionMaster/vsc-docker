@@ -8,6 +8,7 @@ import { Readable } from "stream";
 
 var g_installedImages:string[] = [];
 var g_availableImages:string[] = [];
+var g_menuItems = {};
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -28,7 +29,15 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
-        vscode.window.showQuickPick(["Install Image", "XXX"]).then( selected => {
+        var items:string[] = [];
+
+        for (var item in g_menuItems) {
+            items.push(item);
+        }
+
+        items.push("Install Image");
+
+        vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
                 // XXX - remove installed images from available images
                 // XXX - check if any available images that are not installed
@@ -116,6 +125,36 @@ function queryInstalledImages() {
                     g_installedImages.push(element.split(" ")[0]);                    
                 }
             }
+
+            // query all capabilities for installed docker images
+            queryAllCapabilities();
+        }
+    });
+}
+
+function queryAllCapabilities() {
+    for (var element of g_installedImages) {
+        queryCapabilities(element);
+    }
+}
+
+function queryCapabilities(image: string) {
+    const child = cp.spawn('docker', ['run', image]);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+        g_installedImages = [];
+    });
+
+    child.on('close', code => {
+        if (code) {
+        } else {
+            try {
+                var capabilities = JSON.parse(stdout.join(''));
+                for (var element in capabilities) {
+                    g_menuItems[element] = capabilities[element]
+                }
+            } catch (e) {}
         }
     });
 }
