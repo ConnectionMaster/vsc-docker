@@ -36,12 +36,19 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         items.push("Install Image");
+        items.push("Remove Image");
 
         vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
                 // XXX - remove installed images from available images
                 // XXX - check if any available images that are not installed
-                vscode.window.showQuickPick(g_availableImages).then( selected => {});
+                vscode.window.showQuickPick(g_availableImages).then( selected => {
+                    installImage(selected);
+                });
+            } else if (selected == "Remove Image") {
+                vscode.window.showQuickPick(g_installedImages).then( selected => {
+                    removeImage(selected);
+                });
             }
         })
     });
@@ -77,6 +84,48 @@ function checkDockerInstall(): Promise<boolean> {
         cp.exec('docker --help', err => {
             resolve(!err);
         });
+    });
+}
+
+function installImage(id: string) {
+    const child = cp.spawn('docker', ['pull', id]);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+        vscode.window.showErrorMessage('Failed to install image!');
+    });
+
+    child.on('close', code => {
+        if (code) {
+            vscode.window.showErrorMessage('Failed to install image!');
+        } else {
+
+            vscode.window.showInformationMessage('Image installed successfully!');
+            g_installedImages = [];
+
+            queryInstalledImages();
+        }
+    });
+}
+
+function removeImage(id: string) {
+    const child = cp.spawn('docker', ['rmi', '-f', id]);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+        vscode.window.showErrorMessage('Failed to remove image!');
+    });
+
+    child.on('close', code => {
+        if (code) {
+            vscode.window.showErrorMessage('Failed to remove image!');
+        } else {
+
+            vscode.window.showInformationMessage('Image removed successfully!');
+            g_installedImages = [];
+
+            queryInstalledImages();
+        }
     });
 }
 
@@ -121,7 +170,7 @@ function queryInstalledImages() {
             g_installedImages = [];
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
-                if (!element.startsWith("REPOSITORY")) {
+                if (element.indexOf("xvsc") >= 0) {
                     g_installedImages.push(element.split(" ")[0]);                    
                 }
             }
@@ -133,6 +182,7 @@ function queryInstalledImages() {
 }
 
 function queryAllCapabilities() {
+    g_menuItems = [];
     for (var element of g_installedImages) {
         queryCapabilities(element);
     }
