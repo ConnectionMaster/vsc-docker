@@ -6,8 +6,8 @@ import * as cp from 'child_process';
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
-var g_installedImages:string[] = [];
-var g_availableImages:string[] = [];
+var g_installedImages = {};
+var g_availableImages = {};
 var g_menuItems = {};
 
 // this method is called when your extension is activated
@@ -40,13 +40,26 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
+
+                var items:string[] = [];
+
+                for (var item in g_availableImages) {
+                    items.push(item);
+                }
+
                 // XXX - remove installed images from available images
                 // XXX - check if any available images that are not installed
-                vscode.window.showQuickPick(g_availableImages).then( selected => {
+                vscode.window.showQuickPick(items).then( selected => {
                     installImage(selected);
                 });
             } else if (selected == "Remove Image") {
-                vscode.window.showQuickPick(g_installedImages).then( selected => {
+                var items:string[] = [];
+
+                for (var item in g_installedImages) {
+                    items.push(item);
+                }
+
+                vscode.window.showQuickPick(items).then( selected => {
                     removeImage(selected);
                 });
             }
@@ -101,7 +114,7 @@ function installImage(id: string) {
         } else {
 
             vscode.window.showInformationMessage('Image installed successfully!');
-            g_installedImages = [];
+            g_installedImages = {};
 
             queryInstalledImages();
         }
@@ -122,7 +135,7 @@ function removeImage(id: string) {
         } else {
 
             vscode.window.showInformationMessage('Image removed successfully!');
-            g_installedImages = [];
+            g_installedImages = {};
 
             queryInstalledImages();
         }
@@ -134,20 +147,20 @@ function queryCompatibleImages() {
     const stdout = collectData(child.stdout, 'utf8');
     const stderr = collectData(child.stderr, 'utf8');
     child.on('error', err => {
-        g_installedImages = [];
+        g_installedImages = {};
     });
 
     child.on('close', code => {
         if (code) {
-            g_availableImages = [];
+            g_availableImages = {};
         } else {
 
-            g_availableImages = [];
+            g_availableImages = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
                 if (!element.startsWith("NAME")) {
                     var i: string = element.split(" ")[0]
-                    g_availableImages.push(i);                    
+                    g_availableImages[i] = true;                    
                 }
             }
         }
@@ -159,19 +172,21 @@ function queryInstalledImages() {
     const stdout = collectData(child.stdout, 'utf8');
     const stderr = collectData(child.stderr, 'utf8');
     child.on('error', err => {
-        g_installedImages = [];
+        g_installedImages = {};
     });
 
     child.on('close', code => {
         if (code) {
-            g_installedImages = [];
+            g_installedImages = {};
         } else {
 
-            g_installedImages = [];
+            g_installedImages = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
                 if (element.indexOf("xvsc") >= 0) {
-                    g_installedImages.push(element.split(" ")[0]);                    
+                    var i: string = element.split(" ")[0];
+
+                    g_installedImages[i] = true;                    
                 }
             }
 
@@ -182,18 +197,18 @@ function queryInstalledImages() {
 }
 
 function queryAllCapabilities() {
-    g_menuItems = [];
-    for (var element of g_installedImages) {
+    g_menuItems = {};
+    for (var element in g_installedImages) {
         queryCapabilities(element);
     }
 }
 
 function queryCapabilities(image: string) {
-    const child = cp.spawn('docker', ['run', image]);
+    const child = cp.spawn('docker', ['run', image, 'capabilities']);
     const stdout = collectData(child.stdout, 'utf8');
     const stderr = collectData(child.stderr, 'utf8');
     child.on('error', err => {
-        g_installedImages = [];
+        g_installedImages = {};
     });
 
     child.on('close', code => {
