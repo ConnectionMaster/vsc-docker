@@ -74,6 +74,15 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     });
                 }
+            } else if (g_menuItems[selected][1].startsWith("http")) {
+                var name: string = g_menuItems[selected][0];
+                var url: string =  g_menuItems[selected][1];
+
+                startContainer(name);
+
+                setTimeout(function() {
+                    vscode.commands.executeCommand('vscode.previewHtml', url);    
+                }, 1000);
             }
         })
     });
@@ -97,6 +106,24 @@ export function activate(context: vscode.ExtensionContext) {
     item.text = "Docker for IoT";
     item.command = "extension.openMainMenu";
     item.show();
+
+
+    var BrowserContentProvider = (function () {
+        function BrowserContentProvider() {
+        }
+        BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
+            // TODO: detect failure to load page (e.g. google.com) and display error to user.
+            return "<iframe src=\"" + uri + "\" frameBorder=\"0\" style=\"width: 100%; height: 100%\" />";
+        };
+        return BrowserContentProvider;
+    }());
+
+    var provider = new BrowserContentProvider();
+    // Handle http:// and https://.
+    var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
+    var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
+
+
 
 }
 
@@ -259,7 +286,7 @@ function queryCapabilities(image: string) {
             try {
                 var capabilities = JSON.parse(stdout.join(''));
                 for (var element in capabilities) {
-                    g_menuItems[element] = capabilities[element]
+                    g_menuItems[element] = [image, capabilities[element]];
                 }
             } catch (e) {}
         }
@@ -273,4 +300,18 @@ function collectData(stream: Readable, encoding: string): string[] {
         data.push(decoder.write(buffer));
     });
     return data;
+}
+
+function startContainer(name: string) {
+    const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", name, 'http']);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+    });
+
+    child.on('close', code => {
+        if (code) {
+        } else {
+        }
+    });
 }
