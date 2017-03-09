@@ -44,14 +44,20 @@ export function activate(context: vscode.ExtensionContext) {
                 var items:string[] = [];
 
                 for (var item in g_availableImages) {
-                    items.push(item);
+                    if (!g_installedImages[item]) {
+                        items.push(item);
+                    }
                 }
 
-                // XXX - remove installed images from available images
-                // XXX - check if any available images that are not installed
-                vscode.window.showQuickPick(items).then( selected => {
-                    installImage(selected);
-                });
+                if (items.length == 0) {
+                    vscode.window.showInformationMessage('Not found!');
+                } else {
+                    vscode.window.showQuickPick(items).then( selected => {
+                        if (selected) {
+                            installImage(selected);
+                        }
+                    });
+                }
             } else if (selected == "Remove Image") {
                 var items:string[] = [];
 
@@ -59,9 +65,15 @@ export function activate(context: vscode.ExtensionContext) {
                     items.push(item);
                 }
 
-                vscode.window.showQuickPick(items).then( selected => {
-                    removeImage(selected);
-                });
+                if (items.length == 0) {
+                    vscode.window.showInformationMessage('Not found!');
+                } else {
+                    vscode.window.showQuickPick(items).then( selected => {
+                        if (selected) {
+                            removeImage(selected);
+                        }
+                    });
+                }
             }
         })
     });
@@ -158,7 +170,7 @@ function queryCompatibleImages() {
             g_availableImages = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
-                if (!element.startsWith("NAME")) {
+                if (!element.startsWith("NAME") && element.length != 0) {
                     var i: string = element.split(" ")[0]
                     g_availableImages[i] = true;                    
                 }
@@ -168,6 +180,10 @@ function queryCompatibleImages() {
 }
 
 function queryInstalledImages() {
+
+    // synchronisation should be handled in a better way
+    removeStoppedContainers();
+
     const child = cp.spawn('docker', ['images']);
     const stdout = collectData(child.stdout, 'utf8');
     const stderr = collectData(child.stderr, 'utf8');
@@ -183,10 +199,36 @@ function queryInstalledImages() {
             g_installedImages = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
-                if (element.indexOf("xvsc") >= 0) {
+                if ((element.indexOf("xvsc") >= 0) && (element.indexOf(" latest ") >= 0)) {
                     var i: string = element.split(" ")[0];
 
                     g_installedImages[i] = true;                    
+                }
+            }
+
+            // query all capabilities for installed docker images
+            queryAllCapabilities();
+        }
+    });
+}
+
+function removeStoppedContainers() {
+    const child = cp.spawn('docker', ['ps', '-a']);
+    const stdout = collectData(child.stdout, 'utf8');
+    const stderr = collectData(child.stderr, 'utf8');
+    child.on('error', err => {
+    });
+
+    child.on('close', code => {
+        if (code) {
+        } else {
+            var lines: string[] = stdout.join('').split(/\r?\n/);
+            for (var element of lines) {
+                if (element.indexOf("Exited") >= 0) {
+                    var split: string[] = element.split(" ");
+                    var name = split[split.length - 1];
+
+                    const child = cp.spawn('docker', ['rm', name]);
                 }
             }
 
