@@ -97,8 +97,39 @@ export function activate(context: vscode.ExtensionContext) {
         })
     });
 
+    let disposable3 = vscode.commands.registerCommand('DockerExt.showQuickPick', (p) => {
+        vscode.window.showQuickPick(p.items).then( (selected) => {
+            if (selected)
+            {
+                var index: number = p.items.indexOf(selected);
+                var command: any[] = p.commands[index];
+                vscode.commands.executeCommand.apply(null, command) 
+            }
+        })
+    });
+
+    let disposable4 = vscode.commands.registerCommand('DockerExt.displayInput', (p) => {
+    });
+
+    let disposable6 = vscode.commands.registerCommand('DockerExt.showInformationMessage', (p) => {
+        vscode.window.showInformationMessage(p);
+    });
+
+    let disposable7 = vscode.commands.registerCommand('DockerExt.showErrorMessage', (p) => {
+        vscode.window.showErrorMessage(p.message);
+    });
+
+    let disposable8 = vscode.commands.registerCommand('DockerExt.displayHtml', (p) => {
+
+    });
+
     context.subscriptions.push(disposable1);
     context.subscriptions.push(disposable2);
+    context.subscriptions.push(disposable3);
+    context.subscriptions.push(disposable4);
+    context.subscriptions.push(disposable6);
+    context.subscriptions.push(disposable7);
+    context.subscriptions.push(disposable8);
 
     checkDockerInstall().then(installed => {
         if (installed) {
@@ -327,7 +358,7 @@ function collectData(stream: Readable, encoding: string): string[] {
             var tmp = decoded.substr(cmdIdx - 2);
             var params = JSON.parse(tmp);
             var cmd = params[0].split(':')[1];
-            params.shift();
+            params.shift(); 
 
             vscode.commands.executeCommand(cmd, params[0]);
         }
