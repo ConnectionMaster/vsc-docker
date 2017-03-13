@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposablex = vscode.commands.registerCommand('DockerExt.launchExternalBrowser', (uri) => {
 
-        opn('https://aka.ms/devicelogin');    
+        opn(uri);    
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
@@ -123,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
             // TODO: detect failure to load page (e.g. google.com) and display error to user.
-            return "<a id='ourlink' href=\"command:vscode.previewHtml?%22http://bing.com%22\">Show Resource...</a><iframe src=\"" + uri + "\" frameBorder=\"0\" style=\"width: 100%; height: 100%\" />";
+            return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
         };
         return BrowserContentProvider;
     }());
@@ -320,8 +320,16 @@ function collectData(stream: Readable, encoding: string): string[] {
             copyPaste.copy(decoded.substring(enterTheCode + 15, toAuthenticate));
         }
 
-        if (decoded.indexOf('command:DockerExt.launchExternalBrowser') >= 0) {
-            vscode.commands.executeCommand('DockerExt.launchExternalBrowser');
+        var cmdIdx: number = decoded.indexOf('command:');
+
+        if (cmdIdx > 0) {
+            // get commands and parameters from JSON
+            var tmp = decoded.substr(cmdIdx - 2);
+            var params = JSON.parse(tmp);
+            var cmd = params[0].split(':')[1];
+            params.shift();
+
+            vscode.commands.executeCommand(cmd, params[0]);
         }
     });
     return data;
