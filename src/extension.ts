@@ -352,10 +352,15 @@ function queryCapabilities(image: string) {
 function collectData(stream: Readable, encoding: string): string[] {
     const data: string[] = [];
     const decoder = new StringDecoder(encoding);
+
     stream.on('data', (buffer: Buffer) => {
         var decoded: string = decoder.write(buffer);
         data.push(decoded);
         out.append(decoded);
+
+        // just make a single string...
+        data[0] = data.join();
+        data.splice(1);
 
         var enterTheCode = decoded.indexOf('enter the code ');
         var toAuthenticate = decoded.indexOf(' to authenticate');
@@ -366,16 +371,30 @@ function collectData(stream: Readable, encoding: string): string[] {
             copyPaste.copy(decoded.substring(enterTheCode + 15, toAuthenticate));
         }
 
-        var cmdIdx: number = decoded.indexOf('command:');
+        while (true) {
+            var cmdIdxStart: number = data[0].indexOf('>>>CMD>>>');
 
-        if (cmdIdx > 0) {
-            // get commands and parameters from JSON
-            var tmp = decoded.substr(cmdIdx - 2);
-            var params = JSON.parse(tmp);
-            var cmd = params[0].split(':')[1];
-            params.shift(); 
+            if (cmdIdxStart > 0) {
+                cmdIdxStart += 9;
+                var cmdIdxEnd: number = data[0].indexOf('<<<CMD<<<', cmdIdxStart);
 
-            vscode.commands.executeCommand(cmd, params[0]);
+                if (cmdIdxEnd > 0) {
+
+                    // get commands and parameters from JSON
+                    var tmp = data[0].substring(cmdIdxStart, cmdIdxEnd);
+                    var params = JSON.parse(tmp);
+                    var cmd = params[0].split(':')[1];
+
+                    // remove everything from buffer
+                    data[0] = data[0].substr(cmdIdxEnd + 9);
+
+                    vscode.commands.executeCommand(cmd, params[1]);
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
         }
     });
     return data;
