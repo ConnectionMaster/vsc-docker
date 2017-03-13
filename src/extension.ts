@@ -382,19 +382,23 @@ function collectData(stream: Readable, encoding: string): string[] {
 }
 
 function startContainer(name: string) {
-    const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", "-i", name, 'http']);
-    g_containers[name] = child;
 
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
-    child.on('error', err => {
-    });
-
+    const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
     child.on('close', code => {
-        if (code) {
-        } else {
-        }
-    });
+        const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", "--name", name.split('/')[1], "-i", name, 'http']);
+        g_containers[name] = child;
 
-    vscode.commands.executeCommand("DockerExt.containerCommand", ["dockiot/xvsc-azure-iot", "MYCOMMAND"]);
+        const stdout = collectData(child.stdout, 'utf8');
+        const stderr = collectData(child.stderr, 'utf8');
+        child.on('error', err => {
+        });
+
+        child.on('close', code => {
+            if (code) {
+            } else {
+            }
+        });
+
+        vscode.commands.executeCommand("DockerExt.containerCommand", ["dockiot/xvsc-azure-iot", "MYCOMMAND"]);
+    })
 }
