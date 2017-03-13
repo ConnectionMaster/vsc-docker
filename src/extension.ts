@@ -11,6 +11,8 @@ var g_installedImages = {};
 var g_availableImages = {};
 var g_menuItems = {};
 
+var copyPaste = require('copy-paste');
+
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("Docker for IoT");
 
 // this method is called when your extension is activated
@@ -308,6 +310,15 @@ function collectData(stream: Readable, encoding: string): string[] {
         var decoded: string = decoder.write(buffer);
         data.push(decoded);
         out.append(decoded);
+
+        var enterTheCode = decoded.indexOf('enter the code ');
+        var toAuthenticate = decoded.indexOf(' to authenticate');
+
+        if (enterTheCode >= 0 && toAuthenticate >= 0) {
+            // copy token to clipboard
+
+            copyPaste.copy(decoded.substring(enterTheCode + 15, toAuthenticate));
+        }
 
         if (decoded.indexOf('command:DockerExt.launchExternalBrowser') >= 0) {
             vscode.commands.executeCommand('DockerExt.launchExternalBrowser');
