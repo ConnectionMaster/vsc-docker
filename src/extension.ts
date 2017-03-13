@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
+var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
@@ -26,6 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Display a message box to the user
         vscode.window.showInformationMessage('Docker for IoT is ready!');
+    });
+
+    let disposablex = vscode.commands.registerCommand('DockerExt.launchExternalBrowser', (uri) => {
+
+        vscode.window.showInformationMessage("LAUNCHING EXTERNAL BROWSER" + uri);
+
+        console.log("OPENIONG");
+        opn('https://bing.com');    
+        console.log("OPENED");
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
@@ -113,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
         BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
             // TODO: detect failure to load page (e.g. google.com) and display error to user.
-            return "<iframe src=\"" + uri + "\" frameBorder=\"0\" style=\"width: 100%; height: 100%\" />";
+            return "<a id='ourlink' href=\"command:vscode.previewHtml?%22http://bing.com%22\">Show Resource...</a><iframe src=\"" + uri + "\" frameBorder=\"0\" style=\"width: 100%; height: 100%\" />";
         };
         return BrowserContentProvider;
     }());
