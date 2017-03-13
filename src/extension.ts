@@ -11,6 +11,8 @@ var g_installedImages = {};
 var g_availableImages = {};
 var g_menuItems = {};
 
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("Docker for IoT");
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -133,8 +135,8 @@ export function activate(context: vscode.ExtensionContext) {
     var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
     var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
 
-
-
+    // show output channel
+    out.show();
 }
 
 // this method is called when your extension is deactivated
@@ -308,6 +310,7 @@ function collectData(stream: Readable, encoding: string): string[] {
     const decoder = new StringDecoder(encoding);
     stream.on('data', (buffer: Buffer) => {
         data.push(decoder.write(buffer));
+        out.append(decoder.write(buffer));
     });
     return data;
 }
