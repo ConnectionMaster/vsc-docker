@@ -33,11 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposablex = vscode.commands.registerCommand('DockerExt.launchExternalBrowser', (uri) => {
 
-        vscode.window.showInformationMessage("LAUNCHING EXTERNAL BROWSER" + uri);
-
-        console.log("OPENIONG");
-        opn('https://bing.com');    
-        console.log("OPENED");
+        opn('https://aka.ms/devicelogin');    
     });
 
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
@@ -309,8 +305,13 @@ function collectData(stream: Readable, encoding: string): string[] {
     const data: string[] = [];
     const decoder = new StringDecoder(encoding);
     stream.on('data', (buffer: Buffer) => {
-        data.push(decoder.write(buffer));
-        out.append(decoder.write(buffer));
+        var decoded: string = decoder.write(buffer);
+        data.push(decoded);
+        out.append(decoded);
+
+        if (decoded.indexOf('command:DockerExt.launchExternalBrowser') >= 0) {
+            vscode.commands.executeCommand('DockerExt.launchExternalBrowser');
+        }
     });
     return data;
 }
