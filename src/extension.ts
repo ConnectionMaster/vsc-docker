@@ -10,6 +10,8 @@ import { Readable } from "stream";
 var g_installedImages = {};
 var g_availableImages = {};
 var g_menuItems = {};
+var g_internalHtml = "";
+var g_containers = {};
 
 var copyPaste = require('copy-paste');
 
@@ -111,6 +113,11 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable4 = vscode.commands.registerCommand('DockerExt.displayInput', (p) => {
     });
 
+    let disposable5 = vscode.commands.registerCommand('DockerExt.previewHtml', (p) => {
+        g_internalHtml = p;
+        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
+    });
+
     let disposable6 = vscode.commands.registerCommand('DockerExt.showInformationMessage', (p) => {
         vscode.window.showInformationMessage(p);
     });
@@ -119,14 +126,18 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage(p.message);
     });
 
-    let disposable8 = vscode.commands.registerCommand('DockerExt.displayHtml', (p) => {
-
+    let disposable8 = vscode.commands.registerCommand('DockerExt.containerCommand', (p) => {
+        // p must be an array, first is docker name, second is parameter
+        var cmd = p[0];
+        var params = p[1] + '\r\n';
+        g_containers[p[0]].stdin.write(params);
     });
 
     context.subscriptions.push(disposable1);
     context.subscriptions.push(disposable2);
     context.subscriptions.push(disposable3);
     context.subscriptions.push(disposable4);
+    context.subscriptions.push(disposable5);
     context.subscriptions.push(disposable6);
     context.subscriptions.push(disposable7);
     context.subscriptions.push(disposable8);
@@ -154,7 +165,11 @@ export function activate(context: vscode.ExtensionContext) {
         }
         BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
             // TODO: detect failure to load page (e.g. google.com) and display error to user.
-            return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
+            if (uri != 'http://internal') {
+                return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
+            } else {
+                return g_internalHtml;
+            }
         };
         return BrowserContentProvider;
     }());
@@ -367,7 +382,9 @@ function collectData(stream: Readable, encoding: string): string[] {
 }
 
 function startContainer(name: string) {
-    const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", name, 'http']);
+    const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", "-i", name, 'http']);
+    g_containers[name] = child;
+
     const stdout = collectData(child.stdout, 'utf8');
     const stderr = collectData(child.stderr, 'utf8');
     child.on('error', err => {
@@ -378,4 +395,6 @@ function startContainer(name: string) {
         } else {
         }
     });
+
+    vscode.commands.executeCommand("DockerExt.containerCommand", ["dockiot/xvsc-azure-iot", "MYCOMMAND"]);
 }
