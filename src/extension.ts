@@ -24,22 +24,19 @@ export function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable1 = vscode.commands.registerCommand('extension.init', () => {
+    registerCommand(context, 'extension.init', () => {
         // The code you place here will be executed every time your command is executed
 
         // Display a message box to the user
         vscode.window.showInformationMessage('Docker for IoT is ready!');
     });
 
-    let disposablex = vscode.commands.registerCommand('DockerExt.launchExternalBrowser', (uri) => {
+    registerCommand(context, 'DockerExt.launchExternalBrowser', (uri) => {
 
         opn(uri);    
     });
 
-    let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
+    registerCommand(context, 'extension.openMainMenu', () => {
         var items:string[] = [];
 
         for (var item in g_installedImages) {
@@ -94,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
         })
     });
 
-    let disposable3 = vscode.commands.registerCommand('DockerExt.showQuickPick', (p) => {
+    registerCommand(context, 'DockerExt.showQuickPick', (p) => {
         vscode.window.showQuickPick(p.items).then( (selected) => {
             if (selected)
             {
@@ -106,7 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
         })
     });
 
-    let disposable4 = vscode.commands.registerCommand('DockerExt.displayInput', (p) => {
+    registerCommand(context, 'DockerExt.displayInput', (p) => {
         vscode.window.showInputBox({ prompt: p.label}).then( (text) => {
             var command: string = p.command[0];
             p.command.shift();
@@ -124,11 +121,11 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(p);
     });
 
-    let disposable7 = vscode.commands.registerCommand('DockerExt.showErrorMessage', (p) => {
+    registerCommand(context, 'DockerExt.showErrorMessage', (p) => {
         vscode.window.showErrorMessage(p);
     });
 
-    let disposable8 = vscode.commands.registerCommand('DockerExt.containerCommand', (p) => {
+    registerCommand(context, 'DockerExt.containerCommand', (p) => {
         // p must be an array, first is docker name, second is parameter
         var container = p[0];
         p.shift();
@@ -136,19 +133,9 @@ export function activate(context: vscode.ExtensionContext) {
         g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(p) + '\r\n<<<CMD<<<\r\n');
     });
 
-    let disposable9 = vscode.commands.registerCommand('DockerExt.copyToClipboard', (p) => {
+    registerCommand(context, 'DockerExt.copyToClipboard', (p) => {
         copyPaste.copy(p);
     });
-
-    context.subscriptions.push(disposable1);
-    context.subscriptions.push(disposable2);
-    context.subscriptions.push(disposable3);
-    context.subscriptions.push(disposable4);
-    context.subscriptions.push(disposable5);
-    context.subscriptions.push(disposable6);
-    context.subscriptions.push(disposable7);
-    context.subscriptions.push(disposable8);
-    context.subscriptions.push(disposable9);
 
     checkDockerInstall().then(installed => {
         if (installed) {
@@ -193,6 +180,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+}
+
+function registerCommand(context: vscode.ExtensionContext, name, func) {
+    let disposable = vscode.commands.registerCommand(name, func);
+    context.subscriptions.push(disposable);    
 }
 
 function checkDockerInstall(): Promise<boolean> {
