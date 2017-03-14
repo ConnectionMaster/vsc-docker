@@ -9,7 +9,6 @@ import { Readable } from "stream";
 
 var g_installedImages = {};
 var g_availableImages = {};
-var g_menuItems = {};
 var g_internalHtml = "";
 var g_containers = {};
 
@@ -286,9 +285,6 @@ function queryInstalledImages() {
                     g_installedImages[i] = true;                    
                 }
             }
-
-            // query all capabilities for installed docker images
-            queryAllCapabilities();
         }
     });
 }
@@ -312,38 +308,7 @@ function removeStoppedContainers() {
                     const child = cp.spawn('docker', ['rm', name]);
                 }
             }
-
-            // query all capabilities for installed docker images
-            queryAllCapabilities();
-        }
-    });
-}
-
-function queryAllCapabilities() {
-    g_menuItems = {};
-    for (var element in g_installedImages) {
-        queryCapabilities(element);
-    }
-}
-
-function queryCapabilities(image: string) {
-    const child = cp.spawn('docker', ['run', image, 'capabilities']);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
-    child.on('error', err => {
-        g_installedImages = {};
-    });
-
-    child.on('close', code => {
-        if (code) {
-        } else {
-            try {
-                var capabilities = JSON.parse(stdout.join(''));
-                for (var element in capabilities) {
-                    g_menuItems[element] = [image, capabilities[element]];
-                }
-            } catch (e) {}
-        }
+       }
     });
 }
 
