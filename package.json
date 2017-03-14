@@ -18,7 +18,7 @@
     "commands": [
       {
         "command": "extension.init",
-        "title": "Initialize Docker for IoT"
+        "title": "DockerExt: Init"
       },
       {
         "command": "DockerExt.launchExternalBrowser",

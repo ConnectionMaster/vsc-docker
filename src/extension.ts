@@ -14,7 +14,7 @@ var g_containers = {};
 
 var copyPaste = require('copy-paste');
 
-var out: vscode.OutputChannel = vscode.window.createOutputChannel("Docker for IoT");
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerExt");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -25,14 +25,9 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
     registerCommand(context, 'extension.init', () => {
-        // The code you place here will be executed every time your command is executed
-
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Docker for IoT is ready!');
     });
 
     registerCommand(context, 'DockerExt.launchExternalBrowser', (uri) => {
-
         opn(uri);    
     });
 
@@ -150,7 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "Docker for IoT";
+    item.text = "DockerExt";
     item.command = "extension.openMainMenu";
     item.show();
 
