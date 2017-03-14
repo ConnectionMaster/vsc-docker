@@ -374,7 +374,7 @@ function startContainer(name: string, cb) {
 
     const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
     child.on('close', code => {
-        const child = cp.spawn('docker', ['run', "-p", "127.0.0.1:888:80", "--name", name.split('/')[1], "-i", name, 'http']);
+        const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", name, 'vscode']);
         g_containers[name] = child;
 
         const stdout = collectData(child.stdout, 'utf8');
