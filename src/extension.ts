@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
         var items:string[] = [];
 
         for (var item in g_installedImages) {
-            items.push(item);
+            items.push(g_availableImages[item] + ' [' +  item + ']')
         }
 
         items.push("Install Image");
@@ -43,12 +43,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
-
                 var items:string[] = [];
 
                 for (var item in g_availableImages) {
                     if (!g_installedImages[item]) {
-                        items.push(item);
+                        items.push(g_availableImages[item] + ' [' +  item + ']');
                     }
                 }
 
@@ -57,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
                 } else {
                     vscode.window.showQuickPick(items).then( selected => {
                         if (selected) {
-                            installImage(selected);
+                            installImage(selected.split('[')[1].split(']')[0]);
                         }
                     });
                 }
@@ -78,9 +77,9 @@ export function activate(context: vscode.ExtensionContext) {
                     });
                 }
             } else {
-
-                startContainer(selected, function() {
-                    vscode.commands.executeCommand("DockerExt.containerCommand", [selected, "menu"]);
+                var name: string = selected.split('[')[1].split(']')[0];
+                startContainer(name, function() {
+                    vscode.commands.executeCommand("DockerExt.containerCommand", [name, "menu"]);
                 });
             }
         })
@@ -247,10 +246,18 @@ function queryCompatibleImages() {
 
             g_availableImages = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
+            var descriptionPos = 0;
+            var starsPos = 0;
             for (var element of lines) {
-                if (!element.startsWith("NAME") && element.length != 0) {
-                    var i: string = element.split(" ")[0]
-                    g_availableImages[i] = true;                    
+                if (element.startsWith("NAME")) {
+                    descriptionPos = element.indexOf("DESCRIPTION");
+                    starsPos = element.indexOf("STARS");
+                }
+                else if (element.length != 0) {
+                    
+                    var name: string = element.substring(0, descriptionPos).trim();
+                    var description: string = element.substring(descriptionPos, starsPos).trim();
+                    g_availableImages[name] = description;                    
                 }
             }
         }
