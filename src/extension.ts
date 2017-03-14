@@ -112,12 +112,12 @@ export function activate(context: vscode.ExtensionContext) {
         })
     });
 
-    let disposable5 = vscode.commands.registerCommand('DockerExt.previewHtml', (p) => {
+    registerCommand(context, 'DockerExt.previewHtml', (p) => {
         g_internalHtml = p; 
         vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
     });
 
-    let disposable6 = vscode.commands.registerCommand('DockerExt.showInformationMessage', (p) => {
+    registerCommand(context, 'DockerExt.showInformationMessage', (p) => {
         vscode.window.showInformationMessage(p);
     });
 
