@@ -100,8 +100,9 @@ export function activate(context: vscode.ExtensionContext) {
             if (selected)
             {
                 var index: number = p.items.indexOf(selected);
-                var command: any[] = p.commands[index];
-                vscode.commands.executeCommand.apply(null, command) 
+                var command: string = p.commands[index][0];
+                p.commands[index].shift();
+                vscode.commands.executeCommand(command, p.commands[index]) 
             }
         })
     });
@@ -110,7 +111,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     let disposable5 = vscode.commands.registerCommand('DockerExt.previewHtml', (p) => {
-        g_internalHtml = p;
+        g_internalHtml = p; 
         vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
     });
 
