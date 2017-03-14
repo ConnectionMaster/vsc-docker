@@ -125,7 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     let disposable7 = vscode.commands.registerCommand('DockerExt.showErrorMessage', (p) => {
-        vscode.window.showErrorMessage(p.message);
+        vscode.window.showErrorMessage(p);
     });
 
     let disposable8 = vscode.commands.registerCommand('DockerExt.containerCommand', (p) => {
