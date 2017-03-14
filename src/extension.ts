@@ -107,6 +107,12 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     let disposable4 = vscode.commands.registerCommand('DockerExt.displayInput', (p) => {
+        vscode.window.showInputBox({ prompt: p.label}).then( (text) => {
+            var command: string = p.command[0];
+            p.command.shift();
+            p.command.push(text);
+            vscode.commands.executeCommand(command, p.command) 
+        })
     });
 
     let disposable5 = vscode.commands.registerCommand('DockerExt.previewHtml', (p) => {
