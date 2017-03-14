@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable2 = vscode.commands.registerCommand('extension.openMainMenu', () => {
         var items:string[] = [];
 
-        for (var item in g_menuItems) {
+        for (var item in g_installedImages) {
             items.push(item);
         }
 
@@ -86,15 +86,11 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     });
                 }
-            } else if (g_menuItems[selected][1].startsWith("http")) {
-                var name: string = g_menuItems[selected][0];
-                var url: string =  g_menuItems[selected][1];
+            } else {
 
-                startContainer(name);
-
-                setTimeout(function() {
-                    vscode.commands.executeCommand('vscode.previewHtml', url);    
-                }, 1000);
+                startContainer(selected, function() {
+                    vscode.commands.executeCommand("DockerExt.containerCommand", [selected, "menu"]);
+                });
             }
         })
     });
@@ -128,9 +124,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposable8 = vscode.commands.registerCommand('DockerExt.containerCommand', (p) => {
         // p must be an array, first is docker name, second is parameter
-        var cmd = p[0];
-        var params = p[1] + '\r\n';
-        g_containers[p[0]].stdin.write(params);
+        var container = p[0];
+        p.shift();
+        p[0] = 'command:' + p[0];
+        g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(p) + '\r\n<<<CMD<<<\r\n');
     });
 
     context.subscriptions.push(disposable1);
@@ -400,7 +397,12 @@ function collectData(stream: Readable, encoding: string): string[] {
     return data;
 }
 
-function startContainer(name: string) {
+function startContainer(name: string, cb) {
+
+    if (g_containers.hasOwnProperty(name)) {
+        cb();
+        return;
+    }
 
     const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
     child.on('close', code => {
@@ -418,6 +420,6 @@ function startContainer(name: string) {
             }
         });
 
-        vscode.commands.executeCommand("DockerExt.containerCommand", ["dockiot/xvsc-azure-iot", "MYCOMMAND"]);
+        cb();
     })
 }
