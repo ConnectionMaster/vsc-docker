@@ -130,6 +130,10 @@ export function activate(context: vscode.ExtensionContext) {
         g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(p) + '\r\n<<<CMD<<<\r\n');
     });
 
+    let disposable9 = vscode.commands.registerCommand('DockerExt.copyToClipboard', (p) => {
+        copyPaste.copy(p);
+    });
+
     context.subscriptions.push(disposable1);
     context.subscriptions.push(disposable2);
     context.subscriptions.push(disposable3);
@@ -138,6 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable6);
     context.subscriptions.push(disposable7);
     context.subscriptions.push(disposable8);
+    context.subscriptions.push(disposable9);
 
     checkDockerInstall().then(installed => {
         if (installed) {
@@ -324,15 +329,6 @@ function collectData(stream: Readable, encoding: string): string[] {
         // just make a single string...
         data[0] = data.join();
         data.splice(1);
-
-        var enterTheCode = decoded.indexOf('enter the code ');
-        var toAuthenticate = decoded.indexOf(' to authenticate');
-
-        if (enterTheCode >= 0 && toAuthenticate >= 0) {
-            // copy token to clipboard
-
-            copyPaste.copy(decoded.substring(enterTheCode + 15, toAuthenticate));
-        }
 
         while (true) {
             var cmdIdxStart: number = data[0].indexOf('>>>CMD>>>');
