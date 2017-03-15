@@ -388,20 +388,36 @@ function startContainer(name: string, cb) {
 
     const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
     child.on('close', code => {
-        const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", name, 'vscode']);
-        g_containers[name] = child;
 
-        const stdout = collectData(child.stdout, 'utf8');
-        const stderr = collectData(child.stderr, 'utf8');
-        child.on('error', err => {
-        });
+        const child = cp.spawn('docker', ['run', name, 'config']);
+        const config = collectData(child.stdout, 'utf8');
 
         child.on('close', code => {
-            if (code) {
-            } else {
-            }
-        });
+            var src = '/src';
 
-        cb();
+            // check if we are mapping something here
+            var cfg = JSON.parse(config.join());
+            
+            if (cfg.hasOwnProperty('src')) {
+                src = cfg['src'];
+            }
+
+            // XXX - must get current local directory
+            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', 'c:\\dev\\sample:' + src, name, 'vscode']);
+            g_containers[name] = child;
+
+            const stdout = collectData(child.stdout, 'utf8');
+            const stderr = collectData(child.stderr, 'utf8');
+            child.on('error', err => {
+            });
+
+            child.on('close', code => {
+                if (code) {
+                } else {
+                }
+            });
+
+            cb();
+        })
     })
 }
