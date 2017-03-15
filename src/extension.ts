@@ -11,6 +11,7 @@ var g_installedImages = {};
 var g_availableImages = {};
 var g_internalHtml = "";
 var g_containers = {};
+var g_StatusBarItems = {};
 
 var copyPaste = require('copy-paste');
 
@@ -131,6 +132,26 @@ export function activate(context: vscode.ExtensionContext) {
         copyPaste.copy(p);
     });
 
+    registerCommand(context, 'DockerExt.updateStatusBar', (p) => {
+
+        var name: string = p.name;
+        var command: string = p.command;
+
+        if (!g_StatusBarItems.hasOwnProperty('name')) {
+            g_StatusBarItems['name'] = vscode.window.createStatusBarItem();
+            g_StatusBarItems['name'].show();
+        }
+
+        if (p.hasOwnProperty('text')) {
+            g_StatusBarItems['name'].text = p.text;
+        }
+
+        if (p.hasOwnProperty('command')) {
+            g_StatusBarItems['name'].command = p.command;
+        }
+    });
+    
+
     checkDockerInstall().then(installed => {
         if (installed) {
             queryInstalledImages();
@@ -147,7 +168,6 @@ export function activate(context: vscode.ExtensionContext) {
     item.text = "DockerExt";
     item.command = "extension.openMainMenu";
     item.show();
-
 
     var BrowserContentProvider = (function () {
         function BrowserContentProvider() {
