@@ -326,7 +326,7 @@ function removeStoppedContainers() {
         } else {
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
-                if (element.indexOf("Exited") >= 0) {
+                if ((element.indexOf("Exited") >= 0) || (element.indexOf("Created") >= 0)) {
                     var split: string[] = element.split(" ");
                     var name = split[split.length - 1];
 
