@@ -359,15 +359,20 @@ function collectData(stream: Readable, encoding: string): string[] {
 
                 if (cmdIdxEnd > 0) {
 
-                    // get commands and parameters from JSON
-                    var tmp = data[0].substring(cmdIdxStart, cmdIdxEnd);
-                    var params = JSON.parse(tmp);
-                    var cmd = params[0].split(':')[1];
+                    try {
 
+                        // get commands and parameters from JSON
+                        var tmp = data[0].substring(cmdIdxStart, cmdIdxEnd);
+                        var params = JSON.parse(tmp);
+                        var cmd = params[0].split(':')[1];
+                        vscode.commands.executeCommand(cmd, params[1]);
+                    } catch (e) {
+                        console.log("Parsing JSON failed:");
+                        console.log(data[0].substring(cmdIdxStart, cmdIdxEnd));
+                    }
+                        
                     // remove everything from buffer
                     data[0] = data[0].substr(cmdIdxEnd + 9);
-
-                    vscode.commands.executeCommand(cmd, params[1]);
                 } else {
                     break;
                 }
