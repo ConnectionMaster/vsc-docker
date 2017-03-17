@@ -28,10 +28,6 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.init', () => {
     });
 
-    registerCommand(context, 'DockerExt.launchExternalBrowser', (uri) => {
-        opn(uri);    
-    });
-
     registerCommand(context, 'extension.openMainMenu', () => {
         var items:string[] = [];
 
@@ -80,77 +76,11 @@ export function activate(context: vscode.ExtensionContext) {
             } else {
                 var name: string = selected.split('[')[1].split(']')[0];
                 startContainer(name, function() {
-                    vscode.commands.executeCommand("DockerExt.containerCommand", [name, "menu"]);
+                    executeCommand(JSON.stringify([ 'docker:menu' ]), name);
                 });
             }
         })
     });
-
-    registerCommand(context, 'DockerExt.showQuickPick', (p) => {
-        vscode.window.showQuickPick(p.items).then( (selected) => {
-            if (selected)
-            {
-                var index: number = p.items.indexOf(selected);
-                var command: string = p.commands[index][0];
-                p.commands[index].shift();
-                vscode.commands.executeCommand(command, p.commands[index]) 
-            }
-        })
-    });
-
-    registerCommand(context, 'DockerExt.displayInput', (p) => {
-        vscode.window.showInputBox({ prompt: p.label}).then( (text) => {
-            var command: string = p.command[0];
-            p.command.shift();
-            p.command.push(text);
-            vscode.commands.executeCommand(command, p.command) 
-        })
-    });
-
-    registerCommand(context, 'DockerExt.previewHtml', (p) => {
-        g_internalHtml = p; 
-        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
-    });
-
-    registerCommand(context, 'DockerExt.showInformationMessage', (p) => {
-        vscode.window.showInformationMessage(p);
-    });
-
-    registerCommand(context, 'DockerExt.showErrorMessage', (p) => {
-        vscode.window.showErrorMessage(p);
-    });
-
-    registerCommand(context, 'DockerExt.containerCommand', (p) => {
-        // p must be an array, first is docker name, second is parameter
-        var container = p[0];
-        p.shift();
-        p[0] = 'command:' + p[0];
-        g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(p) + '\r\n<<<CMD<<<\r\n');
-    });
-
-    registerCommand(context, 'DockerExt.copyToClipboard', (p) => {
-        copyPaste.copy(p);
-    });
-
-    registerCommand(context, 'DockerExt.updateStatusBar', (p) => {
-
-        var name: string = p.name;
-        var command: string = p.command;
-
-        if (!g_StatusBarItems.hasOwnProperty('name')) {
-            g_StatusBarItems['name'] = vscode.window.createStatusBarItem();
-            g_StatusBarItems['name'].show();
-        }
-
-        if (p.hasOwnProperty('text')) {
-            g_StatusBarItems['name'].text = p.text;
-        }
-
-        if (p.hasOwnProperty('command')) {
-            g_StatusBarItems['name'].command = p.command;
-        }
-    });
-    
 
     checkDockerInstall().then(installed => {
         if (installed) {
@@ -211,8 +141,8 @@ function checkDockerInstall(): Promise<boolean> {
 
 function installImage(id: string) {
     const child = cp.spawn('docker', ['pull', id]);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
+    const stdout = collectData(child.stdout, 'utf8', '');
+    const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
         vscode.window.showErrorMessage('Failed to install image!');
     });
@@ -232,8 +162,8 @@ function installImage(id: string) {
 
 function removeImage(id: string) {
     const child = cp.spawn('docker', ['rmi', '-f', id]);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
+    const stdout = collectData(child.stdout, 'utf8', '');
+    const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
         vscode.window.showErrorMessage('Failed to remove image!');
     });
@@ -253,8 +183,8 @@ function removeImage(id: string) {
 
 function queryCompatibleImages() {
     const child = cp.spawn('docker', ['search', 'xvsc']);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
+    const stdout = collectData(child.stdout, 'utf8', '');
+    const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
         g_installedImages = {};
     });
@@ -290,8 +220,8 @@ function queryInstalledImages() {
     removeStoppedContainers();
 
     const child = cp.spawn('docker', ['images']);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
+    const stdout = collectData(child.stdout, 'utf8', '');
+    const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
         g_installedImages = {};
     });
@@ -316,8 +246,8 @@ function queryInstalledImages() {
 
 function removeStoppedContainers() {
     const child = cp.spawn('docker', ['ps', '-a']);
-    const stdout = collectData(child.stdout, 'utf8');
-    const stderr = collectData(child.stderr, 'utf8');
+    const stdout = collectData(child.stdout, 'utf8', '');
+    const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
     });
 
@@ -337,7 +267,7 @@ function removeStoppedContainers() {
     });
 }
 
-function collectData(stream: Readable, encoding: string): string[] {
+function collectData(stream: Readable, encoding: string, container: string): string[] {
     const data: string[] = [];
     const decoder = new StringDecoder(encoding);
 
@@ -359,19 +289,7 @@ function collectData(stream: Readable, encoding: string): string[] {
 
                 if (cmdIdxEnd > 0) {
 
-                    try {
-
-                        // get commands and parameters from JSON
-                        var tmp = data[0].substring(cmdIdxStart, cmdIdxEnd);
-                        var params = JSON.parse(tmp);
-                        var cmd = params[0].split(':')[1];
-                        vscode.commands.executeCommand(cmd, params[1]);
-                    } catch (e) {
-                        console.log("Parsing JSON failed:");
-                        console.log(data[0].substring(cmdIdxStart, cmdIdxEnd));
-                    }
-                        
-                    // remove everything from buffer
+                    executeCommand(data[0].substring(cmdIdxStart, cmdIdxEnd), container);
                     data[0] = data[0].substr(cmdIdxEnd + 9);
                 } else {
                     break;
@@ -384,6 +302,78 @@ function collectData(stream: Readable, encoding: string): string[] {
     return data;
 }
 
+function executeCommand(json: string, container: string) {
+    try {
+        var params = JSON.parse(json);
+        var cmd = params[0];
+        var cmdPrefix: string = cmd.split(':')[0];
+        var cmdPostfix: string = cmd.split(':')[1];
+
+        if (cmdPrefix == 'ide') {
+            params.splice(0, 1);
+            switch (cmdPostfix) {
+                case 'info':
+                    vscode.window.showInformationMessage(params[0]);
+                    break;
+                case 'error':
+                    vscode.window.showErrorMessage(params[0]);
+                    break;
+                case 'input':
+                    vscode.window.showInputBox({ prompt: params[0].label}).then( (text) => {
+                        var command: string = params[0];
+                        vscode.commands.executeCommand(command, container) 
+                    })
+                    break;
+                case 'menu':
+                    vscode.window.showQuickPick(params[0].items).then( (selected) => {
+                        if (selected)
+                        {
+                            var index: number = params[0].items.indexOf(selected);
+                            executeCommand(JSON.stringify(params[0].commands[index]), container) 
+                        }
+                    })
+                    break;
+                case 'clipboard':
+                    copyPaste.copy(params[0]);
+                    break;
+                case 'openurl':
+                    opn(params[0]);    
+                    break;
+                case 'html':
+                    g_internalHtml = params[0]; 
+                    vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
+                    break;
+                case 'status':
+                    var name: string = params[0].name;
+                    var command: string = params[0].command;
+
+                    if (!g_StatusBarItems.hasOwnProperty('name')) {
+                        g_StatusBarItems['name'] = vscode.window.createStatusBarItem();
+                        g_StatusBarItems['name'].show();
+                    }
+
+                    if (params[0].hasOwnProperty('text')) {
+                        g_StatusBarItems['name'].text = params[0].text;
+                    }
+
+                    if (params[0].hasOwnProperty('command')) {
+                        g_StatusBarItems['name'].command = params[0].command;
+                    }
+                    break;
+            }
+        } else if (cmdPrefix == 'docker') {
+            g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(params) + '\r\n<<<CMD<<<\r\n');
+        }
+
+        vscode.commands.executeCommand(cmd, params);
+    } catch (e) {
+        console.log("Parsing JSON failed:");
+        console.log(json);
+    }
+}
+
+
+
 function startContainer(name: string, cb) {
 
     if (g_containers.hasOwnProperty(name)) {
@@ -395,7 +385,7 @@ function startContainer(name: string, cb) {
     child.on('close', code => {
 
         const child = cp.spawn('docker', ['run', name, 'config']);
-        const config = collectData(child.stdout, 'utf8');
+        const config = collectData(child.stdout, 'utf8', '');
 
         child.on('close', code => {
             var src = '/src';
@@ -415,8 +405,8 @@ function startContainer(name: string, cb) {
             const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', vscode.workspace.rootPath + ':' + src, name, 'vscode']);
             g_containers[name] = child;
 
-            const stdout = collectData(child.stdout, 'utf8');
-            const stderr = collectData(child.stderr, 'utf8');
+            const stdout = collectData(child.stdout, 'utf8', name);
+            const stderr = collectData(child.stderr, 'utf8', name);
             child.on('error', err => {
             });
 
