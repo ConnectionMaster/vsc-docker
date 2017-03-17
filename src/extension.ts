@@ -401,14 +401,18 @@ function startContainer(name: string, cb) {
             var src = '/src';
 
             // check if we are mapping something here
-            var cfg = JSON.parse(config.join());
-            
-            if (cfg.hasOwnProperty('src')) {
-                src = cfg['src'];
-            }
+
+            try {
+                var cfg = JSON.parse(config.join());
+                
+                if (cfg.hasOwnProperty('src')) {
+                    src = cfg['src'];
+                }
+                
+            } catch (e) {}
 
             // XXX - must get current local directory
-            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', 'c:\\dev\\sample:' + src, name, 'vscode']);
+            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', vscode.workspace.rootPath + ':' + src, name, 'vscode']);
             g_containers[name] = child;
 
             const stdout = collectData(child.stdout, 'utf8');
