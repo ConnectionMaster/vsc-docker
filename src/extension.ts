@@ -320,8 +320,9 @@ function executeCommand(json: string, container: string) {
                     break;
                 case 'input':
                     vscode.window.showInputBox({ prompt: params[0].label}).then( (text) => {
-                        var command: string = params[0];
-                        vscode.commands.executeCommand(command, container) 
+                        var command: any[] = params[0].command;
+                        command.push(text);
+                        executeCommand(JSON.stringify(command), container) 
                     })
                     break;
                 case 'menu':
