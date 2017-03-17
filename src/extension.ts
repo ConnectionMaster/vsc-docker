@@ -347,7 +347,7 @@ function collectData(stream: Readable, encoding: string): string[] {
         out.append(decoded);
 
         // just make a single string...
-        data[0] = data.join();
+        data[0] = data.join('');
         data.splice(1);
 
         while (true) {
