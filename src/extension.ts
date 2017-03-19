@@ -40,23 +40,29 @@ export function activate(context: vscode.ExtensionContext) {
 
         vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
-                var items:string[] = [];
 
-                for (var item in g_availableImages) {
-                    if (!g_installedImages[item]) {
-                        items.push(g_availableImages[item] + ' [' +  item + ']');
-                    }
-                }
+                vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
+                    var items:string[] = [];
 
-                if (items.length == 0) {
-                    vscode.window.showInformationMessage('Not found!');
-                } else {
-                    vscode.window.showQuickPick(items).then( selected => {
-                        if (selected) {
-                            installImage(selected.split('[')[1].split(']')[0]);
+                    searchImages(filter, function (images: any[]) {
+                        for (var item in images) {
+                            if (!images[item]) {
+                                items.push(images[item] + ' [' +  item + ']');
+                            }
                         }
-                    });
-                }
+
+                        if (items.length == 0) {
+                            vscode.window.showInformationMessage('Not found!');
+                        } else {
+                            vscode.window.showQuickPick(items).then( selected => {
+                                if (selected) {
+                                    installImage(selected.split('[')[1].split(']')[0]);
+                                }
+                            });
+                        }
+                    })
+                } )
+
             } else if (selected == "Remove Image") {
                 var items:string[] = [];
 
@@ -85,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
     checkDockerInstall().then(installed => {
         if (installed) {
             queryInstalledImages();
-            queryCompatibleImages();
+            //queryCompatibleImages();
         } else {
             vscode.window.showInformationMessage('Docker is not installed!!');
         }
@@ -181,20 +187,23 @@ function removeImage(id: string) {
     });
 }
 
-function queryCompatibleImages() {
-    const child = cp.spawn('docker', ['search', 'xvsc']);
+function searchImages(filter: string, cb) {
+    var available = {};
+    const child = cp.spawn('docker', ['search', filter]);
     const stdout = collectData(child.stdout, 'utf8', '');
     const stderr = collectData(child.stderr, 'utf8', '');
+    
     child.on('error', err => {
-        g_installedImages = {};
+        available = {};
     });
 
     child.on('close', code => {
         if (code) {
-            g_availableImages = {};
+            available = {};
+            cb(available);
         } else {
 
-            g_availableImages = {};
+            available = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             var descriptionPos = 0;
             var starsPos = 0;
@@ -207,9 +216,11 @@ function queryCompatibleImages() {
                     
                     var name: string = element.substring(0, descriptionPos).trim();
                     var description: string = element.substring(descriptionPos, starsPos).trim();
-                    g_availableImages[name] = description;                    
+                    available[name] = description;                    
                 }
             }
+
+            cb(available);
         }
     });
 }
