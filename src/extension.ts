@@ -335,7 +335,7 @@ function executeCommand(json: any, container: string) {
                     vscode.window.showErrorMessage(params[0]);
                     break;
                 case 'input':
-                    vscode.window.showInputBox({ prompt: params[0].label}).then( (text) => {
+                    vscode.window.showInputBox({ prompt: params[0].label, value: params[0].default}).then( (text) => {
                         var command: any[] = params[0].command;
                         command.push(text);
                         executeCommand(command, container) 
