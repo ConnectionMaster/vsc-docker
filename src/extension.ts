@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
         var items:string[] = [];
  
         for (var item in g_installedImages) {
-            items.push(g_availableImages[item] + ' [' +  item + ']')
+            items.push(g_installedImages[item].description + ' [' +  item + ']')
         }
 
         items.push("Install Image");
@@ -61,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
                         } else {
                             vscode.window.showQuickPick(items).then( selected => {
                                 if (selected) {
-                                    installImage(selected.split('[')[1].split(']')[0]);
+                                    installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
                                 }
                             });
                         }
@@ -150,7 +150,7 @@ function checkDockerInstall(): Promise<boolean> {
     });
 }
 
-function installImage(id: string) {
+function installImage(id: string, description: string) {
     const child = cp.spawn('docker', ['pull', id]);
     const stdout = collectData(child.stdout, 'utf8', '');
     const stderr = collectData(child.stderr, 'utf8', '');
@@ -164,8 +164,7 @@ function installImage(id: string) {
         } else {
 
             vscode.window.showInformationMessage('Image installed successfully!');
-            // XXX - should be name and other stuff
-            g_installedImages[id] = true;
+            g_installedImages[id] = { description: description };
             saveInstalledImages();
         }
     });
