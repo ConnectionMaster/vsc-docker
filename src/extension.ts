@@ -61,6 +61,9 @@ export function activate(context: vscode.ExtensionContext) {
                         } else {
                             vscode.window.showQuickPick(items).then( selected => {
                                 if (selected) {
+                                    g_installedImages[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
+                                    saveInstalledImages();
+
                                     installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
                                 }
                             });
@@ -164,8 +167,6 @@ function installImage(id: string, description: string) {
         } else {
 
             vscode.window.showInformationMessage('Image installed successfully!');
-            g_installedImages[id] = { description: description };
-            saveInstalledImages();
         }
     });
 }
