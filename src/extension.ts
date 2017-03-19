@@ -7,11 +7,16 @@ var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
+var fs = require('fs');
+var path = require('path');
+
+
 var g_installedImages = {};
 var g_availableImages = {};
 var g_internalHtml = "";
 var g_containers = {};
 var g_StatusBarItems = {};
+var g_StoragePath = '';
 
 var copyPaste = require('copy-paste');
 
@@ -21,8 +26,10 @@ var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerRunner"
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
+    g_StoragePath = context.storagePath;
+
+    loadInstalledImages();
+
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
     registerCommand(context, 'extension.init', () => {
@@ -46,9 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                     searchImages(filter, function (images: any[]) {
                         for (var item in images) {
-                            if (!images[item]) {
-                                items.push(images[item] + ' [' +  item + ']');
-                            }
+                            items.push(images[item] + ' [' +  item + ']');
                         }
 
                         if (items.length == 0) {
@@ -90,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     checkDockerInstall().then(installed => {
         if (installed) {
-            queryInstalledImages();
+            //queryInstalledImages();
             //queryCompatibleImages();
         } else {
             vscode.window.showInformationMessage('Docker is not installed!!');
@@ -159,9 +164,9 @@ function installImage(id: string) {
         } else {
 
             vscode.window.showInformationMessage('Image installed successfully!');
-            g_installedImages = {};
-
-            queryInstalledImages();
+            // XXX - should be name and other stuff
+            g_installedImages[id] = true;
+            saveInstalledImages();
         }
     });
 }
@@ -180,9 +185,9 @@ function removeImage(id: string) {
         } else {
 
             vscode.window.showInformationMessage('Image removed successfully!');
-            g_installedImages = {};
 
-            queryInstalledImages();
+            delete g_installedImages['id'];
+            saveInstalledImages();
         }
     });
 }
@@ -430,5 +435,38 @@ function startContainer(name: string, cb) {
 
             cb();
         })
+    })
+}
+
+ 
+fs.mkdirParent = function(dirPath, mode, callback) {
+  //Call the standard fs.mkdir
+  fs.mkdir(dirPath, mode, function(error) {
+    //When it fail in this way, do the custom steps
+    if (error && error.errno === 34) {
+      //Create all the parents recursively
+      fs.mkdirParent(path.dirname(dirPath), mode, callback);
+      //And then the directory
+      fs.mkdirParent(dirPath, mode, callback);
+    }
+    //Manually run the callback since we used our own callback to do all these
+    callback && callback(error);
+  });
+};
+
+function loadInstalledImages() {
+
+    console.log("------------ LOADING FROM: " + g_StoragePath + '/config.json');
+    try {
+        g_installedImages = JSON.parse(fs.readFileSync(g_StoragePath + '/config.json'));
+    } catch (e) {
+        console.log('--- FAILED ---');
+        g_installedImages = {};
+    }
+}
+
+function saveInstalledImages() {
+    fs.mkdirParent(g_StoragePath, undefined, function () {
+        fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_installedImages));
     })
 }
