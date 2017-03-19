@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     registerCommand(context, 'extension.openMainMenu', () => {
         var items:string[] = [];
-
+ 
         for (var item in g_installedImages) {
             items.push(g_availableImages[item] + ' [' +  item + ']')
         }
@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
             } else {
                 var name: string = selected.split('[')[1].split(']')[0];
                 startContainer(name, function() {
-                    executeCommand(JSON.stringify([ 'docker:menu' ]), name);
+                    executeCommand([ 'docker:menu' ], name);
                 });
             }
         })
@@ -302,9 +302,9 @@ function collectData(stream: Readable, encoding: string, container: string): str
     return data;
 }
 
-function executeCommand(json: string, container: string) {
+function executeCommand(json: any, container: string) {
     try {
-        var params = JSON.parse(json);
+        var params = (typeof json == 'string') ? JSON.parse(json) : json;
         var cmd = params[0];
         var cmdPrefix: string = cmd.split(':')[0];
         var cmdPostfix: string = cmd.split(':')[1];
@@ -322,7 +322,7 @@ function executeCommand(json: string, container: string) {
                     vscode.window.showInputBox({ prompt: params[0].label}).then( (text) => {
                         var command: any[] = params[0].command;
                         command.push(text);
-                        executeCommand(JSON.stringify(command), container) 
+                        executeCommand(command, container) 
                     })
                     break;
                 case 'menu':
@@ -330,7 +330,7 @@ function executeCommand(json: string, container: string) {
                         if (selected)
                         {
                             var index: number = params[0].items.indexOf(selected);
-                            executeCommand(JSON.stringify(params[0].commands[index]), container) 
+                            executeCommand(params[0].commands[index], container) 
                         }
                     })
                     break;
