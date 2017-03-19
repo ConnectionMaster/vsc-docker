@@ -15,7 +15,7 @@ var g_StatusBarItems = {};
 
 var copyPaste = require('copy-paste');
 
-var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerExt");
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerRunner");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -95,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "DockerExt";
+    item.text = "Docker Runner";
     item.command = "extension.openMainMenu";
     item.show();
 

@@ -18,11 +18,7 @@
     "commands": [
       {
         "command": "extension.init",
-        "title": "DockerExt: Init"
-      },
-      {
-        "command": "DockerExt.launchExternalBrowser",
-        "title": "Launch External Browser"
+        "title": "DockerRunner: Init"
       }
     ]
   },
