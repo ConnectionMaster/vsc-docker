@@ -41,8 +41,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     checkDockerInstall().then(installed => {
         if (installed) {
-            //queryInstalledImages();
-            //queryCompatibleImages();
         } else {
             vscode.window.showInformationMessage('Docker is not installed!!');
         }
@@ -255,35 +253,6 @@ function searchImages(filter: string, cb) {
     });
 }
 
-function queryInstalledImages() {
-
-    // synchronisation should be handled in a better way
-    removeStoppedContainers();
-
-    const child = cp.spawn('docker', ['images']);
-    const stdout = collectData(child.stdout, 'utf8', '');
-    const stderr = collectData(child.stderr, 'utf8', '');
-    child.on('error', err => {
-        g_Config = {};
-    });
-
-    child.on('close', code => {
-        if (code) {
-            g_Config = {};
-        } else {
-
-            g_Config = {};
-            var lines: string[] = stdout.join('').split(/\r?\n/);
-            for (var element of lines) {
-                if ((element.indexOf("xvsc") >= 0) && (element.indexOf(" latest ") >= 0)) {
-                    var i: string = element.split(" ")[0];
-
-                    g_Config[i] = true;                    
-                }
-            }
-        }
-    });
-}
 
 function removeStoppedContainers() {
     const child = cp.spawn('docker', ['ps', '-a']);
