@@ -1,17 +1,21 @@
-'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
+import { Docker } from './docker';
+import { HtmlView } from './html';
+
+var docker: Docker = new Docker();
+var html: HtmlView = new HtmlView();
+
 var fs = require('fs');
 var path = require('path');
 
 
-var g_installedImages = {};
+var g_Config = {};
 var g_availableImages = {};
 var g_internalHtml = "";
 var g_containers = {};
@@ -84,8 +88,8 @@ export function deactivate() {
 function displayMainMenu() {
     var items:string[] = [];
 
-    for (var item in g_installedImages) {
-        items.push(g_installedImages[item].description + ' [' +  item + ']')
+    for (var item in g_Config) {
+        items.push(g_Config[item].description + ' [' +  item + ']')
     }
 
     items.push('Install Image');
@@ -108,7 +112,7 @@ function displayMainMenu() {
                     } else {
                         vscode.window.showQuickPick(items).then( selected => {
                             if (selected) {
-                                g_installedImages[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
+                                g_Config[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
                                 saveConfig();
 
                                 installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
@@ -121,7 +125,7 @@ function displayMainMenu() {
         } else if (selected == "Remove Image") {
             var items:string[] = [];
 
-            for (var item in g_installedImages) {
+            for (var item in g_Config) {
                 items.push(item);
             }
 
@@ -153,11 +157,17 @@ function displayMainMenu() {
 }
 
 function displayContainerMenu(container: string) {
-    // get items from config
+    var cc :any = g_Config[container];
 
-    // [run in terminal]
+    if (typeof cc == 'object') {
+        if (cc.hasOwnProperty('menu')) {
+            for (var item of cc.menu) {
 
-    // [add command]
+            }
+        } else {
+            // XXX - must create default menu here... 
+        }
+    }
 }
 
 function registerCommand(context: vscode.ExtensionContext, name, func) {
@@ -206,7 +216,7 @@ function removeImage(id: string) {
 
             vscode.window.showInformationMessage('Image removed successfully!');
 
-            delete g_installedImages['id'];
+            delete g_Config['id'];
             saveConfig();
         }
     });
@@ -259,21 +269,21 @@ function queryInstalledImages() {
     const stdout = collectData(child.stdout, 'utf8', '');
     const stderr = collectData(child.stderr, 'utf8', '');
     child.on('error', err => {
-        g_installedImages = {};
+        g_Config = {};
     });
 
     child.on('close', code => {
         if (code) {
-            g_installedImages = {};
+            g_Config = {};
         } else {
 
-            g_installedImages = {};
+            g_Config = {};
             var lines: string[] = stdout.join('').split(/\r?\n/);
             for (var element of lines) {
                 if ((element.indexOf("xvsc") >= 0) && (element.indexOf(" latest ") >= 0)) {
                     var i: string = element.split(" ")[0];
 
-                    g_installedImages[i] = true;                    
+                    g_Config[i] = true;                    
                 }
             }
         }
@@ -480,15 +490,15 @@ fs.mkdirParent = function(dirPath, mode, callback) {
 
 function loadConfig() {
     try {
-        g_installedImages = JSON.parse(fs.readFileSync(g_StoragePath + '/config.json'));
+        g_Config = JSON.parse(fs.readFileSync(g_StoragePath + '/config.json'));
     } catch (e) {
         console.log('--- FAILED ---');
-        g_installedImages = {};
+        g_Config = {};
     }
 }
 
 function saveConfig() {
     fs.mkdirParent(g_StoragePath, undefined, function () {
-        fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_installedImages, null, 2));
+        fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_Config, null, 2));
     })
 }
