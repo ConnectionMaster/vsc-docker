@@ -7,14 +7,16 @@ import * as cp from 'child_process';
 
 export class Docker {
 
-    constructor(rootPath: string, commandHandler) {
+    constructor(rootPath: string, commandHandler, outputHandler) {
         this.m_RootPath = rootPath;
         this.m_CommandHandler = commandHandler;
+        this.m_OutputHandler = outputHandler;
     }
 
     private g_containers = {};
     private m_RootPath: string = "";
     private m_CommandHandler = null;
+    private m_OutputHandler = null;
 
     public startContainer(name, cb) {
 
@@ -149,7 +151,7 @@ export class Docker {
         stream.on('data', (buffer: Buffer) => {
             var decoded: string = decoder.write(buffer);
             data.push(decoded);
-            //out.append(decoded);
+            this.m_OutputHandler(decoded);
 
             // just make a single string...
             data[0] = data.join('');

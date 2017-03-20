@@ -8,7 +8,7 @@ import { Readable } from "stream";
 import { Docker } from './docker';
 import { HtmlView } from './html';
 
-var docker: Docker = new Docker(vscode.workspace.rootPath, executeCommand);
+var docker: Docker = new Docker(vscode.workspace.rootPath, executeCommand, printOutput);
 var html: HtmlView = new HtmlView();
 
 var fs = require('fs');
@@ -341,6 +341,10 @@ function collectData(stream: Readable, encoding: string, container: string): str
         }
     });
     return data;
+}
+
+function printOutput(data: string) {
+    out.append(data);
 }
 
 function executeCommand(json: any, container: string) {
