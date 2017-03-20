@@ -33,69 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
     registerCommand(context, 'extension.openMainMenu', () => {
-        var items:string[] = [];
- 
-        for (var item in g_installedImages) {
-            items.push(g_installedImages[item].description + ' [' +  item + ']')
-        }
-
-        items.push('Install Image');
-        items.push('Remove Image');
-        items.push('Edit Configuration');
-
-        vscode.window.showQuickPick(items).then( selected => {
-            if (selected == "Install Image") {
-
-                vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
-                    var items:string[] = [];
-
-                    searchImages(filter, function (images: any[]) {
-                        for (var item in images) {
-                            items.push(images[item] + ' [' +  item + ']');
-                        }
-
-                        if (items.length == 0) {
-                            vscode.window.showInformationMessage('Not found!');
-                        } else {
-                            vscode.window.showQuickPick(items).then( selected => {
-                                if (selected) {
-                                    g_installedImages[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
-                                    saveInstalledImages();
-
-                                    installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
-                                }
-                            });
-                        }
-                    })
-                } )
-
-            } else if (selected == "Remove Image") {
-                var items:string[] = [];
-
-                for (var item in g_installedImages) {
-                    items.push(item);
-                }
-
-                if (items.length == 0) {
-                    vscode.window.showInformationMessage('Not found!');
-                } else {
-                    vscode.window.showQuickPick(items).then( selected => {
-                        if (selected) {
-                            removeImage(selected);
-                        }
-                    });
-                }
-            } else if (selected == 'Edit Configuration') {
-                vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
-                    vscode.window.showTextDocument(document);
-                });
-           } else {
-                var name: string = selected.split('[')[1].split(']')[0];
-                startContainer(name, function() {
-                    executeCommand([ 'docker:menu' ], name);
-                });
-            }
-        })
+        displayMainMenu();
     });
 
     checkDockerInstall().then(installed => {
@@ -140,6 +78,86 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+}
+
+
+function displayMainMenu() {
+    var items:string[] = [];
+
+    for (var item in g_installedImages) {
+        items.push(g_installedImages[item].description + ' [' +  item + ']')
+    }
+
+    items.push('Install Image');
+    items.push('Remove Image');
+    items.push('Edit Configuration');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == "Install Image") {
+
+            vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
+                var items:string[] = [];
+
+                searchImages(filter, function (images: any[]) {
+                    for (var item in images) {
+                        items.push(images[item] + ' [' +  item + ']');
+                    }
+
+                    if (items.length == 0) {
+                        vscode.window.showInformationMessage('Not found!');
+                    } else {
+                        vscode.window.showQuickPick(items).then( selected => {
+                            if (selected) {
+                                g_installedImages[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
+                                saveInstalledImages();
+
+                                installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
+                            }
+                        });
+                    }
+                })
+            } )
+
+        } else if (selected == "Remove Image") {
+            var items:string[] = [];
+
+            for (var item in g_installedImages) {
+                items.push(item);
+            }
+
+            if (items.length == 0) {
+                vscode.window.showInformationMessage('Not found!');
+            } else {
+                vscode.window.showQuickPick(items).then( selected => {
+                    if (selected) {
+                        removeImage(selected);
+                    }
+                });
+            }
+        } else if (selected == 'Edit Configuration') {
+            vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
+                vscode.window.showTextDocument(document);
+            });
+        } else {
+            var name: string = selected.split('[')[1].split(']')[0];
+            startContainer(name, function(cfg) {
+                if (cfg) {
+                    // get menu from docker itself
+                    executeCommand([ 'docker:menu' ], name);
+                } else {
+                    // display standard menu
+                }
+            });
+        }
+    })
+}
+
+function displayContainerMenu(container: string) {
+    // get items from config
+
+    // [run in terminal]
+
+    // [add command]
 }
 
 function registerCommand(context: vscode.ExtensionContext, name, func) {
@@ -408,17 +426,21 @@ function startContainer(name: string, cb) {
 
         child.on('close', code => {
             var src = '/src';
-
+            var cfg = undefined;
             // check if we are mapping something here
 
             try {
-                var cfg = JSON.parse(config.join());
+                cfg = JSON.parse(config.join());
                 
                 if (cfg.hasOwnProperty('src')) {
                     src = cfg['src'];
                 }
                 
-            } catch (e) {}
+            } catch (e) {
+                // don't start container if has no config
+                cb();
+                return;
+            }
 
             // XXX - must get current local directory
             const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', vscode.workspace.rootPath + ':' + src, name, 'vscode']);
@@ -435,7 +457,7 @@ function startContainer(name: string, cb) {
                 }
             });
 
-            cb();
+            cb(cfg);
         })
     })
 }
