@@ -1,6 +1,5 @@
 
 import * as vscode from 'vscode';
-import * as cp from 'child_process';
 var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
@@ -8,7 +7,7 @@ import { Readable } from "stream";
 import { Docker } from './docker';
 import { HtmlView } from './html';
 
-var docker: Docker = new Docker(vscode.workspace.rootPath, executeCommand, printOutput);
+var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler);
 var html: HtmlView = new HtmlView();
 
 var fs = require('fs');
@@ -133,27 +132,27 @@ function displayMainMenu() {
                 vscode.window.showTextDocument(document);
             });
         } else {
-            var name: string = selected.split('[')[1].split(']')[0];
-            displayContainerMenu(name);
+            var image: string = selected.split('[')[1].split(']')[0];
+            displayContainerMenu(image);
         }
     })
 }
 
-function displayContainerMenu(id: string) {
-    var cc :any = g_Config[id];
+function displayContainerMenu(image: string) {
+    var cc :any = g_Config[image];
 
     if (typeof cc == 'object') {
         if (cc.config.compatible) {
 
-            if (docker.isRunning(id)) {
-                executeCommand([ 'docker:menu' ], id);
+            if (docker.isRunning(image)) {
+                cmdHandler([ 'docker:menu' ], image);
             } else {
-                startContainerFromTerminal(id, false, function() {
-                    executeCommand([ 'docker:menu' ], id);
+                startContainerFromTerminal(image, false, function() {
+                    cmdHandler([ 'docker:menu' ], image);
                 });
             }
         } else {
-            executeCommand([ 'ide:menu', cc.menu ], id);
+            cmdHandler([ 'ide:menu', cc.menu ], image);
         }
     }
 }
@@ -187,11 +186,11 @@ function installImage(id: string, description: string) {
 }
 
 
-function printOutput(data: string) {
+function logHandler(data: string) {
     out.append(data);
 }
 
-function executeCommand(json: any, container: string) {
+function cmdHandler(json: any, container: string) {
     try {
         // XXX - stupid thing! made this to make sure this function won't damage original JSON
         // XXX - have to figure out how to do this properly in JS
@@ -213,7 +212,7 @@ function executeCommand(json: any, container: string) {
                     vscode.window.showInputBox({ prompt: params[0].label, value: params[0].default}).then( (text) => {
                         var command: any[] = params[0].command;
                         command.push(text);
-                        executeCommand(command, container) 
+                        cmdHandler(command, container) 
                     })
                     break;
                 case 'menu':
@@ -221,7 +220,7 @@ function executeCommand(json: any, container: string) {
                         if (selected)
                         {
                             var index: number = params[0].items.indexOf(selected);
-                            executeCommand(params[0].commands[index], container) 
+                            cmdHandler(params[0].commands[index], container) 
                         }
                     })
                     break;
