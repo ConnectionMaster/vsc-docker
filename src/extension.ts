@@ -148,7 +148,7 @@ function displayContainerMenu(id: string) {
             if (docker.isRunning(id)) {
                 executeCommand([ 'docker:menu' ], id);
             } else {
-                startContainerFromTerminal(id, false, function() {
+                startContainerFromTerminal(id, true, function() {
                     executeCommand([ 'docker:menu' ], id);
                 });
             }
@@ -297,14 +297,20 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
                     cb();
                 });
             } else {
-                g_Terminals[name].sendText('docker run -i -t --name ' + name + ' ' + id, true);
+                var src = '/src';
+
+                if (g_Config[id].config.src) {
+                    src = g_Config[id].config.src;
+                }
+
+                g_Terminals[name].sendText('docker run -i -t --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id, true);
 
                 setTimeout(function() {
                     docker.attach(id, g_Config[id].config.compatible, function(result) {
                         console.log("----- ATTACHED TO CONTAINER : " + result);
                         cb();
                     });
-                }, 1000)
+                }, 3000)
             }
         });
     }
