@@ -44,8 +44,9 @@ export class Docker {
 
 
         // XXX - must get current local directory
-        const child = cp.spawn('docker', ['exec', '-i', this.nameFromId(id)].concat(xvsc ? [ 'cmd.sh', 'vscode' ] : []));
+        const child = cp.spawn('docker', ['exec', '-i', this.nameFromId(id)].concat(xvsc ? [ 'cmd.sh', 'vscode' ] : [ 'bash' ]));
         this.m_Containers[id] = child;
+        child['xvsc'] = xvsc;
 
         const stdout = this.collectData(child.stdout, 'utf8', id);
         const stderr = this.collectData(child.stderr, 'utf8', id);
@@ -61,8 +62,13 @@ export class Docker {
         cb(true);
     }
 
-    public exec(id: string, command: any[], cb) {
-        this.m_Containers[id].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
+    public exec(id: string, command: any, cb) {
+
+        if (this.m_Containers[id].xvsc) {
+            this.m_Containers[id].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
+        } else {
+            this.m_Containers[id].stdin.write(command + '\n');
+        }
     }
 
     public ps(all: boolean, cb) {

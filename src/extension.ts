@@ -255,7 +255,10 @@ function executeCommand(json: any, container: string) {
                 case 'bash':
                     startContainerFromTerminal(container, true, function() {});
                     break;
-
+                case 'execute':
+                    vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
+                        docker.exec(container, cmd, function() {});
+                    });
             }
         } else if (cmdPrefix == 'docker') {
             docker.exec(container, params, function(result) {});
