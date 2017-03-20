@@ -139,14 +139,21 @@ function displayMainMenu() {
     })
 }
 
-function displayContainerMenu(container: string) {
-    var cc :any = g_Config[container];
+function displayContainerMenu(id: string) {
+    var cc :any = g_Config[id];
 
     if (typeof cc == 'object') {
         if (cc.config.compatible) {
-            executeCommand([ 'docker:menu' ], container);
+
+            if (docker.isRunning(id)) {
+                executeCommand([ 'docker:menu' ], id);
+            } else {
+                startContainerFromTerminal(id, function() {
+                    executeCommand([ 'docker:menu' ], id);
+                });
+            }
         } else {
-            executeCommand([ 'ide:menu', cc.menu ], container);
+            executeCommand([ 'ide:menu', cc.menu ], id);
         }
     }
 }
@@ -246,7 +253,7 @@ function executeCommand(json: any, container: string) {
                     }
                     break;
                 case 'bash':
-                    startContainerFromTerminal(container);
+                    startContainerFromTerminal(container, function() {});
                     break;
 
             }
@@ -261,16 +268,16 @@ function executeCommand(json: any, container: string) {
     }
 }
 
-function startContainerFromTerminal(id: string) {
-    var cn = ((id.indexOf('/') > 0) ? id.split('/')[1] : id);
+function startContainerFromTerminal(id: string, cb) {
+    var name = docker.nameFromId(id);
 
-    if (g_Terminals.hasOwnProperty(cn)) {
+    if (g_Terminals.hasOwnProperty(name)) {
         // just show the terminal if it was already created for this container
-        g_Terminals[cn].show();
+        g_Terminals[name].show();
     } else {
         // create a new terminal and show it
-        g_Terminals[cn]  = vscode.window.createTerminal();
-        g_Terminals[cn].show();
+        g_Terminals[name]  = vscode.window.createTerminal();
+        g_Terminals[name].show();
 
         // check if we already have this process isRunning
 
@@ -278,18 +285,26 @@ function startContainerFromTerminal(id: string) {
             var exists: boolean = false;
 
             for (var i = 0; i < result.rows.length; i++) {
-                if (result.rows[i].names == cn) {
+                if (result.rows[i].names == name) {
                     exists = true;
                 }
             }
 
             if (exists) {
-                g_Terminals[cn].sendText('docker attach ' + cn, true);
-            } else {
-                g_Terminals[cn].sendText('docker run -i -t --name ' + cn + ' ' + id, true);
-                docker.attach(cn, function(result) {
+                g_Terminals[name].sendText('docker attach ' + name, true);
+                docker.attach(id, g_Config[id].config.compatible, function(result) {
                     console.log("----- ATTACHED TO CONTAINER : " + result);
+                    cb();
                 });
+            } else {
+                g_Terminals[name].sendText('docker run -i -t --name ' + name + ' ' + id, true);
+
+                setTimeout(function() {
+                    docker.attach(id, g_Config[id].config.compatible, function(result) {
+                        console.log("----- ATTACHED TO CONTAINER : " + result);
+                        cb();
+                    });
+                }, 1000)
             }
         });
     }

@@ -13,43 +13,13 @@ export class Docker {
         this.m_OutputHandler = outputHandler;
     }
 
-    private g_containers = {};
+    private m_Containers = {};
     private m_RootPath: string = "";
     private m_CommandHandler = null;
     private m_OutputHandler = null;
 
-    public startContainer(name, cb) {
-
-        if (this.g_containers.hasOwnProperty(name)) {
-            cb(true);
-            return;
-        }
-
-        const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
-        child.on('close', code => {
-
-            var src = '/src';
-            var cfg = undefined;
-            // check if we are mapping something here
-
-
-            // XXX - must get current local directory
-            const child = cp.spawn('docker', ['run', "--name", ((name.indexOf('/') > 0) ? name.split('/')[1] : name), "-i", '-v', this.m_RootPath + ':' + src, name, 'vscode']);
-            this.g_containers[name] = child;
-
-            const stdout = this.collectData(child.stdout, 'utf8', name);
-            const stderr = this.collectData(child.stderr, 'utf8', name);
-            child.on('error', err => {
-            });
-
-            child.on('close', code => {
-                if (code) {
-                } else {
-                }
-            });
-
-            cb(cfg);
-        })        
+    public nameFromId(id: string) {
+        return id.replace('/', '_');
     }
 
     public searchImages(filter: string): object {
@@ -59,12 +29,12 @@ export class Docker {
         return null;
     }
 
-    public isRunning(container: string): boolean {
-        return this.g_containers.hasOwnProperty(container);
+    public isRunning(id: string): boolean {
+        return this.m_Containers.hasOwnProperty(id);
     }
 
-    public attach(name: string, cb) {
-        if (this.g_containers.hasOwnProperty(name)) {
+    public attach(id: string, xvsc: boolean, cb) {
+        if (this.m_Containers.hasOwnProperty(id)) {
             cb(true);
             return;
         }
@@ -74,11 +44,11 @@ export class Docker {
 
 
         // XXX - must get current local directory
-        const child = cp.spawn('docker', ['attach', name]);
-        this.g_containers[name] = child;
+        const child = cp.spawn('docker', ['exec', '-i', this.nameFromId(id)].concat(xvsc ? [ 'cmd.sh', 'vscode' ] : []));
+        this.m_Containers[id] = child;
 
-        const stdout = this.collectData(child.stdout, 'utf8', name);
-        const stderr = this.collectData(child.stderr, 'utf8', name);
+        const stdout = this.collectData(child.stdout, 'utf8', id);
+        const stderr = this.collectData(child.stderr, 'utf8', id);
         child.on('error', err => {
         });
 
@@ -91,13 +61,8 @@ export class Docker {
         cb(true);
     }
 
-    public exec(container: string, command: any[], cb) {
-        var _this: Docker = this;
-
-        this.startContainer(container, function(result) {
-            // XXX - old way of doing things
-            _this.g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
-        })
+    public exec(id: string, command: any[], cb) {
+        this.m_Containers[id].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
     }
 
     public ps(all: boolean, cb) {
@@ -108,8 +73,8 @@ export class Docker {
         this.query(['images'], true, cb);
     }
 
-    public getConfig(container, cb) {
-        this. query(['run', container, 'config'], false, cb);
+    public getConfig(id, cb) {
+        this. query(['run', id, 'config'], false, cb);
     }
 
     public search(filter: string, cb) {
@@ -181,7 +146,7 @@ export class Docker {
     }
 
 
-    private  collectData(stream: Readable, encoding: string, container: string): string[] {
+    private  collectData(stream: Readable, encoding: string, id: string): string[] {
         const data: string[] = [];
         const decoder = new StringDecoder(encoding);
 
@@ -203,7 +168,7 @@ export class Docker {
 
                     if (cmdIdxEnd > 0) {
                         // pass command to handler
-                        this.m_CommandHandler(JSON.parse(data[0].substring(cmdIdxStart, cmdIdxEnd)), container);
+                        this.m_CommandHandler(JSON.parse(data[0].substring(cmdIdxStart, cmdIdxEnd)), id);
 
                         data[0] = data[0].substr(cmdIdxEnd + 9);
                     } else {
@@ -216,5 +181,4 @@ export class Docker {
         });
         return data;
     }
-
 }
