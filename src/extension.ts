@@ -184,21 +184,14 @@ function checkDockerInstall(): Promise<boolean> {
 }
 
 function installImage(id: string, description: string) {
-    const child = cp.spawn('docker', ['pull', id]);
-    const stdout = collectData(child.stdout, 'utf8', '');
-    const stderr = collectData(child.stderr, 'utf8', '');
-    child.on('error', err => {
-        vscode.window.showErrorMessage('Failed to install image!');
-    });
 
-    child.on('close', code => {
-        if (code) {
-            vscode.window.showErrorMessage('Failed to install image!');
+    docker.getConfig(id, function(config) {
+        if (config) {
+            vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!")
         } else {
-
-            vscode.window.showInformationMessage('Image installed successfully!');
+            vscode.window.showInformationMessage("Installed generic image!");
         }
-    });
+    })
 }
 
 function removeImage(id: string) {

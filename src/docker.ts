@@ -15,58 +15,75 @@ export class Docker {
     }
 
     public ps(cb) {
-        this.query(['ps', '-a'], cb);
+        this.query(['ps', '-a'], true, cb);
     }
 
-    private query(params: string[], cb) {
+    public images(cb) {
+        this.query(['images'], true, cb);
+    }
+
+    public getConfig(container, cb) {
+        this. query(['run', container, 'config'], false, cb);
+    }
+
+    private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
         const child = cp.spawn('docker', params);
         const stdout = this.collectData(child.stdout, 'utf8', '');
         const stderr = this.collectData(child.stderr, 'utf8', '');
         child.on('error', err => {
-
+            cb(false);
         });
 
         child.on('close', code => {
             if (code) {
-                // XXX - error occured here
+                cb(false);
             } else {
-                var lines: string[] = stdout.join('').split(/\r?\n/);
-                var parsed: object[] = [];
+                if (parse) {
+                    var lines: string[] = stdout.join('').split(/\r?\n/);
+                    var parsed: object[] = [];
 
-                // first line is a header, parse write
-                var header: string = lines.shift();
-                var startIdx: number = 0;
-                var headerIdx: number[] = [];
-                var headers: string[] = [];
+                    // first line is a header, parse write
+                    var header: string = lines.shift();
+                    var startIdx: number = 0;
+                    var headerIdx: number[] = [];
+                    var headers: string[] = [];
 
 
-                while (startIdx < header.length) {
-                    var endIdx: number = header.indexOf('  ', startIdx);
-                    if (endIdx < 0) endIdx = header.length;
-                    
-                    // store data about header
-                    headers.push(header.substring(startIdx, endIdx).trim().toLowerCase());
-                    headerIdx.push(startIdx);
+                    while (startIdx < header.length) {
+                        var endIdx: number = header.indexOf('  ', startIdx);
+                        if (endIdx < 0) endIdx = header.length;
+                        
+                        // store data about header
+                        headers.push(header.substring(startIdx, endIdx).trim().toLowerCase());
+                        headerIdx.push(startIdx);
 
-                    while (endIdx < header.length && header[endIdx] == ' ') endIdx++;
-                    startIdx = endIdx;
-                }
-
-                headerIdx.push(startIdx);
-
-                for (var i: number = 1; i < lines.length; i++) {
-                    var o: object = {};
-
-                    for (var hidx: number = 0; hidx < headers.length; hidx++) {
-                        o[headers[hidx]] = lines[i].substring(headerIdx[hidx], headerIdx[hidx + 1]).trim();
+                        while (endIdx < header.length && header[endIdx] == ' ') endIdx++;
+                        startIdx = endIdx;
                     }
 
-                    parsed.push(o);
-                }
+                    headerIdx.push(startIdx);
 
-                cb({ headers: headers, rows: parsed});
+                    for (var i: number = 1; i < lines.length; i++) {
+                        var o: object = {};
+
+                        for (var hidx: number = 0; hidx < headers.length; hidx++) {
+                            o[headers[hidx]] = lines[i].substring(headerIdx[hidx], headerIdx[hidx + 1]).trim();
+                        }
+
+                        parsed.push(o);
+                    }
+
+                    cb({ headers: headers, rows: parsed});
+                } else {
+                    try {
+                        var out = JSON.parse(stdout.join(''));
+                        cb(out);
+                    } catch (e) {
+                        cb(false);
+                    }
+                }
             }
         });
 
