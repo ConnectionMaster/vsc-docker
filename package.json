@@ -11,15 +11,11 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.init"
+    "onCommand:extension.openMainMenu"
   ],
   "main": "./out/src/extension",
   "contributes": {
     "commands": [
-      {
-        "command": "extension.init",
-        "title": "DockerRunner: Init"
-      },
       {
         "command": "extension.openMainMenu",
         "title": "DockerRunner: Main Menu"

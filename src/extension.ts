@@ -32,9 +32,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
-    registerCommand(context, 'extension.init', () => {
-    });
-
     registerCommand(context, 'extension.openMainMenu', () => {
         var items:string[] = [];
  
