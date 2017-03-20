@@ -148,7 +148,7 @@ function displayContainerMenu(id: string) {
             if (docker.isRunning(id)) {
                 executeCommand([ 'docker:menu' ], id);
             } else {
-                startContainerFromTerminal(id, true, function() {
+                startContainerFromTerminal(id, false, function() {
                     executeCommand([ 'docker:menu' ], id);
                 });
             }
