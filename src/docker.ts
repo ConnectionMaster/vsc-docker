@@ -7,11 +7,63 @@ import * as cp from 'child_process';
 
 export class Docker {
 
+    constructor(rootPath: string, commandHandler) {
+        this.m_RootPath = rootPath;
+        this.m_CommandHandler = commandHandler;
+    }
+
+    private g_containers = {};
+    private m_RootPath: string = "";
+    private m_CommandHandler = null;
+
+    public startContainer(name, cb) {
+
+        if (this.g_containers.hasOwnProperty(name)) {
+            cb(true);
+            return;
+        }
+
+        const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
+        child.on('close', code => {
+
+            var src = '/src';
+            var cfg = undefined;
+            // check if we are mapping something here
+
+
+            // XXX - must get current local directory
+            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', this.m_RootPath + ':' + src, name, 'vscode']);
+            this.g_containers[name] = child;
+
+            const stdout = this.collectData(child.stdout, 'utf8', name);
+            const stderr = this.collectData(child.stderr, 'utf8', name);
+            child.on('error', err => {
+            });
+
+            child.on('close', code => {
+                if (code) {
+                } else {
+                }
+            });
+
+            cb(cfg);
+        })        
+    }
+
     public searchImages(filter: string): object {
 
         console.log("SEARCH IMAGES CALLED");
 
         return null;
+    }
+
+    public exec(container: string, command: any[], cb) {
+        var _this: Docker = this;
+
+        this.startContainer(container, function(result) {
+            // XXX - old way of doing things
+            _this.g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
+        })
     }
 
     public ps(cb) {
@@ -111,8 +163,9 @@ export class Docker {
                     var cmdIdxEnd: number = data[0].indexOf('<<<CMD<<<', cmdIdxStart);
 
                     if (cmdIdxEnd > 0) {
+                        // pass command to handler
+                        this.m_CommandHandler(JSON.parse(data[0].substring(cmdIdxStart, cmdIdxEnd)), container);
 
-              //          executeCommand(data[0].substring(cmdIdxStart, cmdIdxEnd), container);
                         data[0] = data[0].substr(cmdIdxEnd + 9);
                     } else {
                         break;

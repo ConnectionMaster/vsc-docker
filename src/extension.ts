@@ -8,7 +8,7 @@ import { Readable } from "stream";
 import { Docker } from './docker';
 import { HtmlView } from './html';
 
-var docker: Docker = new Docker();
+var docker: Docker = new Docker(vscode.workspace.rootPath, executeCommand);
 var html: HtmlView = new HtmlView();
 
 var fs = require('fs');
@@ -18,7 +18,6 @@ var path = require('path');
 var g_Config = {};
 var g_availableImages = {};
 var g_internalHtml = "";
-var g_containers = {};
 var g_StatusBarItems = {};
 var g_StoragePath = '';
 
@@ -405,7 +404,7 @@ function executeCommand(json: any, container: string) {
                     break;
             }
         } else if (cmdPrefix == 'docker') {
-            g_containers[container].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(params) + '\r\n<<<CMD<<<\r\n');
+            docker.exec(container, params, function(result) {});
         }
 
         vscode.commands.executeCommand(cmd, params);
@@ -417,58 +416,6 @@ function executeCommand(json: any, container: string) {
 
 
 
-function startContainer(name: string, cb) {
-
-    if (g_containers.hasOwnProperty(name)) {
-        cb();
-        return;
-    }
-
-    const child = cp.spawn('docker', ['rm', '-f', name.split('/')[1]]);
-    child.on('close', code => {
-
-        const child = cp.spawn('docker', ['run', name, 'config']);
-        const config = collectData(child.stdout, 'utf8', '');
-
-        child.on('close', code => {
-            var src = '/src';
-            var cfg = undefined;
-            // check if we are mapping something here
-
-            try {
-                cfg = JSON.parse(config.join());
-                
-                if (cfg.hasOwnProperty('src')) {
-                    src = cfg['src'];
-                }
-                
-            } catch (e) {
-                // don't start container if has no config
-                cb();
-                return;
-            }
-
-            // XXX - must get current local directory
-            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', vscode.workspace.rootPath + ':' + src, name, 'vscode']);
-            g_containers[name] = child;
-
-            const stdout = collectData(child.stdout, 'utf8', name);
-            const stderr = collectData(child.stderr, 'utf8', name);
-            child.on('error', err => {
-            });
-
-            child.on('close', code => {
-                if (code) {
-                } else {
-                }
-            });
-
-            cb(cfg);
-        })
-    })
-}
-
- 
 fs.mkdirParent = function(dirPath, mode, callback) {
   //Call the standard fs.mkdir
   fs.mkdir(dirPath, mode, function(error) {
