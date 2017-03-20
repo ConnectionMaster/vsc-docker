@@ -241,6 +241,16 @@ function executeCommand(json: any, container: string) {
                         g_StatusBarItems['name'].command = params[0].command;
                     }
                     break;
+                case 'bash':
+                    var terminal: vscode.Terminal = vscode.window.createTerminal();
+
+                    terminal.show();
+                    if (docker.isRunning(container)) {
+                        terminal.sendText('docker attach ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container), true);
+                    } else {
+                        terminal.sendText('docker run -i -t --name ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container) + ' ' + container, true);
+                    }
+
             }
         } else if (cmdPrefix == 'docker') {
             docker.exec(container, params, function(result) {});

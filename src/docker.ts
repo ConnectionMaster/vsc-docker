@@ -34,7 +34,7 @@ export class Docker {
 
 
             // XXX - must get current local directory
-            const child = cp.spawn('docker', ['run', "--name", name.split('/')[1], "-i", '-v', this.m_RootPath + ':' + src, name, 'vscode']);
+            const child = cp.spawn('docker', ['run', "--name", ((name.indexOf('/') > 0) ? name.split('/')[1] : name), "-i", '-v', this.m_RootPath + ':' + src, name, 'vscode']);
             this.g_containers[name] = child;
 
             const stdout = this.collectData(child.stdout, 'utf8', name);
@@ -57,6 +57,10 @@ export class Docker {
         console.log("SEARCH IMAGES CALLED");
 
         return null;
+    }
+
+    public isRunning(container: string): boolean {
+        return this.g_containers.hasOwnProperty(container);
     }
 
     public exec(container: string, command: any[], cb) {
