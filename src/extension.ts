@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     g_StoragePath = context.storagePath;
 
-    loadInstalledImages();
+    loadConfig();
 
     console.log('Congratulations, your extension "vsc-docker" is now active!');
 
@@ -109,7 +109,7 @@ function displayMainMenu() {
                         vscode.window.showQuickPick(items).then( selected => {
                             if (selected) {
                                 g_installedImages[selected.split('[')[1].split(']')[0]] = { description: selected.split('[')[0].trim() };
-                                saveInstalledImages();
+                                saveConfig();
 
                                 installImage(selected.split('[')[1].split(']')[0], selected.split('[')[0].trim());
                             }
@@ -207,7 +207,7 @@ function removeImage(id: string) {
             vscode.window.showInformationMessage('Image removed successfully!');
 
             delete g_installedImages['id'];
-            saveInstalledImages();
+            saveConfig();
         }
     });
 }
@@ -478,9 +478,7 @@ fs.mkdirParent = function(dirPath, mode, callback) {
   });
 };
 
-function loadInstalledImages() {
-
-    console.log("------------ LOADING FROM: " + g_StoragePath + '/config.json');
+function loadConfig() {
     try {
         g_installedImages = JSON.parse(fs.readFileSync(g_StoragePath + '/config.json'));
     } catch (e) {
@@ -489,7 +487,7 @@ function loadInstalledImages() {
     }
 }
 
-function saveInstalledImages() {
+function saveConfig() {
     fs.mkdirParent(g_StoragePath, undefined, function () {
         fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_installedImages, null, 2));
     })
