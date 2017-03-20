@@ -42,8 +42,9 @@ export function activate(context: vscode.ExtensionContext) {
             items.push(g_installedImages[item].description + ' [' +  item + ']')
         }
 
-        items.push("Install Image");
-        items.push("Remove Image");
+        items.push('Install Image');
+        items.push('Remove Image');
+        items.push('Edit Configuration');
 
         vscode.window.showQuickPick(items).then( selected => {
             if (selected == "Install Image") {
@@ -87,7 +88,11 @@ export function activate(context: vscode.ExtensionContext) {
                         }
                     });
                 }
-            } else {
+            } else if (selected == 'Edit Configuration') {
+                vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
+                    vscode.window.showTextDocument(document);
+                });
+           } else {
                 var name: string = selected.split('[')[1].split(']')[0];
                 startContainer(name, function() {
                     executeCommand([ 'docker:menu' ], name);
@@ -467,6 +472,6 @@ function loadInstalledImages() {
 
 function saveInstalledImages() {
     fs.mkdirParent(g_StoragePath, undefined, function () {
-        fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_installedImages));
+        fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_installedImages, null, 2));
     })
 }
