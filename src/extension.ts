@@ -131,7 +131,7 @@ function displayMainMenu() {
             } else {
                 vscode.window.showQuickPick(items).then( selected => {
                     if (selected) {
-                        removeImage(selected);
+                        //removeImage(selected);
                     }
                 });
             }
@@ -191,27 +191,6 @@ function installImage(id: string, description: string) {
         };
 
         saveConfig();
-    });
-}
-
-function removeImage(id: string) {
-    const child = cp.spawn('docker', ['rmi', '-f', id]);
-    const stdout = collectData(child.stdout, 'utf8', '');
-    const stderr = collectData(child.stderr, 'utf8', '');
-    child.on('error', err => {
-        vscode.window.showErrorMessage('Failed to remove image!');
-    });
-
-    child.on('close', code => {
-        if (code) {
-            vscode.window.showErrorMessage('Failed to remove image!');
-        } else {
-
-            vscode.window.showInformationMessage('Image removed successfully!');
-
-            delete g_Config['id'];
-            saveConfig();
-        }
     });
 }
 
