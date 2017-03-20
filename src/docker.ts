@@ -66,7 +66,7 @@ export class Docker {
                     parsed.push(o);
                 }
 
-                cb(parsed);
+                cb({ headers: headers, rows: parsed});
             }
         });
 
