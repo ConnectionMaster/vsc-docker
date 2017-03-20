@@ -21,6 +21,8 @@ var g_internalHtml = "";
 var g_StatusBarItems = {};
 var g_StoragePath = '';
 
+var g_Terminals = {};
+
 var copyPaste = require('copy-paste');
 
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerRunner");
@@ -184,7 +186,9 @@ function printOutput(data: string) {
 
 function executeCommand(json: any, container: string) {
     try {
-        var params = (typeof json == 'string') ? JSON.parse(json) : json;
+        // XXX - stupid thing! made this to make sure this function won't damage original JSON
+        // XXX - have to figure out how to do this properly in JS
+        var params = (typeof json == 'string') ? JSON.parse(json) : JSON.parse(JSON.stringify(json));
         var cmd = params[0];
         var cmdPrefix: string = cmd.split(':')[0];
         var cmdPostfix: string = cmd.split(':')[1];
@@ -242,14 +246,21 @@ function executeCommand(json: any, container: string) {
                     }
                     break;
                 case 'bash':
-                    var terminal: vscode.Terminal = vscode.window.createTerminal();
-
-                    terminal.show();
-                    if (docker.isRunning(container)) {
-                        terminal.sendText('docker attach ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container), true);
+                    var cn = ((container.indexOf('/') > 0) ?container.split('/')[1] : container);
+                    if (g_Terminals.hasOwnProperty(cn)) {
+                        g_Terminals[cn].show();
                     } else {
-                        terminal.sendText('docker run -i -t --name ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container) + ' ' + container, true);
+
+                        g_Terminals[cn]  = vscode.window.createTerminal();
+
+                        g_Terminals[cn].show();
+                        if (docker.isRunning(container)) {
+                            g_Terminals[cn].sendText('docker attach ' + name, true);
+                        } else {
+                            g_Terminals[cn].sendText('docker run -i -t --name ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container) + ' ' + container, true);
+                        }
                     }
+                    break;
 
             }
         } else if (cmdPrefix == 'docker') {
