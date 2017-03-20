@@ -39,15 +39,6 @@ export function activate(context: vscode.ExtensionContext) {
         displayMainMenu();
     });
 
-    checkDockerInstall().then(installed => {
-        if (installed) {
-        } else {
-            vscode.window.showInformationMessage('Docker is not installed!!');
-        }
-
-    });
-
-
     var item = vscode.window.createStatusBarItem();
 
     item.text = "Docker Runner";
@@ -161,14 +152,6 @@ function displayContainerMenu(container: string) {
 function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
-}
-
-function checkDockerInstall(): Promise<boolean> {
-    return new Promise(resolve => {
-        cp.exec('docker --help', err => {
-            resolve(!err);
-        });
-    });
 }
 
 function installImage(id: string, description: string) {
