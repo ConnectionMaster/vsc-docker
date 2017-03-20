@@ -254,29 +254,6 @@ function searchImages(filter: string, cb) {
 }
 
 
-function removeStoppedContainers() {
-    const child = cp.spawn('docker', ['ps', '-a']);
-    const stdout = collectData(child.stdout, 'utf8', '');
-    const stderr = collectData(child.stderr, 'utf8', '');
-    child.on('error', err => {
-    });
-
-    child.on('close', code => {
-        if (code) {
-        } else {
-            var lines: string[] = stdout.join('').split(/\r?\n/);
-            for (var element of lines) {
-                if ((element.indexOf("Exited") >= 0) || (element.indexOf("Created") >= 0)) {
-                    var split: string[] = element.split(" ");
-                    var name = split[split.length - 1];
-
-                    const child = cp.spawn('docker', ['rm', name]);
-                }
-            }
-       }
-    });
-}
-
 function collectData(stream: Readable, encoding: string, container: string): string[] {
     const data: string[] = [];
     const decoder = new StringDecoder(encoding);
