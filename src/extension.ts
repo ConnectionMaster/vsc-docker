@@ -148,7 +148,7 @@ function displayContainerMenu(id: string) {
             if (docker.isRunning(id)) {
                 executeCommand([ 'docker:menu' ], id);
             } else {
-                startContainerFromTerminal(id, function() {
+                startContainerFromTerminal(id, false, function() {
                     executeCommand([ 'docker:menu' ], id);
                 });
             }
@@ -253,7 +253,7 @@ function executeCommand(json: any, container: string) {
                     }
                     break;
                 case 'bash':
-                    startContainerFromTerminal(container, function() {});
+                    startContainerFromTerminal(container, true, function() {});
                     break;
 
             }
@@ -268,16 +268,16 @@ function executeCommand(json: any, container: string) {
     }
 }
 
-function startContainerFromTerminal(id: string, cb) {
+function startContainerFromTerminal(id: string, view: boolean, cb) {
     var name = docker.nameFromId(id);
 
     if (g_Terminals.hasOwnProperty(name)) {
         // just show the terminal if it was already created for this container
-        g_Terminals[name].show();
+        if (view) g_Terminals[name].show();
     } else {
         // create a new terminal and show it
         g_Terminals[name]  = vscode.window.createTerminal();
-        g_Terminals[name].show();
+        if (view) g_Terminals[name].show();
 
         // check if we already have this process isRunning
 
