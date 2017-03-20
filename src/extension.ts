@@ -99,9 +99,9 @@ function displayMainMenu() {
             vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
                 var items:string[] = [];
 
-                searchImages(filter, function (images: any[]) {
-                    for (var item in images) {
-                        items.push(images[item] + ' [' +  item + ']');
+                docker.search(filter, function (result: object) {
+                    for (var item in result['rows']) {
+                        items.push(result['rows'][item].description + ' [' +  result['rows'][item].name + ']');
                     }
 
                     if (items.length == 0) {
@@ -194,79 +194,6 @@ function installImage(id: string, description: string) {
     });
 }
 
-function searchImages(filter: string, cb) {
-    var available = {};
-    const child = cp.spawn('docker', ['search', filter]);
-    const stdout = collectData(child.stdout, 'utf8', '');
-    const stderr = collectData(child.stderr, 'utf8', '');
-    
-    child.on('error', err => {
-        available = {};
-    });
-
-    child.on('close', code => {
-        if (code) {
-            available = {};
-            cb(available);
-        } else {
-
-            available = {};
-            var lines: string[] = stdout.join('').split(/\r?\n/);
-            var descriptionPos = 0;
-            var starsPos = 0;
-            for (var element of lines) {
-                if (element.startsWith("NAME")) {
-                    descriptionPos = element.indexOf("DESCRIPTION");
-                    starsPos = element.indexOf("STARS");
-                }
-                else if (element.length != 0) {
-                    
-                    var name: string = element.substring(0, descriptionPos).trim();
-                    var description: string = element.substring(descriptionPos, starsPos).trim();
-                    available[name] = description;                    
-                }
-            }
-
-            cb(available);
-        }
-    });
-}
-
-
-function collectData(stream: Readable, encoding: string, container: string): string[] {
-    const data: string[] = [];
-    const decoder = new StringDecoder(encoding);
-
-    stream.on('data', (buffer: Buffer) => {
-        var decoded: string = decoder.write(buffer);
-        data.push(decoded);
-        out.append(decoded);
-
-        // just make a single string...
-        data[0] = data.join('');
-        data.splice(1);
-
-        while (true) {
-            var cmdIdxStart: number = data[0].indexOf('>>>CMD>>>');
-
-            if (cmdIdxStart > 0) {
-                cmdIdxStart += 9;
-                var cmdIdxEnd: number = data[0].indexOf('<<<CMD<<<', cmdIdxStart);
-
-                if (cmdIdxEnd > 0) {
-
-                    executeCommand(data[0].substring(cmdIdxStart, cmdIdxEnd), container);
-                    data[0] = data[0].substr(cmdIdxEnd + 9);
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-    });
-    return data;
-}
 
 function printOutput(data: string) {
     out.append(data);

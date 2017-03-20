@@ -80,6 +80,10 @@ export class Docker {
         this. query(['run', container, 'config'], false, cb);
     }
 
+    public search(filter: string, cb) {
+        this.query(['search', filter], true, cb)
+    }
+
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
