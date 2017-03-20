@@ -19,7 +19,14 @@
       {
         "command": "extension.init",
         "title": "DockerRunner: Init"
+      },
+      {
+        "command": "extension.openMainMenu",
+        "title": "DockerRunner: Main Menu"
       }
+    ],
+    "keybindings": [
+      { "key": "ctrl+d", "command": "extension.openMainMenu"}
     ]
   },
   "scripts": {
