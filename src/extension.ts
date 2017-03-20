@@ -144,14 +144,7 @@ function displayMainMenu() {
             });
         } else {
             var name: string = selected.split('[')[1].split(']')[0];
-            startContainer(name, function(cfg) {
-                if (cfg) {
-                    // get menu from docker itself
-                    executeCommand([ 'docker:menu' ], name);
-                } else {
-                    // display standard menu
-                }
-            });
+            displayContainerMenu(name);
         }
     })
 }
@@ -160,12 +153,10 @@ function displayContainerMenu(container: string) {
     var cc :any = g_Config[container];
 
     if (typeof cc == 'object') {
-        if (cc.hasOwnProperty('menu')) {
-            for (var item of cc.menu) {
-
-            }
+        if (cc.config.compatible) {
+            executeCommand([ 'docker:menu' ], container);
         } else {
-            // XXX - must create default menu here... 
+            executeCommand([ 'ide:menu', cc.menu ], container);
         }
     }
 }
@@ -187,11 +178,23 @@ function installImage(id: string, description: string) {
 
     docker.getConfig(id, function(config) {
         if (config) {
-            vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!")
+            vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!");
+            g_Config[id].config = config;
+            g_Config[id].config.compatible = true;
         } else {
             vscode.window.showInformationMessage("Installed generic image!");
+
+            g_Config[id].config = {};
+            g_Config[id].config.compatible = false;
         }
-    })
+
+        g_Config[id].menu = {
+            items: [ "Bash", "Execute" ],
+            commands: [ "ide:bash", "ide:execute"] 
+        };
+
+        saveConfig();
+    });
 }
 
 function removeImage(id: string) {
