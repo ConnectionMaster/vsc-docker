@@ -246,20 +246,7 @@ function executeCommand(json: any, container: string) {
                     }
                     break;
                 case 'bash':
-                    var cn = ((container.indexOf('/') > 0) ?container.split('/')[1] : container);
-                    if (g_Terminals.hasOwnProperty(cn)) {
-                        g_Terminals[cn].show();
-                    } else {
-
-                        g_Terminals[cn]  = vscode.window.createTerminal();
-
-                        g_Terminals[cn].show();
-                        if (docker.isRunning(container)) {
-                            g_Terminals[cn].sendText('docker attach ' + name, true);
-                        } else {
-                            g_Terminals[cn].sendText('docker run -i -t --name ' + ((container.indexOf('/') > 0) ?container.split('/')[1] : container) + ' ' + container, true);
-                        }
-                    }
+                    startContainerFromTerminal(container);
                     break;
 
             }
@@ -272,6 +259,41 @@ function executeCommand(json: any, container: string) {
         console.log("Parsing JSON failed:");
         console.log(json);
     }
+}
+
+function startContainerFromTerminal(id: string) {
+    var cn = ((id.indexOf('/') > 0) ? id.split('/')[1] : id);
+
+    if (g_Terminals.hasOwnProperty(cn)) {
+        // just show the terminal if it was already created for this container
+        g_Terminals[cn].show();
+    } else {
+        // create a new terminal and show it
+        g_Terminals[cn]  = vscode.window.createTerminal();
+        g_Terminals[cn].show();
+
+        // check if we already have this process isRunning
+
+        docker.ps(false, function(result) {
+            var exists: boolean = false;
+
+            for (var i = 0; i < result.rows.length; i++) {
+                if (result.rows[i].names == cn) {
+                    exists = true;
+                }
+            }
+
+            if (exists) {
+                g_Terminals[cn].sendText('docker attach ' + cn, true);
+            } else {
+                g_Terminals[cn].sendText('docker run -i -t --name ' + cn + ' ' + id, true);
+                docker.attach(cn, function(result) {
+                    console.log("----- ATTACHED TO CONTAINER : " + result);
+                });
+            }
+        });
+    }
+
 }
 
 

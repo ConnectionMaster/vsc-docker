@@ -63,6 +63,34 @@ export class Docker {
         return this.g_containers.hasOwnProperty(container);
     }
 
+    public attach(name: string, cb) {
+        if (this.g_containers.hasOwnProperty(name)) {
+            cb(true);
+            return;
+        }
+
+        var src = '/src';
+        // check if we are mapping something here
+
+
+        // XXX - must get current local directory
+        const child = cp.spawn('docker', ['attach', name]);
+        this.g_containers[name] = child;
+
+        const stdout = this.collectData(child.stdout, 'utf8', name);
+        const stderr = this.collectData(child.stderr, 'utf8', name);
+        child.on('error', err => {
+        });
+
+        child.on('close', code => {
+            if (code) {
+            } else {
+            }
+        });
+
+        cb(true);
+    }
+
     public exec(container: string, command: any[], cb) {
         var _this: Docker = this;
 
@@ -72,8 +100,8 @@ export class Docker {
         })
     }
 
-    public ps(cb) {
-        this.query(['ps', '-a'], true, cb);
+    public ps(all: boolean, cb) {
+        this.query(['ps'], true, cb);
     }
 
     public images(cb) {
@@ -125,9 +153,10 @@ export class Docker {
                         startIdx = endIdx;
                     }
 
-                    headerIdx.push(startIdx);
+                    // what's the longest?
+                    headerIdx.push(256);
 
-                    for (var i: number = 1; i < lines.length; i++) {
+                    for (var i: number = 0; i < lines.length; i++) {
                         var o: object = {};
 
                         for (var hidx: number = 0; hidx < headers.length; hidx++) {
