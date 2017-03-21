@@ -43,16 +43,16 @@ export class HtmlView {
         this.documentTableStart(o['headers']);
 
         for (var i: number = 0; i < o['rows'].length; i++) {
-            this.responseTableRowStart();
+            this.documentTableRowStart();
 
             for (var j: number = 0; j < o['headers'].length; j++) {
-                this.responseTableCell(o['rows'][i][o['headers'][j]]);
+                this.documentTableCell(o['rows'][i][o['headers'][j]]);
             } 
 
-            this.responseTableRowEnd();
+            this.documentTableRowEnd();
         }
 
-        this.responseTableEnd();
+        this.documentTableEnd();
 
         this.documentEnd();
 
@@ -87,42 +87,42 @@ export class HtmlView {
     private documentTableStart(headers) {
         this.write("<table cellspacing='0'>");
 
-        this.responseTableRowStart();
+        this.documentTableRowStart();
 
         for (var i in headers) {
             this.write('<th>' + headers[i] + '</th>');
         }
 
-        this.responseTableRowEnd();
+        this.documentTableRowEnd();
     }
 
-    private responseTableEnd() {
+    private documentTableEnd() {
         this.write('</table>');
     }
 
-    private responseTableRowStart() {
+    private documentTableRowStart() {
         this.write('<tr>');
     }
 
-    private responseTableRowEnd() {
+    private documentTableRowEnd() {
         this.write('</tr>');
     }
 
-    private responseTableCell(text) {
+    private documentTableCell(text) {
         this.write('<td>' + text + '</td>');
     }
 
-    private responseTableButton(text, url) {
+    private documentTableButton(text, url) {
         var js = 'window.location.href="' + url + '"';
 
         this.write("<td><button onclick='" + js + "'>" + text + "</button></td>");
     }
 
-    private responseButtonJs(text, js) {
+    private documentButtonJs(text, js) {
         this.write("<button onclick='" + js + "'>" + text + "</button>");
     }
 
-    private responseWriteLink(text, link) {
+    private documentWriteLink(text, link) {
         this.write("<a href='" + link + "'>" + text + "</a>");
     }
 
