@@ -74,6 +74,9 @@ function displayMainMenu() {
 
                 docker.search(filter, function (result: object) {
 
+                    // XXX - just for testing purposes here
+                    html.createPreviewFromObject(result);
+
                     for (var item in result['rows']) {
                         items.push(result['rows'][item].description + ' [' +  result['rows'][item].name + ']');
                     }

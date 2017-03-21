@@ -54,6 +54,10 @@ export class HtmlView {
 
         this.documentTableEnd();
 
+        this.documentWriteLink("TEST", encodeURI('command:extension.openMainMenu'));
+
+        
+
         this.documentEnd();
 
         this.preview(this.m_CurrentDocument);
