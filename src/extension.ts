@@ -16,7 +16,6 @@ var path = require('path');
 
 var g_Config = {};
 var g_availableImages = {};
-var g_internalHtml = "";
 var g_StatusBarItems = {};
 var g_StoragePath = '';
 
@@ -45,25 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
     item.text = "Docker Runner";
     item.command = "extension.openMainMenu";
     item.show();
-
-    var BrowserContentProvider = (function () {
-        function BrowserContentProvider() {
-        }
-        BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
-            // TODO: detect failure to load page (e.g. google.com) and display error to user.
-            if (uri != 'http://internal') {
-                return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
-            } else {
-                return g_internalHtml;
-            }
-        };
-        return BrowserContentProvider;
-    }());
-
-    var provider = new BrowserContentProvider();
-    // Handle http:// and https://.
-    var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
-    var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
 
     // show output channel
     out.show();
@@ -231,8 +211,7 @@ function cmdHandler(json: any, container: string) {
                     opn(params[0]);    
                     break;
                 case 'html':
-                    g_internalHtml = params[0]; 
-                    vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
+                    html.preview(params[0]);
                     break;
                 case 'status':
                     var name: string = params[0].name;
