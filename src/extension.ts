@@ -30,6 +30,7 @@ var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerRunner"
 export function activate(context: vscode.ExtensionContext) {
 
     g_StoragePath = context.storagePath;
+    html.setExtensionPath(context.extensionPath);
 
     loadConfig();
 
@@ -72,6 +73,7 @@ function displayMainMenu() {
                 var items:string[] = [];
 
                 docker.search(filter, function (result: object) {
+
                     for (var item in result['rows']) {
                         items.push(result['rows'][item].description + ' [' +  result['rows'][item].name + ']');
                     }
