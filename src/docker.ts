@@ -128,13 +128,15 @@ export class Docker {
                     headerIdx.push(256);
 
                     for (var i: number = 0; i < lines.length; i++) {
-                        var o: object = {};
+                        if (lines[i].trim() != '') {
+                            var o: object = {};
 
-                        for (var hidx: number = 0; hidx < headers.length; hidx++) {
-                            o[headers[hidx]] = lines[i].substring(headerIdx[hidx], headerIdx[hidx + 1]).trim();
+                            for (var hidx: number = 0; hidx < headers.length; hidx++) {
+                                o[headers[hidx]] = lines[i].substring(headerIdx[hidx], headerIdx[hidx + 1]).trim();
+                            }
+
+                            parsed.push(o);
                         }
-
-                        parsed.push(o);
                     }
 
                     cb({ headers: headers, rows: parsed});
