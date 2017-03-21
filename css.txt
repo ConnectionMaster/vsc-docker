@@ -52,7 +52,6 @@ body{
 	font-family:Arial, Helvetica, sans-serif;
 	background: url(background.jpg);
 	margin:0 auto;
-	width:520px;
 }
 a:link {
 	color: #666;
