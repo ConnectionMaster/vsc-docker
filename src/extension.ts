@@ -40,6 +40,10 @@ export function activate(context: vscode.ExtensionContext) {
         displayMainMenu();
     });
 
+    registerCommand(context, 'extension.removeContainers', (...p:any[]) => {
+        console.log("REMOVE CONTAINERS CALLED! " + JSON.stringify(p));
+    });
+        
     var item = vscode.window.createStatusBarItem();
 
     item.text = "Docker Runner";
@@ -65,6 +69,7 @@ function displayMainMenu() {
     items.push('Install Image');
     items.push('Remove Image');
     items.push('Edit Configuration');
+    items.push('Docker Processes');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == "Install Image") {
@@ -116,6 +121,14 @@ function displayMainMenu() {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
+        } else if (selected == 'Docker Processes') {
+            docker.ps(true, function (result: object) {
+
+                // add complex definition to the headers
+                result['headers'].push(['Remove', 'command:extension.removeContainers', '$container id']);
+
+                html.createPreviewFromObject(result);
+            })
         } else {
             var image: string = selected.split('[')[1].split(']')[0];
             displayContainerMenu(image);

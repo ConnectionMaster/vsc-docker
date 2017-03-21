@@ -46,15 +46,37 @@ export class HtmlView {
             this.documentTableRowStart();
 
             for (var j: number = 0; j < o['headers'].length; j++) {
-                this.documentTableCell(o['rows'][i][o['headers'][j]]);
-            } 
+
+                if (typeof o['headers'][j] == 'string') {
+                    this.documentTableCell(o['rows'][i][o['headers'][j]]);
+                } else {
+                    var def = o['headers'][j];
+                    var command = def[1];
+                    var params = [];
+
+                    for (var x: number = 2; x < def.length; x++) {
+                        if (def[x][0] == '$') {
+                            // XXX try to get value
+                            var field: string = def[x].substring(1);
+                            var value: string = o['rows'][i][field];
+
+                            params.push(value);
+                        } else {
+                            params.push(def[x]);
+                        }
+                    }
+
+                    // generate link
+                    var link: string = encodeURI(command + '?' + JSON.stringify(params));
+
+                    this.documentTableCellLink(def[0], link);
+                } 
+            }
 
             this.documentTableRowEnd();
         }
 
         this.documentTableEnd();
-
-        this.documentWriteLink("TEST", encodeURI('command:extension.openMainMenu'));
 
         
 
@@ -94,7 +116,11 @@ export class HtmlView {
         this.documentTableRowStart();
 
         for (var i in headers) {
-            this.write('<th>' + headers[i] + '</th>');
+            if (typeof headers[i] == 'string') {
+                this.write('<th>' + headers[i] + '</th>');
+            } else {
+                this.write('<th>*</th>');
+            }
         }
 
         this.documentTableRowEnd();
@@ -114,6 +140,12 @@ export class HtmlView {
 
     private documentTableCell(text) {
         this.write('<td>' + text + '</td>');
+    }
+
+    private documentTableCellLink(text, link) {
+        this.write('<td>');
+        this.documentWriteLink(text, link);
+        this.write('</td>');
     }
 
     private documentTableButton(text, url) {
