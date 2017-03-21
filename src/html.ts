@@ -27,9 +27,9 @@ var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('htt
 
 
 export class HtmlView {
-    public preview(html: string) {
+    public preview(html: string, title: string) {
         g_internalHtml = html; 
-        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal'); 
+        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal', 1, title); 
     }
 
     public setExtensionPath(path: string) {
@@ -38,7 +38,7 @@ export class HtmlView {
 
     public createPreviewFromObject(o : object) {
 
-        this.documentStart('xxx');
+        this.documentStart(o['title']);
 
         this.documentTableStart(o['headers']);
 
@@ -82,13 +82,13 @@ export class HtmlView {
 
         this.documentEnd();
 
-        this.preview(this.m_CurrentDocument);
+        this.preview(this.m_CurrentDocument, o['title']);
     }
 
     private m_CurrentDocument = '';
     private m_ExtensionPath = '';
 
-    private documentStart(title) {
+    private documentStart(title: string) {
         this.m_CurrentDocument = '';
         var css = fs.readFileSync(this.m_ExtensionPath + '/css.txt')
         var script = fs.readFileSync(this.m_ExtensionPath + '/script.js')
@@ -101,9 +101,7 @@ export class HtmlView {
         this.write(css);
         this.write('<script>' + script + '</script>');
         this.write("<body>");
-
-        this.write('<h1 id="buka">' + title + '</h1>');
-    }
+   }
 
     private documentEnd() {
         this.write("</body>");

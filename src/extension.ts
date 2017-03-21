@@ -125,6 +125,7 @@ function displayMainMenu() {
             docker.ps(true, function (result: object) {
 
                 // add complex definition to the headers
+                result['title'] = 'Docker Processes';
                 result['headers'].push(['Remove', 'command:extension.removeContainers', '$container id']);
 
                 html.createPreviewFromObject(result);
@@ -229,7 +230,7 @@ function cmdHandler(json: any, container: string) {
                     opn(params[0]);    
                     break;
                 case 'html':
-                    html.preview(params[0]);
+                    html.preview(params[0], 'Info');
                     break;
                 case 'status':
                     var name: string = params[0].name;
