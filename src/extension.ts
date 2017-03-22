@@ -70,6 +70,7 @@ function displayMainMenu() {
     items.push('Remove Image');
     items.push('Edit Configuration');
     items.push('Docker Processes');
+    items.push('Docker Images');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == "Install Image") {
@@ -121,6 +122,15 @@ function displayMainMenu() {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
+        } else if (selected == 'Docker Images') {
+            docker.images(function (result: object) {
+
+                // add complex definition to the headers
+                result['title'] = 'Docker Images';
+                result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
+
+                html.createPreviewFromObject(result);
+            })
         } else if (selected == 'Docker Processes') {
             docker.ps(true, function (result: object) {
 
