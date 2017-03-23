@@ -6,19 +6,23 @@ var fs = require('fs');
 
 var g_internalHtml = "";
 
-var BrowserContentProvider = (function () {
-    function BrowserContentProvider() {
-    }
-    BrowserContentProvider.prototype.provideTextDocumentContent = function (uri, token) {
+
+class BrowserContentProvider  implements vscode.TextDocumentContentProvider {
+    public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
         // TODO: detect failure to load page (e.g. google.com) and display error to user.
-        if (uri != 'http://internal') {
+        if (uri.toString() != 'http://internal') {
             return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
         } else {
             return g_internalHtml;
         }
     };
-    return BrowserContentProvider;
-}());
+
+
+	public onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+
+	get onDidChange(): vscode.Event<vscode.Uri> { return this.onDidChangeEmitter.event; }
+
+}
 
 var provider = new BrowserContentProvider();
 // Handle http:// and https://.
@@ -29,7 +33,9 @@ var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('htt
 export class HtmlView {
     public preview(html: string, title: string) {
         g_internalHtml = html; 
-        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal', 1, title); 
+        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal', 1, title);
+
+        provider.onDidChangeEmitter.fire(vscode.Uri.parse('http://internal')); 
     }
 
     public setExtensionPath(path: string) {
