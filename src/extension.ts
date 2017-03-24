@@ -8,7 +8,7 @@ import { Docker } from './docker';
 import { HtmlView } from './html';
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler);
-var html: HtmlView = new HtmlView();
+var html: HtmlView = HtmlView.getInstance();
 
 var fs = require('fs');
 var path = require('path');
