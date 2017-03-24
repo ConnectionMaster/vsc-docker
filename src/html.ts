@@ -24,11 +24,6 @@ class BrowserContentProvider  implements vscode.TextDocumentContentProvider {
 
 }
 
-var provider = new BrowserContentProvider();
-// Handle http:// and https://.
-var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
-var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
-
 
 export class HtmlView {
     public preview(html: string, title: string) {
@@ -170,3 +165,9 @@ export class HtmlView {
         this.m_CurrentDocument += s;
     }
 }
+
+var provider = new BrowserContentProvider();
+// Handle http:// and https://.
+var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
+var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
+
