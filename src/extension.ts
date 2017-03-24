@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
         
     registerCommand(context, 'extension.removeImages', (...p:any[]) => {
-        docker.removeImages(p[0], function(result) {
+        docker.rmi(p[0], function(result) {
             vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
 
             queryImages();            
