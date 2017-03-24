@@ -87,6 +87,10 @@ export class Docker {
         this.query(['search', filter], true, cb)
     }
 
+    public removeImages(images: string[], cb) {
+        this.query(['rmi', '-f'].concat(images), true, cb)
+    }
+
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 

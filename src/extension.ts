@@ -44,6 +44,21 @@ export function activate(context: vscode.ExtensionContext) {
         console.log("REMOVE CONTAINERS CALLED! " + JSON.stringify(p));
     });
         
+    registerCommand(context, 'extension.removeImages', (...p:any[]) => {
+        docker.removeImages(p[0], function(result) {
+            vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
+            
+            // XXX - should be a separate function
+           docker.images(function (result: object) {
+
+                // add complex definition to the headers
+                result['title'] = 'Docker Images';
+                result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
+
+                html.createPreviewFromObject(result);
+            })        })
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "Docker Runner";
