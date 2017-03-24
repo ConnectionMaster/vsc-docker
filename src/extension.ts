@@ -47,16 +47,8 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.removeImages', (...p:any[]) => {
         docker.removeImages(p[0], function(result) {
             vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
-            
-            // XXX - should be a separate function
-           docker.images(function (result: object) {
 
-                // add complex definition to the headers
-                result['title'] = 'Docker Images';
-                result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
-
-                html.createPreviewFromObject(result);
-            })       
+            queryImages();            
          })
     });
 
@@ -132,23 +124,9 @@ function displayMainMenu() {
                 vscode.window.showTextDocument(document);
             });
         } else if (selected == 'Docker Images') {
-            docker.images(function (result: object) {
-
-                // add complex definition to the headers
-                result['title'] = 'Docker Images';
-                result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
-
-                html.createPreviewFromObject(result);
-            })
+            queryImages();
         } else if (selected == 'Docker Processes') {
-            docker.ps(true, function (result: object) {
-
-                // add complex definition to the headers
-                result['title'] = 'Docker Processes';
-                result['headers'].push(['Remove', 'command:extension.removeContainers', '$container id']);
-
-                html.createPreviewFromObject(result);
-            })
+            queryContainers();
         } else {
             var image: string = selected.split('[')[1].split(']')[0];
             displayContainerMenu(image);
@@ -178,6 +156,28 @@ function displayContainerMenu(image: string) {
 function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
+}
+
+function queryImages() {
+    docker.images(function (result: object) {
+
+        // add complex definition to the headers
+        result['title'] = 'Docker Images';
+        result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
+
+        html.createPreviewFromObject(result);
+    })       
+}
+
+function queryContainers() {
+    docker.ps(true, function (result: object) {
+
+        // add complex definition to the headers
+        result['title'] = 'Containers';
+        result['headers'].push(['Remove', 'command:extension.removeContainers', '$container id']);
+
+        html.createPreviewFromObject(result);
+    })
 }
 
 function installImage(id: string, description: string) {
