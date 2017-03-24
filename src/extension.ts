@@ -42,6 +42,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     registerCommand(context, 'extension.removeContainers', (...p:any[]) => {
         console.log("REMOVE CONTAINERS CALLED! " + JSON.stringify(p));
+
+        docker.rm(p[0], function(result) {
+            vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
+
+            queryContainers();            
+         })
+
     });
         
     registerCommand(context, 'extension.removeImages', (...p:any[]) => {
