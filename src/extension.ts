@@ -66,6 +66,14 @@ export function activate(context: vscode.ExtensionContext) {
             installImage(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.containerOptions', (...p:any[]) => {
+        displayContainerOptions(p[0], p[1]);
+    });
+
+    registerCommand(context, 'extension.imageOptions', (...p:any[]) => {
+        displayImageOptions(p[0]);
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "Docker Runner";
@@ -154,6 +162,49 @@ function displayContainerMenu(image: string) {
     }
 }
 
+function displayContainerOptions(id: string, status: string) {
+    var items:string[] = [];
+    var isCreated: boolean = (status.indexOf('Created') >= 0);
+    var isExited: boolean = (status.indexOf('Exited') >= 0)
+
+    if (isExited) {
+        items.push('Remove');
+    } else {
+        items.push('Kill & Remove');
+        items.push('Pause');
+    }
+
+    items.push('Rename');
+    //items.push('Edit Configuration');
+
+    //items.push('docker ...');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == 'Remove') {
+
+        } else if (selected == 'Kill & Remove') {
+
+        } else if (selected == 'Rename') {
+
+        } else if (selected == 'Pause') {
+            
+        }
+    })
+}
+
+function displayImageOptions(name: string) {
+    var items:string[] = [];
+
+    //items.push('Edit Configuration');
+
+    //items.push('docker ...');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == 'XXX') {
+        }
+    })
+}
+
 function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
@@ -164,7 +215,7 @@ function queryImages() {
 
         // add complex definition to the headers
         result['title'] = 'Docker Images';
-        result['headers'].push(['Remove', 'command:extension.removeImages', '$image id']);
+        result['headers'].push(['More...', 'command:extension.imageOptions', '$image id']);
 
         html.createPreviewFromObject(result);
     })       
@@ -175,7 +226,7 @@ function queryContainers() {
 
         // add complex definition to the headers
         result['title'] = 'Containers';
-        result['headers'].push(['Remove', 'command:extension.removeContainers', '$container id']);
+        result['headers'].push(['More...', 'command:extension.containerOptions', '$container id', '$status']);
 
         html.createPreviewFromObject(result);
     })
