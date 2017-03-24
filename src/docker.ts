@@ -72,7 +72,7 @@ export class Docker {
     }
 
     public ps(all: boolean, cb) {
-        this.query(['ps'], true, cb);
+        this.query(['ps'].concat(all ? [ '-a'] : []), true, cb);
     }
 
     public images(cb) {
