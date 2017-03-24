@@ -88,52 +88,46 @@ function displayMainMenu() {
         items.push(g_Config[item].description + ' [' +  item + ']')
     }
 
-    items.push('Find Docker Images');
     items.push('Edit Configuration');
-    items.push('Docker Processes');
-    items.push('Docker Images');
+
+    items.push('docker ...');
 
     vscode.window.showQuickPick(items).then( selected => {
-        if (selected == "Find Docker Images") {
-
-            vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
-                var items:string[] = [];
-
-                docker.search(filter, function (result: object) {
-
-                    // add complex definition to the headers
-                    result['title'] = 'Find Docker Images';
-                    result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
-
-                    // XXX - just for testing purposes here
-                    html.createPreviewFromObject(result);
-                })
-            } )
-
-        } else if (selected == "Remove Image") {
-            var items:string[] = [];
-
-            for (var item in g_Config) {
-                items.push(item);
-            }
-
-            if (items.length == 0) {
-                vscode.window.showInformationMessage('Not found!');
-            } else {
-                vscode.window.showQuickPick(items).then( selected => {
-                    if (selected) {
-                        //removeImage(selected);
-                    }
-                });
-            }
-        } else if (selected == 'Edit Configuration') {
+        if (selected == 'Edit Configuration') {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
-        } else if (selected == 'Docker Images') {
-            queryImages();
-        } else if (selected == 'Docker Processes') {
-            queryContainers();
+        } else if (selected == 'docker ...') {
+            items = [];
+            items.push('search');
+            items.push('ps');
+            items.push('images');
+
+            vscode.window.showQuickPick(items).then( selected => {
+                switch (selected) {
+                    case 'search':
+                        vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
+                            var items:string[] = [];
+
+                            docker.search(filter, function (result: object) {
+
+                                // add complex definition to the headers
+                                result['title'] = 'Find Docker Images';
+                                result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
+
+                                // XXX - just for testing purposes here
+                                html.createPreviewFromObject(result);
+                            })
+                        } )
+                        break;
+                    case 'ps':
+                        queryContainers();
+                        break;
+                    case 'images':
+                        queryImages();
+                        break;
+                }
+            });            
         } else {
             var image: string = selected.split('[')[1].split(']')[0];
             displayContainerMenu(image);
