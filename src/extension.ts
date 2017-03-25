@@ -175,6 +175,7 @@ function displayContainerOptions(id: string, status: string) {
     }
 
     items.push('Rename');
+    items.push('Diff');
     //items.push('Edit Configuration');
 
     //items.push('docker ...');
