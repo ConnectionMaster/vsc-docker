@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     registerCommand(context, 'extension.imageOptions', (...p:any[]) => {
-        displayImageOptions(p[0]);
+        displayImageOptions(p[0], p[1]);
     });
 
     var item = vscode.window.createStatusBarItem();
@@ -189,7 +189,7 @@ function displayContainerOptions(id: string, status: string) {
     })
 }
 
-function displayImageOptions(name: string) {
+function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
 
     items.push('Pull');
@@ -216,11 +216,21 @@ function displayImageOptions(name: string) {
                 queryImages();            
             })
         } else if (selected == 'Pull') {
-            docker.pull(name, function(result) {
+            docker.pull(repository, function(result) {
                 if (result) {
                     vscode.window.showInformationMessage('Pull completed!');
                 } else {
                     vscode.window.showErrorMessage('Pull failed');
+                }
+
+                queryImages();
+            })
+        } else if (selected == 'Push') {
+            docker.push(repository, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Push completed!');
+                } else {
+                    vscode.window.showErrorMessage('Push failed');
                 }
 
                 queryImages();
@@ -246,7 +256,7 @@ function queryImages() {
 
         // add complex definition to the headers
         result['title'] = 'Docker Images';
-        result['headers'].push(['More...', 'command:extension.imageOptions', '$image id']);
+        result['headers'].push(['More...', 'command:extension.imageOptions', '$image id', '$repository']);
 
         html.createPreviewFromObject(result);
     })       

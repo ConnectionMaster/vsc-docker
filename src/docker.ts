@@ -99,7 +99,10 @@ export class Docker {
         this.query(['pull', image], false, cb)
     }
     
-
+    public push(image: string, cb) {
+        this.query(['push', image], false, cb)
+    }
+    
     public rm(containers: string[], cb) {
         this.query(['rm'].concat(containers), true, cb)
     }
