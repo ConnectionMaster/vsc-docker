@@ -182,6 +182,16 @@ function displayContainerOptions(id: string, status: string) {
         } else if (selected == 'Kill & Remove') {
 
         } else if (selected == 'Rename') {
+            vscode.window.showInputBox({ prompt: 'New name'}).then( (newName) => {
+                docker.rename(id, newName, function(result) {
+                    if (result) {
+                        vscode.window.showInformationMessage('Container renamed');
+                    } else {
+                        vscode.window.showErrorMessage('Operation failed');
+                    }
+                    queryContainers();            
+                })
+            })
 
         } else if (selected == 'Pause') {
 

@@ -111,6 +111,9 @@ export class Docker {
         this.query(['history', '--no-trunc', name], true, cb)
     }
 
+    public rename(id, newName, cb) {
+        this.query(['rename', id, newName], false, cb)
+    }
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
@@ -169,7 +172,8 @@ export class Docker {
                         var out = JSON.parse(stdout.join(''));
                         cb(out);
                     } catch (e) {
-                        cb(stdout.join(''));
+                        var r: string = stdout.join('');                        
+                        cb(r ? r : true);
                     }
                 }
             }
