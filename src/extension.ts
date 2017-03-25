@@ -51,14 +51,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     });
         
-    registerCommand(context, 'extension.removeImages', (...p:any[]) => {
-        docker.rmi(p[0], function(result) {
-            vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
-
-            queryImages();            
-         })
-    });
-
     registerCommand(context, 'extension.installImage', (...p:any[]) => {
             g_Config[p[0]] = { description: p[1] };
             saveConfig();
@@ -207,8 +199,6 @@ function displayImageOptions(name: string) {
     items.push('History');
     items.push('Remove');
 
-    //items.push('docker ...');
-
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'History') {
             docker.history(name, function (result: object) {
@@ -218,6 +208,22 @@ function displayImageOptions(name: string) {
 
                 // XXX - just for testing purposes here
                 html.createPreviewFromObject(result);
+            })
+        } else if (selected == 'Remove') {
+            docker.rmi([ name ], function(result) {
+                vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
+
+                queryImages();            
+            })
+        } else if (selected == 'Pull') {
+            docker.pull(name, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Pull completed!');
+                } else {
+                    vscode.window.showErrorMessage('Pull failed');
+                }
+
+                queryImages();
             })
         }
     })

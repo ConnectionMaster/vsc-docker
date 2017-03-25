@@ -95,6 +95,11 @@ export class Docker {
         this.query(['rmi', '-f'].concat(images), true, cb)
     }
 
+    public pull(image: string, cb) {
+        this.query(['pull', image], false, cb)
+    }
+    
+
     public rm(containers: string[], cb) {
         this.query(['rm'].concat(containers), true, cb)
     }
