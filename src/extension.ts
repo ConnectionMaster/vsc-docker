@@ -187,7 +187,7 @@ function displayContainerOptions(id: string, status: string) {
         } else if (selected == 'Rename') {
 
         } else if (selected == 'Pause') {
-            
+
         }
     })
 }
@@ -195,12 +195,25 @@ function displayContainerOptions(id: string, status: string) {
 function displayImageOptions(name: string) {
     var items:string[] = [];
 
-    //items.push('Edit Configuration');
+    items.push('Pull');
+    items.push('Push');
+    items.push('Load');
+    items.push('Save');
+    items.push('History');
+    items.push('Remove');
 
     //items.push('docker ...');
 
     vscode.window.showQuickPick(items).then( selected => {
-        if (selected == 'XXX') {
+        if (selected == 'History') {
+            docker.history(name, function (result: object) {
+
+                // add complex definition to the headers
+                result['title'] = 'History of ' + name;
+
+                // XXX - just for testing purposes here
+                html.createPreviewFromObject(result);
+            })
         }
     })
 }

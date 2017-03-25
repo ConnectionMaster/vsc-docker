@@ -95,6 +95,10 @@ export class Docker {
         this.query(['rm'].concat(containers), true, cb)
     }
 
+    public history(name: string, cb) {
+        this.query(['history', '--no-trunc', name], true, cb)
+    }
+
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
