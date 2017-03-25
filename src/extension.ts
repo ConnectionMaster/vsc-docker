@@ -199,7 +199,6 @@ function displayContainerOptions(id: string, status: string) {
     }
 
     items.push('Rename');
-    items.push('Rename');
 
 
     items.push('Diff');
@@ -273,8 +272,14 @@ function displayContainerOptions(id: string, status: string) {
                 queryContainers();                            
             })
         } else if (selected == 'Diff') {
+            docker.diff(id, function (result: object) {
+                html.createPreviewFromText(result.toString(), "Diff");
+            })
 
         } else if (selected == 'Top') {
+            docker.top(id, function (result: object) {
+                html.createPreviewFromText(result.toString(), "Diff");
+            })
 
         }
     })

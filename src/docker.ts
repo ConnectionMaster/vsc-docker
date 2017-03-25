@@ -126,9 +126,17 @@ export class Docker {
     public start(id, cb) {
         this.query(['start', id], false, cb)
     }
-    
+
     public restart(id, cb) {
         this.query(['restart', id], false, cb)
+    }
+
+    public diff(id, cb) {
+        this.query(['diff', id], false, cb)
+    }
+
+    public top(id, cb) {
+        this.query(['top', id, 'ps'], false, cb)
     }
 
     private query(params: string[], parse: boolean, cb) {
