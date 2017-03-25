@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.removeContainers', (...p:any[]) => {
         console.log("REMOVE CONTAINERS CALLED! " + JSON.stringify(p));
 
-        docker.rm(p[0], function(result) {
+        docker.rm(p[0], true, function(result) {
             vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
 
             queryContainers();            
@@ -178,9 +178,23 @@ function displayContainerOptions(id: string, status: string) {
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Remove') {
-
+            docker.rm([ id ], false, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container removed');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();            
+            })
         } else if (selected == 'Kill & Remove') {
-
+            docker.rm([ id ], true, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container removed');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();            
+            })
         } else if (selected == 'Rename') {
             vscode.window.showInputBox({ prompt: 'New name'}).then( (newName) => {
                 docker.rename(id, newName, function(result) {

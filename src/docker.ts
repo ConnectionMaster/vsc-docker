@@ -103,8 +103,8 @@ export class Docker {
         this.query(['push', image], false, cb)
     }
     
-    public rm(containers: string[], cb) {
-        this.query(['rm'].concat(containers), true, cb)
+    public rm(containers: string[], force: boolean, cb) {
+        this.query(['rm'].concat(force ? [ '-f' ] : []).concat(containers), true, cb)
     }
 
     public history(name: string, cb) {
