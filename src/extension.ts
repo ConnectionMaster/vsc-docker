@@ -110,6 +110,7 @@ function displayMainMenu() {
             items.push('search');
             items.push('ps');
             items.push('images');
+            items.push('info');
 
             vscode.window.showQuickPick(items).then( selected => {
                 switch (selected) {
@@ -133,6 +134,9 @@ function displayMainMenu() {
                         break;
                     case 'images':
                         queryImages();
+                        break;
+                    case 'info':
+                        displayInfo();
                         break;
                 }
             });            
@@ -222,6 +226,13 @@ function displayImageOptions(name: string) {
 function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
+}
+
+function displayInfo() {
+    docker.info(function (result: object) {
+
+        html.createPreviewFromText(result.toString(), 'Info');
+    })       
 }
 
 function queryImages() {

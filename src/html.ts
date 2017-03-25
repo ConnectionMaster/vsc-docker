@@ -39,6 +39,17 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.m_ExtensionPath = path;
     }
 
+    public createPreviewFromText(text: string, title: string) {
+
+        text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
+
+        this.documentStart(title);
+        this.documentParagraph(text);
+        this.documentEnd();
+
+        this.preview(this.m_CurrentDocument, title);
+    }
+
     public createPreviewFromObject(o : object) {
 
         this.documentStart(o['title']);
@@ -109,6 +120,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentEnd() {
         this.write("</body>");
         this.write("</html>");
+    }
+
+    private documentParagraph(text: string) {
+        this.write('<p>' + text + '</p>');
     }
 
     private documentTableStart(headers) {

@@ -71,6 +71,10 @@ export class Docker {
         }
     }
 
+    public info(cb) {
+        this.query(['info'], false, cb);
+    }
+
     public ps(all: boolean, cb) {
         this.query(['ps'].concat(all ? [ '-a'] : []), true, cb);
     }
@@ -157,7 +161,7 @@ export class Docker {
                         var out = JSON.parse(stdout.join(''));
                         cb(out);
                     } catch (e) {
-                        cb(false);
+                        cb(stdout.join(''));
                     }
                 }
             }
