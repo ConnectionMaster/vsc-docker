@@ -158,23 +158,52 @@ function displayContainerMenu(image: string) {
     }
 }
 
+enum ContainerState {
+    Created,
+    Running,
+    Paused,
+    Exited
+}
+
 function displayContainerOptions(id: string, status: string) {
     var items:string[] = [];
-    var isCreated: boolean = (status.indexOf('Created') >= 0);
-    var isExited: boolean = (status.indexOf('Exited') >= 0)
 
-    if (isExited) {
-        items.push('Remove');
-    } else {
-        items.push('Kill & Remove');
+    var state: ContainerState = ContainerState.Running;
+
+    if (status.indexOf('Created') >= 0) {
+        state = ContainerState.Created;
+    } else if (status.indexOf('Exited') >= 0) {
+        state = ContainerState.Exited;
+    } else if (status.indexOf('Paused') >= 0) {
+        state = ContainerState.Paused;
+    }
+
+    // XXX - when container can be started?
+    items.push('Start');
+
+    if (state != ContainerState.Paused) {
+        if (state == ContainerState.Exited) {
+            items.push('Remove');
+        } else {
+            items.push('Kill & Remove');
+        }
+
+        // XXX - container can be restarted only when not paused -- and what else?
+        items.push('Restart');
+    }
+
+    if (state == ContainerState.Running) {
         items.push('Pause');
+    } else if (state == ContainerState.Paused) {
+        items.push('Unpause');
     }
 
     items.push('Rename');
-    items.push('Diff');
-    //items.push('Edit Configuration');
+    items.push('Rename');
 
-    //items.push('docker ...');
+
+    items.push('Diff');
+    items.push('Top');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Remove') {
@@ -208,6 +237,44 @@ function displayContainerOptions(id: string, status: string) {
             })
 
         } else if (selected == 'Pause') {
+            docker.pause(id, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container paused');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();                            
+            })
+        } else if (selected == 'Unpause') {
+            docker.unpause(id, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container unpaused');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();                            
+            })
+        } else if (selected == 'Start') {
+            docker.start(id, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container started');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();                            
+            })
+        } else if (selected == 'Restart') {
+            docker.restart(id, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container restarted');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();                            
+            })
+        } else if (selected == 'Diff') {
+
+        } else if (selected == 'Top') {
 
         }
     })

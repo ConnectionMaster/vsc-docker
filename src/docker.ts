@@ -114,6 +114,23 @@ export class Docker {
     public rename(id, newName, cb) {
         this.query(['rename', id, newName], false, cb)
     }
+
+    public pause(id, cb) {
+        this.query(['pause', id], false, cb)
+    }
+
+    public unpause(id, cb) {
+        this.query(['unpause', id], false, cb)
+    }
+
+    public start(id, cb) {
+        this.query(['start', id], false, cb)
+    }
+    
+    public restart(id, cb) {
+        this.query(['restart', id], false, cb)
+    }
+
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
