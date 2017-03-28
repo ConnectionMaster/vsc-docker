@@ -469,7 +469,21 @@ function cmdHandler(json: any, container: string) {
                 case 'execute':
                     vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
                         docker.exec(container, cmd.split(' '), function(result) {
-                            console.log(result);
+                            if (result) {
+                                console.log(result);
+                                vscode.window.showInformationMessage('Execution Successful!', 'Store').then( (result) => {
+                                    if (result == 'Store') {
+                                        vscode.window.showInputBox( { prompt: "Menu item name", value: ''} ).then( (name) => {
+                                            g_Config[container].menu.items.push(name);
+                                            g_Config[container].menu.commands.push(cmd);
+
+                                            saveConfig();
+                                        });
+                                    }
+                                });
+                            } else {
+                                vscode.window.showErrorMessage('Execution Failed!');
+                            }
                         });
                     });
             }
