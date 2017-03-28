@@ -23,7 +23,7 @@
     ],
     "keybindings": [
       {
-        "key": "ctrl+d",
+        "key": "alt+ctrl+d",
         "command": "extension.openMainMenu"
       }
     ]
