@@ -467,25 +467,35 @@ function cmdHandler(json: any, container: string) {
                     startContainerFromTerminal(container, true, function() {});
                     break;
                 case 'execute':
-                    vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
-                        docker.exec(container, cmd.split(' '), function(result) {
-                            if (result) {
-                                console.log(result);
-                                vscode.window.showInformationMessage('Execution Successful!', 'Store').then( (result) => {
-                                    if (result == 'Store') {
-                                        vscode.window.showInputBox( { prompt: "Menu item name", value: ''} ).then( (name) => {
-                                            g_Config[container].menu.items.push(name);
-                                            g_Config[container].menu.commands.push(cmd);
+                    if (params.length < 1) {
+                        vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
+                            docker.exec(container, cmd.split(' '), function(result) {
+                                if (result) {
+                                    console.log(result);
+                                    vscode.window.showInformationMessage('Execution Successful!', 'Store').then( (result) => {
+                                        if (result == 'Store') {
+                                            vscode.window.showInputBox( { prompt: "Menu item name", value: ''} ).then( (name) => {
+                                                g_Config[container].menu.items.push(name);
+                                                g_Config[container].menu.commands.push(['ide:execute'].concat(cmd.split(' ')));
 
-                                            saveConfig();
-                                        });
-                                    }
-                                });
+                                                saveConfig();
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    vscode.window.showErrorMessage('Execution Failed!');
+                                }
+                            });
+                        });
+                    } else {
+                        docker.exec(container, params, function (result) {
+                            if (result) {
+                                vscode.window.showInformationMessage('Execution Successful!');
                             } else {
                                 vscode.window.showErrorMessage('Execution Failed!');
                             }
                         });
-                    });
+                    }
             }
         } else if (cmdPrefix == 'docker') {
             docker.execCmd(container, params, function(result) {});
