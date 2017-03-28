@@ -51,9 +51,17 @@ export class Docker {
         const stdout = this.collectData(child.stdout, 'utf8', id);
         const stderr = this.collectData(child.stderr, 'utf8', id);
         child.on('error', err => {
+            console.log('CONTAINER ERROR');
         });
 
         child.on('close', code => {
+            console.log('CONTAINER EXITED ' + code);
+
+            // remove this container from container list
+            delete this.m_Containers[id]; 
+
+            // XXX - send notification, so terminal can be closed, etc...
+
             if (code) {
             } else {
             }
