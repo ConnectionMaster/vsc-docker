@@ -7,7 +7,7 @@ import { Readable } from "stream";
 import { Docker } from './docker';
 import { HtmlView } from './html';
 
-var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler);
+var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
 
 var fs = require('fs');
@@ -401,6 +401,14 @@ function installImage(id: string, description: string) {
 
 function logHandler(data: string) {
     out.append(data);
+}
+
+function closeHandler(id: string) {
+    // remove terminal
+    if (g_Terminals.hasOwnProperty(id)) {
+        g_Terminals[id].dispose();
+        delete g_Terminals[id];
+    }
 }
 
 function cmdHandler(json: any, container: string) {

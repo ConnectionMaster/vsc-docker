@@ -7,16 +7,18 @@ import * as cp from 'child_process';
 
 export class Docker {
 
-    constructor(rootPath: string, commandHandler, outputHandler) {
+    constructor(rootPath: string, commandHandler, outputHandler, closeHandler) {
         this.m_RootPath = rootPath;
         this.m_CommandHandler = commandHandler;
         this.m_OutputHandler = outputHandler;
+        this.m_CloseHandler = closeHandler;
     }
 
     private m_Containers = {};
     private m_RootPath: string = "";
     private m_CommandHandler = null;
     private m_OutputHandler = null;
+    private m_CloseHandler = null;
 
     public nameFromId(id: string) {
         return id.replace('/', '_');
@@ -61,7 +63,7 @@ export class Docker {
             delete this.m_Containers[id]; 
 
             // XXX - send notification, so terminal can be closed, etc...
-
+            this.m_CloseHandler(id);
             if (code) {
             } else {
             }
