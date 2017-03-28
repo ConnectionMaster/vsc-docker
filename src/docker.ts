@@ -62,7 +62,12 @@ export class Docker {
         cb(true);
     }
 
-    public exec(id: string, command: any, cb) {
+    public exec(id: string, command: any[], cb) {
+        this.query(['exec', this.nameFromId(id)].concat(command), false, cb);
+    }
+
+
+    public execCmd(id: string, command: any, cb) {
 
         if (this.m_Containers[id].xvsc) {
             this.m_Containers[id].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');

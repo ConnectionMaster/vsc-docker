@@ -462,11 +462,13 @@ function cmdHandler(json: any, container: string) {
                     break;
                 case 'execute':
                     vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
-                        docker.exec(container, cmd, function() {});
+                        docker.exec(container, cmd.split(' '), function(result) {
+                            console.log(result);
+                        });
                     });
             }
         } else if (cmdPrefix == 'docker') {
-            docker.exec(container, params, function(result) {});
+            docker.execCmd(container, params, function(result) {});
         }
 
         vscode.commands.executeCommand(cmd, params);
