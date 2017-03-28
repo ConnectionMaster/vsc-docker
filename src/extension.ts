@@ -203,6 +203,7 @@ function displayContainerOptions(id: string, status: string) {
 
     items.push('Diff');
     items.push('Top');
+    items.push('Logs');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Remove') {
@@ -279,6 +280,11 @@ function displayContainerOptions(id: string, status: string) {
         } else if (selected == 'Top') {
             docker.top(id, function (result: object) {
                 html.createPreviewFromText(result.toString(), "Diff");
+            })
+
+        } else if (selected == 'Logs') {
+            docker.logs(id, function (result: object) {
+                html.createPreviewFromText(result.toString(), "Logs");
             })
 
         }

@@ -144,6 +144,10 @@ export class Docker {
         this.query(['top', id, 'ps'], false, cb)
     }
 
+    public logs(id, cb) {
+        this.query(['logs', id], false, cb)
+    }
+
     private query(params: string[], parse: boolean, cb) {
         // this function will call docker command, and parse output
 
