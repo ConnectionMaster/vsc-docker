@@ -3,6 +3,9 @@
 import * as vscode from 'vscode';
 
 var fs = require('fs');
+var Convert = require('ansi-to-html');
+var convert = new Convert();
+
 
 export class HtmlView implements vscode.TextDocumentContentProvider {
 
@@ -155,7 +158,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private documentTableCell(text) {
-        this.write('<td>' + text + '</td>');
+        this.write('<td>' + convert.toHtml(text) + '</td>');
     }
 
     private documentTableCellLink(text, link) {
