@@ -23,7 +23,7 @@ var g_Terminals = {};
 
 var copyPaste = require('copy-paste');
 
-var out: vscode.OutputChannel = vscode.window.createOutputChannel("DockerRunner");
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("Code\u2764Docker");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "Docker Runner";
+    item.text = "Code\u2764Docker";
     item.command = "extension.openMainMenu";
     item.show();
 
