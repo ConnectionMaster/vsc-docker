@@ -178,8 +178,9 @@ function displayContainerOptions(id: string, status: string) {
         state = ContainerState.Paused;
     }
 
-    // XXX - when container can be started?
-    items.push('Start');
+    if ((state == ContainerState.Created) || (state == ContainerState.Exited)) {
+        items.push('Start');
+    }
 
     if (state != ContainerState.Paused) {
         if (state == ContainerState.Exited) {
