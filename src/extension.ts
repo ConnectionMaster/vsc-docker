@@ -85,7 +85,8 @@ function displayMainMenu() {
     var items:string[] = [];
 
     for (var item in g_Config) {
-        items.push(g_Config[item].description + ' [' +  item + ']')
+        // 9898, 9899
+        items.push((g_Terminals.hasOwnProperty(item)? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
     }
 
     items.push('Edit Configuration');
