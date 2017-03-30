@@ -531,7 +531,7 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
         if (view) g_Terminals[name].show();
     } else {
         // create a new terminal and show it
-        g_Terminals[name]  = vscode.window.createTerminal();
+        g_Terminals[name]  = vscode.window.createTerminal(name);
         if (view) g_Terminals[name].show();
 
         // check if we already have this process isRunning
@@ -557,7 +557,7 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
                     src = g_Config[id].config.src;
                 }
 
-                g_Terminals[name].sendText('docker run -i -t --rm --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id + '\n', true);
+                g_Terminals[name].sendText('docker run -i -t --rm --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id, true);
 
                 setTimeout(function() {
                     docker.attach(id, g_Config[id].config.compatible, function(result) {
