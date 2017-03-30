@@ -85,8 +85,7 @@ function displayMainMenu() {
     var items:string[] = [];
 
     for (var item in g_Config) {
-        // 9898, 9899
-        items.push((g_Terminals.hasOwnProperty(item)? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
+        items.push((g_Terminals.hasOwnProperty(item) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
     }
 
     items.push('Edit Configuration');
@@ -146,15 +145,21 @@ function displayContainerMenu(image: string) {
     if (typeof cc == 'object') {
         if (cc.config.compatible) {
 
-            if (docker.isRunning(image)) {
+            if (g_Terminals.hasOwnProperty(image)) {
                 cmdHandler([ 'docker:menu' ], image);
             } else {
-                startContainerFromTerminal(image, false, function() {
+                startContainerFromTerminal(image, true, function() {
                     cmdHandler([ 'docker:menu' ], image);
                 });
             }
         } else {
-            cmdHandler([ 'ide:menu', cc.menu ], image);
+            if (g_Terminals.hasOwnProperty(image)) {
+                cmdHandler([ 'ide:menu', cc.menu ], image);
+            } else {
+                startContainerFromTerminal(image, true, function() {
+                    cmdHandler([ 'ide:menu' ], image);
+                });
+            }
         }
     }
 }
