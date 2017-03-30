@@ -484,9 +484,10 @@ function cmdHandler(json: any, container: string) {
                 case 'execute':
                     if (params.length < 1) {
                         vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
+                            out.appendLine('\u27a4\u27a4 ' + container + " \u27a4\u27a4 " + cmd + " \u27a4\u27a4");
+                            out.show();
                             docker.exec(container, cmd.split(' '), function(result) {
                                 if (result) {
-                                    console.log(result);
                                     vscode.window.showInformationMessage('Execution Successful!', 'Store').then( (result) => {
                                         if (result == 'Store') {
                                             vscode.window.showInputBox( { prompt: "Menu item name", value: ''} ).then( (name) => {
@@ -500,15 +501,19 @@ function cmdHandler(json: any, container: string) {
                                 } else {
                                     vscode.window.showErrorMessage('Execution Failed!');
                                 }
+                                out.appendLine('\u2b24');
                             });
                         });
                     } else {
+                        out.appendLine('\u27a4\u27a4 ' + container + " \u27a4\u27a4 " + params.join(' ') + " \u27a4\u27a4");
+                        out.show();
                         docker.exec(container, params, function (result) {
                             if (result) {
                                 vscode.window.showInformationMessage('Execution Successful!');
                             } else {
                                 vscode.window.showErrorMessage('Execution Failed!');
                             }
+                            out.appendLine('\u2b24');
                         });
                     }
             }
