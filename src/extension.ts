@@ -85,7 +85,7 @@ function displayMainMenu() {
     var items:string[] = [];
 
     for (var item in g_Config) {
-        items.push((g_Terminals.hasOwnProperty(item) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
+        items.push((g_Terminals.hasOwnProperty(docker.nameFromId(item)) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
     }
 
     items.push('Edit Configuration');
@@ -145,7 +145,7 @@ function displayContainerMenu(image: string) {
     if (typeof cc == 'object') {
         if (cc.config.compatible) {
 
-            if (g_Terminals.hasOwnProperty(image)) {
+            if (g_Terminals.hasOwnProperty(docker.nameFromId(image))) {
                 cmdHandler([ 'docker:menu' ], image);
             } else {
                 startContainerFromTerminal(image, true, function() {
@@ -153,7 +153,7 @@ function displayContainerMenu(image: string) {
                 });
             }
         } else {
-            if (g_Terminals.hasOwnProperty(image)) {
+            if (g_Terminals.hasOwnProperty(docker.nameFromId(image))) {
                 cmdHandler([ 'ide:menu', cc.menu ], image);
             } else {
                 startContainerFromTerminal(image, true, function() {
@@ -518,7 +518,7 @@ function cmdHandler(json: any, container: string) {
 
         vscode.commands.executeCommand(cmd, params);
     } catch (e) {
-        console.log("Parsing JSON failed:");
+        console.log("Parsing JSON failstartContainerFromTerminaled:");
         console.log(json);
     }
 }
