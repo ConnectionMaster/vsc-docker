@@ -562,7 +562,7 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
                     src = g_Config[id].config.src;
                 }
 
-                g_Terminals[name].sendText('docker run -i -t --rm --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id, true);
+                g_Terminals[name].sendText('docker run -i -t --rm --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id + ' sh', true);
 
                 setTimeout(function() {
                     docker.attach(id, g_Config[id].config.compatible, function(result) {
