@@ -50,8 +50,8 @@ export class Docker {
         this.m_Containers[id] = child;
         child['xvsc'] = xvsc;
 
-        const stdout = this.collectData(child.stdout, 'utf8', id);
-        const stderr = this.collectData(child.stderr, 'utf8', id);
+        const stdout = this.collectData(child.stdout, 'utf8', id, true);
+        const stderr = this.collectData(child.stderr, 'utf8', id, true);
         child.on('error', err => {
             console.log('CONTAINER ERROR');
         });
@@ -80,7 +80,7 @@ export class Docker {
     public execCmd(id: string, command: any, cb) {
 
         if (this.m_Containers[id].xvsc) {
-            this.m_Containers[id].stdin.write('\r\n>>>CMD>>>\r\n' + JSON.stringify(command) + '\r\n<<<CMD<<<\r\n');
+            this.m_Containers[id].stdin.write(JSON.stringify(command) + '\n');
         } else {
             this.m_Containers[id].stdin.write(command + '\n');
         }
@@ -162,8 +162,8 @@ export class Docker {
         // this function will call docker command, and parse output
 
         const child = cp.spawn('docker', params);
-        const stdout = this.collectData(child.stdout, 'utf8', '');
-        const stderr = this.collectData(child.stderr, 'utf8', '');
+        const stdout = this.collectData(child.stdout, 'utf8', '', false);
+        const stderr = this.collectData(child.stderr, 'utf8', '', false);
         child.on('error', err => {
             cb(false);
         });
@@ -226,7 +226,7 @@ export class Docker {
     }
 
 
-    private  collectData(stream: Readable, encoding: string, id: string): string[] {
+    private  collectData(stream: Readable, encoding: string, id: string, cmds: boolean): string[] {
         const data: string[] = [];
         const decoder = new StringDecoder(encoding);
 
@@ -239,25 +239,29 @@ export class Docker {
             data[0] = data.join('');
             data.splice(1);
 
-            while (true) {
-                var cmdIdxStart: number = data[0].indexOf('>>>CMD>>>');
+            if (cmds) {
+                var cmdIdxStart: number = 0;
 
-                if (cmdIdxStart > 0) {
-                    cmdIdxStart += 9;
-                    var cmdIdxEnd: number = data[0].indexOf('<<<CMD<<<', cmdIdxStart);
+                while (cmdIdxStart < data[0].length) {
+                    if ((data[0][cmdIdxStart] == '[') || (data[0][cmdIdxStart] == '{')) {
+                        var cmdIdxEnd: number = data[0].indexOf('\n', cmdIdxStart);
 
-                    if (cmdIdxEnd > 0) {
-                        // pass command to handler
-                        this.m_CommandHandler(JSON.parse(data[0].substring(cmdIdxStart, cmdIdxEnd)), id);
+                        if (cmdIdxEnd > 0) {
+                            // pass command to handler
+                            this.m_CommandHandler(JSON.parse(data[0].substring(cmdIdxStart, cmdIdxEnd)), id);
 
-                        data[0] = data[0].substr(cmdIdxEnd + 9);
+                            // remove JSON from buffer and continue the loop
+                            data[0] = data[0].substr(cmdIdxEnd + 1);
+                            cmdIdxStart = 0;
+                        } else {
+                            // exit here as seems like JSON is not complete yet
+                            return;
+                        }
                     } else {
-                        break;
+                        cmdIdxStart++;
                     }
-                } else {
-                    break;
                 }
-            }
+            } 
         });
         return data;
     }
