@@ -113,7 +113,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                     // generate link
                     var link: string = encodeURI(command + '?' + JSON.stringify(params));
 
-                    this.documentTableCellLink(def[0], link, i);
+                    this.documentTableCellLink(def[0], link);
                 } 
             }
 
@@ -130,9 +130,11 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private m_CurrentDocument = '';
+    private m_GlobalLinks = '';
     private m_ExtensionPath = '';
 
     private documentStart(title: string) {
+        this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
         var css = fs.readFileSync(this.m_ExtensionPath + '/css.txt')
         var script = fs.readFileSync(this.m_ExtensionPath + '/script.js')
@@ -150,6 +152,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
    }
 
     private documentEnd() {
+        this.write(this.m_GlobalLinks);
         this.write("</body>");
         this.write("</html>");
     }
@@ -188,6 +191,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         } else {
             this.write('<tr>');
         }
+
+        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' /></a>";
     }
 
     private documentTableRowEnd() {
@@ -198,9 +203,9 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('<td>' + convert.toHtml(text) + '</td>');
     }
 
-    private documentTableCellLink(text, link, rowId) {
+    private documentTableCellLink(text, link) {
         this.write('<td>');
-        this.documentWriteLink(text, link, 'tr_' + rowId + "_a");
+        this.documentWriteLink(text, link);
         this.write('</td>');
     }
 
@@ -214,8 +219,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("<button onclick='" + js + "'>" + text + "</button>");
     }
 
-    private documentWriteLink(text, link, id) {
-        this.write("<a href='" + link + "' id='" + id + "'>" + text + "</a>");
+    private documentWriteLink(text, link) {
+        this.write("<a href='" + link + "'>" + text + "</a>");
     }
 
     private write(s: string) {
