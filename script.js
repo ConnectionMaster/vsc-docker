@@ -11,15 +11,13 @@ function tableKeyDown(event) {
     } else if (event.key == 'ArrowUp') {
         focused--;
         document.getElementById('tr_' + focused).focus();
+    } else if (event.key == 'ArrowRight') {
+        document.getElementById("tr_" + focused + "_a_alt").click();
     } else if (event.key == 'Enter') {
         if (blockEnter)
             return;
         if (focused >= 0) {
-            if (!event.ctrlKey) {
-                document.getElementById("tr_" + focused + "_a").click();
-            } else {
-                document.getElementById("tr_" + focused + "_a_alt").click();
-            }
+            document.getElementById("tr_" + focused + "_a").click();
         }
     }
 

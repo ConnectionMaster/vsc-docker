@@ -330,8 +330,8 @@ function fileOpen(containerId: string, path: string, name: string, access: strin
 
         docker.dir(containerId, newPath, function(dir) {
 
-            dir['onSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name', '$access'];
-            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name', '$access'];
+            dir['onSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name', '$access'];
+            dir['onAltSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name', '$access'];
             
             html.createPreviewFromObject(dir);
         })
@@ -341,10 +341,19 @@ function fileOpen(containerId: string, path: string, name: string, access: strin
 function fileOptions(containerId: string, path: string, name: string, access: string) {
     var items:string[] = [];
 
-    items.push('Copy');
-    items.push('Delete');
-    items.push('Open');
-    items.push('Rename');
+    if (access[0] == 'd') {
+        items.push('Copy directory');
+        items.push('Delete directory');
+        items.push('Open directory');
+        items.push('Rename directory');
+    } else if (access[0] == 'l') {
+
+    } else {
+        items.push('Copy file');
+        items.push('Delete file');
+        items.push('Open File');
+        items.push('Rename File');
+    }
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'History') {
