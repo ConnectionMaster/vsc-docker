@@ -124,6 +124,8 @@ function displayMainMenu() {
                                 result['title'] = 'Find Docker Images';
                                 result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
 
+                                result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
+
                                 // XXX - just for testing purposes here
                                 html.createPreviewFromObject(result);
                             })
