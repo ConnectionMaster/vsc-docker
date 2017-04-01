@@ -211,6 +211,7 @@ function displayContainerOptions(id: string, status: string) {
     items.push('Diff');
     items.push('Top');
     items.push('Logs');
+    items.push('Browse');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Remove') {
@@ -294,6 +295,10 @@ function displayContainerOptions(id: string, status: string) {
                 html.createPreviewFromText(result.toString(), "Logs");
             })
 
+        } else if (selected == 'Browse') {
+            docker.dir(id, '/', function(dir) {
+                html.createPreviewFromText(dir, "Directory");
+            })
         }
     })
 }
