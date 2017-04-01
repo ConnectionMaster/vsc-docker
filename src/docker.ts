@@ -72,10 +72,13 @@ export class Docker {
         cb(true);
     }
 
+    public dir(id: string, path: string, cb) {
+        this.exec(id, ['ls', '-al'], cb)        
+    }
+
     public exec(id: string, command: any[], cb) {
         this.query(['exec', this.nameFromId(id)].concat(command), false, cb);
     }
-
 
     public execCmd(id: string, command: any, cb) {
 
