@@ -396,7 +396,6 @@ function queryImages() {
         result['headers'].push(['More...', 'command:extension.imageOptions', '$image id', '$repository']);
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
-        result['onAltSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
         html.createPreviewFromObject(result);
     })       
@@ -407,7 +406,7 @@ function queryContainers() {
 
         // add complex definition to the headers
         result['title'] = 'Containers';
-        result['headers'].push(['More...', 'command:extension.containerOptions', '$container id', '$status']);
+        result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
 
         html.createPreviewFromObject(result);
     })
