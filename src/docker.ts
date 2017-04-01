@@ -73,7 +73,7 @@ export class Docker {
     }
 
     public dir(id: string, path: string, cb) {
-        this.exec(id, ['ls', '-al'], function(s: string) {
+        this.exec(id, ['ls', '-al', path], function(s: string) {
             var lines: string[] = s.split('\n');
             var out: {} = {
                 title: path,

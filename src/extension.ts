@@ -66,6 +66,14 @@ export function activate(context: vscode.ExtensionContext) {
         displayImageOptions(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.fileOpen', (...p:any[]) => {
+        fileOpen(p[0], p[1], p[2]);
+    });
+
+    registerCommand(context, 'extension.fileOptions', (...p:any[]) => {
+        fileOptions(p[0], p[1], p[2]);
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "\u27a4\u27a4 Docker Runner \u27a4\u27a4";
@@ -296,11 +304,26 @@ function displayContainerOptions(id: string, status: string) {
             })
 
         } else if (selected == 'Browse') {
-            docker.dir(id, '/', function(dir) {
-                html.createPreviewFromObject(dir);
-            })
+            fileOpen(id, '', '');
         }
     })
+}
+
+function fileOpen(containerId: string, path: string, name: string) {
+
+    if (name != '.') {
+        docker.dir(containerId, path + '/' + name, function(dir) {
+
+            dir['onSelect'] = ['command:extension.fileOpen', containerId, path + '/' + name, '$name'];
+            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, path + '/' + name, '$name'];
+            
+            html.createPreviewFromObject(dir);
+        })
+    }
+}
+
+function fileOptions(containerId: string, path: string, name: string) {
+
 }
 
 function displayImageOptions(name: string, repository: string) {
@@ -372,7 +395,8 @@ function queryImages() {
         result['title'] = 'Docker Images';
         result['headers'].push(['More...', 'command:extension.imageOptions', '$image id', '$repository']);
 
-        result['onrowclick'] = ['command:extension.imageOptions', '$image id', '$repository'];
+        result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
+        result['onAltSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
         html.createPreviewFromObject(result);
     })       

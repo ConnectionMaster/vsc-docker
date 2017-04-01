@@ -1,12 +1,17 @@
 
 var focused = -1;
+var altPressed = false;
 
 function tableKey(event) {
     document.getElementById("dupa").innerText = event.key;
 
     if (event.key == 'Enter') {
         if (focused >= 0) {
-            document.getElementById("tr_" + focused + "_a").click();
+            if (!altPressed) {
+                document.getElementById("tr_" + focused + "_a").click();
+            } else {
+                document.getElementById("tr_" + focused + "_a_alt").click();
+            }
         }
     }
 } 
@@ -16,8 +21,18 @@ function tableKeyDown(event) {
 
     if (event.key == 'ArrowDown') {
         document.getElementById('tr_' + (focused + 1)).focus();
-    } else if (event.key = 'ArrowUp') {
+    } else if (event.key == 'ArrowUp') {
         document.getElementById('tr_' + (focused - 1)).focus();
+    } else if (event.key == 'Alt') {
+        altPressed = true;
+    }
+}
+
+function tableKeyUp(event) {
+    document.getElementById("dupa").innerText = event.key;
+
+    if (event.key == 'Alt') {
+        altPressed = false;
     }
 }
 

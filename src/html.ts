@@ -59,35 +59,63 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentTableStart(o['headers']);
 
-        var onRowClick: any[] = undefined;
+        var onSelect: any[] = undefined;
+        var onAltSelect: any[] = undefined;
 
-        // check if we have onclick pattern
-        if (o.hasOwnProperty('onrowclick')) {
-            onRowClick = o['onrowclick'];
+        // check if we have onSelect pattern
+        if (o.hasOwnProperty('onSelect')) {
+            onSelect = o['onSelect'];
+        }
+
+        // check if we have onAltSelect pattern
+        if (o.hasOwnProperty('onAltSelect')) {
+            onAltSelect = o['onAltSelect'];
         }
 
         for (var i: number = 0; i < o['rows'].length; i++) {
-            var link = '';           
+            var link = '';
+            var altLink = '';
+
             // prepare onclick for this row here
-            if (onRowClick) {
-                var command = onRowClick[0];
+            if (onSelect) {
+                var command = onSelect[0];
                 var params = [];
 
-                for (var x: number = 1; x < onRowClick.length; x++) {
-                    if (onRowClick[x][0] == '$') {
+                for (var x: number = 1; x < onSelect.length; x++) {
+                    if (onSelect[x][0] == '$') {
                         // XXX try to get value
-                        var field: string = onRowClick[x].substring(1);
+                        var field: string = onSelect[x].substring(1);
                         var value: string = o['rows'][i][field];
 
                         params.push(value);
                     } else {
-                        params.push(def[x]);
+                        params.push(onSelect[x]);
                     }
                 }
-                var link: string = encodeURI(command + '?' + JSON.stringify(params));
+                link = encodeURI(command + '?' + JSON.stringify(params));
             }
 
-            this.documentTableRowStart(i, link);
+            // prepare onclick for this row here
+            if (onAltSelect) {
+                var command = onAltSelect[0];
+                var params = [];
+
+                for (var x: number = 1; x < onAltSelect.length; x++) {
+                    if (onAltSelect[x][0] == '$') {
+                        // XXX try to get value
+                        var field: string = onAltSelect[x].substring(1);
+                        var value: string = o['rows'][i][field];
+
+                        params.push(value);
+                    } else {
+                        params.push(onAltSelect[x]);
+                    }
+                }
+                altLink = encodeURI(command + '?' + JSON.stringify(params));
+            }
+
+
+            this.documentTableRowStart(i, link, altLink);
 
             for (var j: number = 0; j < o['headers'].length; j++) {
 
@@ -164,9 +192,9 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private tabIndex = 1;
 
     private documentTableStart(headers) {
-        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)'>");
+        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();'>");
 
-        this.documentTableRowStart(-1, '');
+        this.documentTableRowStart(-1, '', '');
 
         for (var i in headers) {
             if (typeof headers[i] == 'string') {
@@ -184,7 +212,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
 
-    private documentTableRowStart(idx, link) {
+    private documentTableRowStart(idx, link, altLink) {
 
         if (idx >= 0) {
             this.write('<tr id="tr_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)">');
@@ -192,7 +220,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             this.write('<tr>');
         }
 
-        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' /></a>";
+        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' />";
+        this.m_GlobalLinks += "<a href='" + altLink + "' id='tr_" + idx + "_a_alt' />";
     }
 
     private documentTableRowEnd() {
