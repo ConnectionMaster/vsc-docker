@@ -312,7 +312,19 @@ function displayContainerOptions(id: string, status: string) {
 function fileOpen(containerId: string, path: string, name: string) {
 
     if (name != '.') {
-        var newPath: string = (path == '/') ? (path + name) : (path + '/' + name);
+        var newPath: string = ('/' != path) ? path : '';
+        
+        if (name != '..') {
+            newPath += '/' + name;
+        } else {
+            if (newPath == '') {
+                newPath = '/';
+            } else {
+                var temp: string[] = newPath.split('/'); //
+                temp.pop();
+                newPath = (temp.length > 1) ? temp.join('/') : '/';
+            }
+        }
 
         docker.dir(containerId, newPath, function(dir) {
 
