@@ -304,7 +304,7 @@ function displayContainerOptions(id: string, status: string) {
             })
 
         } else if (selected == 'Browse') {
-            fileOpen(id, '', '');
+            fileOpen(id, '/', '');
         }
     })
 }
@@ -312,10 +312,12 @@ function displayContainerOptions(id: string, status: string) {
 function fileOpen(containerId: string, path: string, name: string) {
 
     if (name != '.') {
-        docker.dir(containerId, path + '/' + name, function(dir) {
+        var newPath: string = (path == '/') ? (path + name) : (path + '/' + name);
 
-            dir['onSelect'] = ['command:extension.fileOpen', containerId, path + '/' + name, '$name'];
-            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, path + '/' + name, '$name'];
+        docker.dir(containerId, newPath, function(dir) {
+
+            dir['onSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name'];
+            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name'];
             
             html.createPreviewFromObject(dir);
         })
