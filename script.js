@@ -15,7 +15,7 @@ function tableKeyDown(event) {
         if (blockEnter)
             return;
         if (focused >= 0) {
-            if (!event.altKey) {
+            if (!event.ctrlKey) {
                 document.getElementById("tr_" + focused + "_a").click();
             } else {
                 document.getElementById("tr_" + focused + "_a_alt").click();
@@ -32,13 +32,15 @@ function tableKeyUp(event) {
 }
 
 function tableGotFocus() {
+    //document.getElementById('para').innerText += "*GOT*";
     blockEnter = true;
     window.setTimeout(function() {
         blockEnter = false;
-    }, 500);
+    }, 100);
 }
 
 function tableLostFocus() {
+    //document.getElementById('para').innerText += "*LOST*";
 }
 
 function tableRowFocus(event) {
