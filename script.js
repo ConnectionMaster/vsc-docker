@@ -30,3 +30,7 @@ function tableRowClick(event) {
     var idx = Number(event.target.parentNode.id.split('_')[1]);
     document.getElementById("tr_" + idx + "_a").click();
 }
+
+function onPageLoaded() {
+    document.getElementById("tr_0").focus();
+}
