@@ -3,6 +3,12 @@ var focused = -1;
 
 function tableKey(event) {
     document.getElementById("dupa").innerText = event.key;
+
+    if (event.key == 'Enter') {
+        if (focused >= 0) {
+            document.getElementById("tr_" + focused + "_a").click();
+        }
+    }
 } 
 
 function tableKeyDown(event) {
