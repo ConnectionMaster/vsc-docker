@@ -90,23 +90,23 @@ function displayMainMenu() {
 
     items.push('Edit Configuration');
 
-    items.push('docker ...');
+    items.push('Docker...');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Edit Configuration') {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
-        } else if (selected == 'docker ...') {
+        } else if (selected == 'Docker...') {
             items = [];
-            items.push('search');
-            items.push('ps');
-            items.push('images');
-            items.push('info');
+            items.push('Search Images');
+            items.push('Local Containers');
+            items.push('Local Images');
+            items.push('Info');
 
             vscode.window.showQuickPick(items).then( selected => {
                 switch (selected) {
-                    case 'search':
+                    case 'Search Images':
                         vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
                             var items:string[] = [];
 
@@ -121,13 +121,13 @@ function displayMainMenu() {
                             })
                         } )
                         break;
-                    case 'ps':
+                    case 'Local Containers':
                         queryContainers();
                         break;
-                    case 'images':
+                    case 'Local Images':
                         queryImages();
                         break;
-                    case 'info':
+                    case 'Info':
                         displayInfo();
                         break;
                 }
