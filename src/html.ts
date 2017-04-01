@@ -15,7 +15,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
         // TODO: detect failure to load page (e.g. google.com) and display error to user.
-        if (uri.toString() != 'http://internal') {
+        if (uri.toString() != 'xxx://internal') {
             return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
         } else {
             return this.m_internalHtml;
@@ -33,9 +33,19 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public preview(html: string, title: string) {
         this.m_internalHtml = html; 
-        vscode.commands.executeCommand('vscode.previewHtml', 'http://internal', 1, title);
 
-        this.onDidChangeEmitter.fire(vscode.Uri.parse('http://internal')); 
+        var x = vscode.workspace.textDocuments;
+
+        for (var d of x) {
+            if (d.uri.authority == 'internal') {
+                console.log('FOUND');
+                this.onDidChangeEmitter.fire(vscode.Uri.parse('xxx://internal'));
+                return; 
+            }
+        }
+
+        // only call preview if document really changed
+        vscode.commands.executeCommand('vscode.previewHtml', 'xxx://internal', 1, 'Docker Runner');
     }
 
     public setExtensionPath(path: string) {
@@ -257,6 +267,5 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
 var provider = new HtmlView();
 // Handle http:// and https://.
-var registrationHTTPS = vscode.workspace.registerTextDocumentContentProvider('https', provider);
-var registrationHTTP = vscode.workspace.registerTextDocumentContentProvider('http', provider);
+var registrationXxx = vscode.workspace.registerTextDocumentContentProvider('xxx', provider);
 
