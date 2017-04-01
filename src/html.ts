@@ -175,8 +175,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write(css);
         this.write('<script>' + script + '</script>');
         this.write("<body onload='onPageLoaded();'>");
-
-        this.write('<p id="dupa">KUPA</p>');
    }
 
     private documentEnd() {

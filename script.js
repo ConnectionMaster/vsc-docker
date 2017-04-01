@@ -3,8 +3,6 @@ var focused = -1;
 var altPressed = false;
 
 function tableKey(event) {
-    document.getElementById("dupa").innerText = event.key;
-
     if (event.key == 'Enter') {
         if (focused >= 0) {
             if (!altPressed) {
@@ -17,8 +15,6 @@ function tableKey(event) {
 } 
 
 function tableKeyDown(event) {
-    document.getElementById("dupa").innerText = event.key;
-
     if (event.key == 'ArrowDown') {
         document.getElementById('tr_' + (focused + 1)).focus();
     } else if (event.key == 'ArrowUp') {
@@ -29,8 +25,6 @@ function tableKeyDown(event) {
 }
 
 function tableKeyUp(event) {
-    document.getElementById("dupa").innerText = event.key;
-
     if (event.key == 'Alt') {
         altPressed = false;
     }
@@ -38,7 +32,6 @@ function tableKeyUp(event) {
 
 function tableRowFocus(event) {
     focused = Number(event.target.id.split('_')[1]);
-    document.getElementById("dupa").innerText = "FOCUSED " + focused ;
 }
 
 function tableRowClick(event) {
