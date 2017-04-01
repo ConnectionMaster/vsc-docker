@@ -189,6 +189,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     private documentEnd() {
         this.write(this.m_GlobalLinks);
+        this.write("<p id='para'>...</p>");
         this.write("</body>");
         this.write("</html>");
     }
@@ -200,7 +201,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private tabIndex = 1;
 
     private documentTableStart(headers) {
-        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();'>");
+        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus();' onfocusout='tableLostFocus(event)' >");
 
         this.documentTableRowStart(-1, '', '');
 
@@ -223,7 +224,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentTableRowStart(idx, link, altLink) {
 
         if (idx >= 0) {
-            this.write('<tr id="tr_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)">');
+            this.write('<tr id="tr_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)" onfocusout="tableRowBlur(event)">');
         } else {
             this.write('<tr>');
         }
