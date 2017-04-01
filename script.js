@@ -1,41 +1,34 @@
 
 var focused = -1;
-var altPressed = false;
 var blockEnter = false;
 
-function tableKey(event) {
-    if (blockEnter)
-        return;
+function tableKeyDown(event) {
 
-    if (event.key == 'Enter') {
 
+    if (event.key == 'ArrowDown') {
+        focused++;
+        document.getElementById('tr_' + focused).focus();
+    } else if (event.key == 'ArrowUp') {
+        focused--;
+        document.getElementById('tr_' + focused).focus();
+    } else if (event.key == 'Enter') {
         if (blockEnter)
             return;
-
         if (focused >= 0) {
-            if (!altPressed) {
+            if (!event.altKey) {
                 document.getElementById("tr_" + focused + "_a").click();
             } else {
                 document.getElementById("tr_" + focused + "_a_alt").click();
             }
         }
     }
-} 
 
-function tableKeyDown(event) {
-    if (event.key == 'ArrowDown') {
-        document.getElementById('tr_' + (focused + 1)).focus();
-    } else if (event.key == 'ArrowUp') {
-        document.getElementById('tr_' + (focused - 1)).focus();
-    } else if (event.key == 'Alt') {
-        altPressed = true;
+    if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
+        event.preventDefault();
     }
 }
 
 function tableKeyUp(event) {
-    if (event.key == 'Alt') {
-        altPressed = false;
-    }
 }
 
 function tableGotFocus() {
@@ -43,7 +36,6 @@ function tableGotFocus() {
     window.setTimeout(function() {
         blockEnter = false;
     }, 500);
-    
 }
 
 function tableLostFocus() {

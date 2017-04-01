@@ -67,11 +67,11 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     registerCommand(context, 'extension.fileOpen', (...p:any[]) => {
-        fileOpen(p[0], p[1], p[2]);
+        fileOpen(p[0], p[1], p[2], p[3]);
     });
 
     registerCommand(context, 'extension.fileOptions', (...p:any[]) => {
-        fileOptions(p[0], p[1], p[2]);
+        fileOptions(p[0], p[1], p[2], p[3]);
     });
 
     var item = vscode.window.createStatusBarItem();
@@ -306,12 +306,12 @@ function displayContainerOptions(id: string, status: string) {
             })
 
         } else if (selected == 'Browse') {
-            fileOpen(id, '/', '');
+            fileOpen(id, '/', '', 'd---------');
         }
     })
 }
 
-function fileOpen(containerId: string, path: string, name: string) {
+function fileOpen(containerId: string, path: string, name: string, access: string) {
 
     if (name != '.') {
         var newPath: string = ('/' != path) ? path : '';
@@ -330,16 +330,29 @@ function fileOpen(containerId: string, path: string, name: string) {
 
         docker.dir(containerId, newPath, function(dir) {
 
-            dir['onSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name'];
-            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name'];
+            dir['onSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name', '$access'];
+            dir['onAltSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name', '$access'];
             
             html.createPreviewFromObject(dir);
         })
     }
 }
 
-function fileOptions(containerId: string, path: string, name: string) {
+function fileOptions(containerId: string, path: string, name: string, access: string) {
+    var items:string[] = [];
 
+    items.push('Copy');
+    items.push('Delete');
+    items.push('Open');
+    items.push('Rename');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == 'History') {
+        } else if (selected == 'Remove') {
+        } else if (selected == 'Pull') {
+        } else if (selected == 'Push') {
+        }
+    })
 }
 
 function displayImageOptions(name: string, repository: string) {

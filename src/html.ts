@@ -201,7 +201,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private tabIndex = 1;
 
     private documentTableStart(headers) {
-        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus();' onfocusout='tableLostFocus(event)' >");
+        this.write("<table cellspacing='0' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus();' onfocusout='tableLostFocus(event)' >");
 
         this.documentTableRowStart(-1, '', '');
 
