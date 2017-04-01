@@ -59,8 +59,35 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentTableStart(o['headers']);
 
+        var onRowClick: any[] = undefined;
+
+        // check if we have onclick pattern
+        if (o.hasOwnProperty('onrowclick')) {
+            onRowClick = o['onrowclick'];
+        }
+
         for (var i: number = 0; i < o['rows'].length; i++) {
-            this.documentTableRowStart();
+            var link = '';           
+            // prepare onclick for this row here
+            if (onRowClick) {
+                var command = onRowClick[0];
+                var params = [];
+
+                for (var x: number = 1; x < onRowClick.length; x++) {
+                    if (onRowClick[x][0] == '$') {
+                        // XXX try to get value
+                        var field: string = onRowClick[x].substring(1);
+                        var value: string = o['rows'][i][field];
+
+                        params.push(value);
+                    } else {
+                        params.push(def[x]);
+                    }
+                }
+                var link: string = encodeURI(command + '?' + JSON.stringify(params));
+            }
+
+            this.documentTableRowStart(i, link);
 
             for (var j: number = 0; j < o['headers'].length; j++) {
 
@@ -86,7 +113,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                     // generate link
                     var link: string = encodeURI(command + '?' + JSON.stringify(params));
 
-                    this.documentTableCellLink(def[0], link);
+                    this.documentTableCellLink(def[0], link, i);
                 } 
             }
 
@@ -118,6 +145,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write(css);
         this.write('<script>' + script + '</script>');
         this.write("<body>");
+
+        this.write('<p id="dupa">KUPA</p>');
    }
 
     private documentEnd() {
@@ -129,10 +158,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('<p>' + text + '</p>');
     }
 
-    private documentTableStart(headers) {
-        this.write("<table cellspacing='0'>");
+    private tabIndex = 1;
 
-        this.documentTableRowStart();
+    private documentTableStart(headers) {
+        this.write("<table cellspacing='0' tabindex='1' onkeypress='tableKey(event)' onkeydown='tableKeyDown(event)'>");
+
+        this.documentTableRowStart(-1, '');
 
         for (var i in headers) {
             if (typeof headers[i] == 'string') {
@@ -149,8 +180,14 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('</table>');
     }
 
-    private documentTableRowStart() {
-        this.write('<tr>');
+
+    private documentTableRowStart(idx, link) {
+
+        if (idx >= 0) {
+            this.write('<tr id="tr_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)">');
+        } else {
+            this.write('<tr>');
+        }
     }
 
     private documentTableRowEnd() {
@@ -161,9 +198,9 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('<td>' + convert.toHtml(text) + '</td>');
     }
 
-    private documentTableCellLink(text, link) {
+    private documentTableCellLink(text, link, rowId) {
         this.write('<td>');
-        this.documentWriteLink(text, link);
+        this.documentWriteLink(text, link, 'tr_' + rowId + "_a");
         this.write('</td>');
     }
 
@@ -177,8 +214,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("<button onclick='" + js + "'>" + text + "</button>");
     }
 
-    private documentWriteLink(text, link) {
-        this.write("<a href='" + link + "'>" + text + "</a>");
+    private documentWriteLink(text, link, id) {
+        this.write("<a href='" + link + "' id='" + id + "'>" + text + "</a>");
     }
 
     private write(s: string) {

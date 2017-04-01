@@ -372,6 +372,8 @@ function queryImages() {
         result['title'] = 'Docker Images';
         result['headers'].push(['More...', 'command:extension.imageOptions', '$image id', '$repository']);
 
+        result['onrowclick'] = ['command:extension.imageOptions', '$image id', '$repository'];
+
         html.createPreviewFromObject(result);
     })       
 }
