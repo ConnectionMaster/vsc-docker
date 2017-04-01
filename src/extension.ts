@@ -297,7 +297,7 @@ function displayContainerOptions(id: string, status: string) {
 
         } else if (selected == 'Browse') {
             docker.dir(id, '/', function(dir) {
-                html.createPreviewFromText(dir, "Directory");
+                html.createPreviewFromObject(dir);
             })
         }
     })
