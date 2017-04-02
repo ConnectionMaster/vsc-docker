@@ -307,6 +307,7 @@ function displayContainerOptions(id: string, status: string) {
 
         } else if (selected == 'Browse') {
             fileOpen(id, '/', '', 'd---------');
+            localFileOpen(vscode.workspace.rootPath, '');
         }
     })
 }
@@ -363,6 +364,43 @@ function fileOptions(containerId: string, path: string, name: string, access: st
         }
     })
 }
+
+function localFileOpen(path: string, name: string) {
+
+    if (name != '.') {
+        var newPath: string = ('/' != path) ? path : '';
+        
+        if (name != '..') {
+            newPath += '/' + name;
+        } else {
+            if (newPath == '') {
+                newPath = '/';
+            } else {
+                var temp: string[] = newPath.split('/'); //
+                temp.pop();
+                newPath = (temp.length > 1) ? temp.join('/') : '/';
+            }
+        }
+
+        var dir = {
+            headers: ['name'],
+            rows: [],            
+            onSelect: ['command:extension.localFileOptions', newPath, '$name'],
+            onAltSelect: ['command:extension.localFileOpen', newPath, '$name']
+        };
+        var dirs = fs.readdirSync(path);
+
+        dir.rows.push({ name: '.' });
+        dir.rows.push({ name: '..' });
+
+        for (var i: number = 0; i < dirs.length; i++) {
+            dir.rows.push({ name: dirs[i] });
+        }
+
+        html.createPreviewFromObject('local-dir', dir, 2);
+    }
+}
+
 
 function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
