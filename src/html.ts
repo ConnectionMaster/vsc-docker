@@ -14,11 +14,14 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
+
+        var uriString: string = uri.toString();
+
         // TODO: detect failure to load page (e.g. google.com) and display error to user.
-        if (uri.toString() != 'xxx://internal') {
+        if (!uriString.startsWith('xxx://internal')) {
             return "<iframe src=\"" + uri + "\" frameBorder=\"0\" width=\"1024\" height=\"1024\"/>";
         } else {
-            return this.m_internalHtml;
+            return this.m_InternalPages[uriString];
         }
     };
 
@@ -27,32 +30,32 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
 	get onDidChange(): vscode.Event<vscode.Uri> { return this.onDidChangeEmitter.event; }
 
-    private m_internalHtml = "";
+    private m_InternalPages : {} = {};
 
 
 
-    public preview(html: string, title: string, panel: number) {
-        this.m_internalHtml = html; 
+    public preview(uri: string, html: string, title: string, panel: number) {
+        this.m_InternalPages[uri] = html; 
 
         var x = vscode.workspace.textDocuments;
 
         for (var d of x) {
-            if (d.uri.authority == 'internal') {
+            if (d.uri.toString() == uri) {
                 console.log('FOUND');
-                this.onDidChangeEmitter.fire(vscode.Uri.parse('xxx://internal'));
+                this.onDidChangeEmitter.fire(vscode.Uri.parse(uri));
                 return; 
             }
         }
 
         // only call preview if document really changed
-        vscode.commands.executeCommand('vscode.previewHtml', 'xxx://internal', panel, 'Docker Runner');
+        vscode.commands.executeCommand('vscode.previewHtml', uri, panel, 'Docker Runner');
     }
 
     public setExtensionPath(path: string) {
         this.m_ExtensionPath = path;
     }
 
-    public createPreviewFromText(text: string, title: string, panel: number = 1) {
+    public createPreviewFromText(type: string, text: string, title: string, panel: number = 1) {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
 
@@ -60,10 +63,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.documentParagraph(text);
         this.documentEnd();
 
-        this.preview(this.m_CurrentDocument, title, panel);
+        this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel);
     }
 
-    public createPreviewFromObject(o : object, panel: number = 1) {
+    public createPreviewFromObject(type: string, o : object, panel: number = 1) {
 
         this.documentStart(o['title']);
 
@@ -164,7 +167,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentEnd();
 
-        this.preview(this.m_CurrentDocument, o['title'], panel);
+        this.preview('xxx://internal/' + type, this.m_CurrentDocument, o['title'], panel);
     }
 
     private m_CurrentDocument = '';

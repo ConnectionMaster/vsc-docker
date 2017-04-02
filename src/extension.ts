@@ -127,7 +127,7 @@ function displayMainMenu() {
                                 result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
 
                                 // XXX - just for testing purposes here
-                                html.createPreviewFromObject(result);
+                                html.createPreviewFromObject('docker', result);
                             })
                         } )
                         break;
@@ -292,17 +292,17 @@ function displayContainerOptions(id: string, status: string) {
             })
         } else if (selected == 'Diff') {
             docker.diff(id, function (result: object) {
-                html.createPreviewFromText(result.toString(), "Diff");
+                html.createPreviewFromText('docker', result.toString(), "Diff");
             })
 
         } else if (selected == 'Top') {
             docker.top(id, function (result: object) {
-                html.createPreviewFromText(result.toString(), "Diff");
+                html.createPreviewFromText('docker', result.toString(), "Diff");
             })
 
         } else if (selected == 'Logs') {
             docker.logs(id, function (result: object) {
-                html.createPreviewFromText(result.toString(), "Logs");
+                html.createPreviewFromText('docker', result.toString(), "Logs");
             })
 
         } else if (selected == 'Browse') {
@@ -333,7 +333,7 @@ function fileOpen(containerId: string, path: string, name: string, access: strin
             dir['onSelect'] = ['command:extension.fileOptions', containerId, newPath, '$name', '$access'];
             dir['onAltSelect'] = ['command:extension.fileOpen', containerId, newPath, '$name', '$access'];
             
-            html.createPreviewFromObject(dir);
+            html.createPreviewFromObject('docker-dir', dir);
         })
     }
 }
@@ -382,7 +382,7 @@ function displayImageOptions(name: string, repository: string) {
                 result['title'] = 'History of ' + name;
 
                 // XXX - just for testing purposes here
-                html.createPreviewFromObject(result);
+                html.createPreviewFromObject('docker', result);
             })
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
@@ -422,7 +422,7 @@ function registerCommand(context: vscode.ExtensionContext, name, func) {
 function displayInfo() {
     docker.info(function (result: object) {
 
-        html.createPreviewFromText(result.toString(), 'Info');
+        html.createPreviewFromText('docker', result.toString(), 'Info');
     })       
 }
 
@@ -435,7 +435,7 @@ function queryImages() {
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
-        html.createPreviewFromObject(result);
+        html.createPreviewFromObject('docker', result);
     })       
 }
 
@@ -446,7 +446,7 @@ function queryContainers() {
         result['title'] = 'Containers';
         result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
 
-        html.createPreviewFromObject(result);
+        html.createPreviewFromObject('docker', result);
     })
 }
 
@@ -527,7 +527,7 @@ function cmdHandler(json: any, container: string) {
                     opn(params[0]);    
                     break;
                 case 'html':
-                    html.preview(params[0], 'Info', 1);
+                    html.preview('extension', params[0], 'Info', 1);
                     break;
                 case 'status':
                     var name: string = params[0].name;
