@@ -31,7 +31,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
 
 
-    public preview(html: string, title: string) {
+    public preview(html: string, title: string, panel: number) {
         this.m_internalHtml = html; 
 
         var x = vscode.workspace.textDocuments;
@@ -45,14 +45,14 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         }
 
         // only call preview if document really changed
-        vscode.commands.executeCommand('vscode.previewHtml', 'xxx://internal', 1, 'Docker Runner');
+        vscode.commands.executeCommand('vscode.previewHtml', 'xxx://internal', panel, 'Docker Runner');
     }
 
     public setExtensionPath(path: string) {
         this.m_ExtensionPath = path;
     }
 
-    public createPreviewFromText(text: string, title: string) {
+    public createPreviewFromText(text: string, title: string, panel: number = 1) {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
 
@@ -60,10 +60,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.documentParagraph(text);
         this.documentEnd();
 
-        this.preview(this.m_CurrentDocument, title);
+        this.preview(this.m_CurrentDocument, title, panel);
     }
 
-    public createPreviewFromObject(o : object) {
+    public createPreviewFromObject(o : object, panel: number = 1) {
 
         this.documentStart(o['title']);
 
@@ -164,7 +164,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentEnd();
 
-        this.preview(this.m_CurrentDocument, o['title']);
+        this.preview(this.m_CurrentDocument, o['title'], panel);
     }
 
     private m_CurrentDocument = '';

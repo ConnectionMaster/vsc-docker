@@ -527,7 +527,7 @@ function cmdHandler(json: any, container: string) {
                     opn(params[0]);    
                     break;
                 case 'html':
-                    html.preview(params[0], 'Info');
+                    html.preview(params[0], 'Info', 1);
                     break;
                 case 'status':
                     var name: string = params[0].name;
