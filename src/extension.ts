@@ -74,6 +74,14 @@ export function activate(context: vscode.ExtensionContext) {
         fileOptions(p[0], p[1], p[2], p[3]);
     });
 
+    registerCommand(context, 'extension.localFileOpen', (...p:any[]) => {
+        localFileOpen(p[0], p[1]);
+    });
+
+    registerCommand(context, 'extension.localFileOptions', (...p:any[]) => {
+        localFileOptions(p[0], p[1]);
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "\u27a4\u27a4 Docker Runner \u27a4\u27a4";
@@ -307,7 +315,10 @@ function displayContainerOptions(id: string, status: string) {
 
         } else if (selected == 'Browse') {
             fileOpen(id, '/', '', 'd---------');
-            localFileOpen(vscode.workspace.rootPath, '');
+
+            var localPath: string = vscode.workspace.rootPath.split('\\').join('/');
+
+            localFileOpen(localPath, '');
         }
     })
 }
@@ -388,7 +399,7 @@ function localFileOpen(path: string, name: string) {
             onSelect: ['command:extension.localFileOptions', newPath, '$name'],
             onAltSelect: ['command:extension.localFileOpen', newPath, '$name']
         };
-        var dirs = fs.readdirSync(path);
+        var dirs = fs.readdirSync(newPath);
 
         dir.rows.push({ name: '.' });
         dir.rows.push({ name: '..' });
@@ -401,6 +412,8 @@ function localFileOpen(path: string, name: string) {
     }
 }
 
+function localFileOptions(path: string, name: string) {
+}
 
 function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
