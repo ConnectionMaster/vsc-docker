@@ -4,12 +4,17 @@ var blockEnter = false;
 
 function tableKeyDown(event) {
 
+    var table = document.getElementById("tr_0").parentNode;
 
     if (event.key == 'ArrowDown') {
         focused++;
+        if (focused > table.childNodes.length -  2) focused = 0;
         document.getElementById('tr_' + focused).focus();
     } else if (event.key == 'ArrowUp') {
         focused--;
+
+        if (focused < 0) focused = focused = table.childNodes.length - 2;
+
         document.getElementById('tr_' + focused).focus();
     } else if (event.key == 'ArrowRight') {
         document.getElementById("tr_" + focused + "_a_alt").click();
