@@ -101,6 +101,10 @@ export class Docker {
         })        
     }
 
+    public cp(src: string, dst: string, cb) {
+        this.query(['cp', src, dst], false, cb)
+    }
+
     public exec(id: string, command: any[], cb) {
         this.query(['exec', this.nameFromId(id)].concat(command), false, cb);
     }
