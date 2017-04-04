@@ -140,7 +140,7 @@ function displayMainMenu() {
                                 result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
 
                                 // XXX - just for testing purposes here
-                                html.createPreviewFromObject('docker', result);
+                                html.createPreviewFromObject('docker', 'Search Result', result);
                             })
                         } )
                         break;
@@ -409,7 +409,7 @@ function displayImageOptions(name: string, repository: string) {
                 result['title'] = 'History of ' + name;
 
                 // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', result);
+                html.createPreviewFromObject('docker', 'History', result);
             })
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
@@ -462,7 +462,7 @@ function queryImages() {
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
-        html.createPreviewFromObject('docker', result);
+        html.createPreviewFromObject('docker','Images', result);
     })       
 }
 
@@ -473,7 +473,7 @@ function queryContainers() {
         result['title'] = 'Containers';
         result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
 
-        html.createPreviewFromObject('docker', result);
+        html.createPreviewFromObject('docker', 'Containers', result);
     })
 }
 

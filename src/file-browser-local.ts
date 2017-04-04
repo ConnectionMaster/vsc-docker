@@ -34,6 +34,11 @@ export class FileBrowserLocal extends FileBrowser
         return 'local-dir';
     }
 
+    getViewerTitle(): string
+    {
+        return 'Local FS';
+    }
+
     getPanel(): number
     {
         return 2;

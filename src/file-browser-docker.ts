@@ -29,6 +29,11 @@ export class FileBrowserDocker extends FileBrowser
         return 'docker-dir';
     }
 
+    getViewerTitle(): string
+    {
+        return this.m_ContainerId +  ' FS';
+    }
+
     getPanel(): number
     {
         return 1;

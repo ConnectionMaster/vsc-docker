@@ -33,12 +33,16 @@ export abstract class FileBrowser
 
     abstract dir();
     abstract getViewerName(): string;
+    abstract getViewerTitle(): string;
     abstract getPanel(): number;
 
     protected preview(dir: any)
     {
         var html: HtmlView = HtmlView.getInstance();
-        html.createPreviewFromObject(this.getViewerName(), dir, this.getPanel());
+
+        dir['title'] = this.m_CurrentDirectory;
+
+        html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), dir, this.getPanel());
     }
 
     public getPath() : string

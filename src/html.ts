@@ -48,7 +48,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         }
 
         // only call preview if document really changed
-        vscode.commands.executeCommand('vscode.previewHtml', uri, panel, 'Docker Runner');
+        vscode.commands.executeCommand('vscode.previewHtml', uri, panel, title);
     }
 
     public setExtensionPath(path: string) {
@@ -66,7 +66,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel);
     }
 
-    public createPreviewFromObject(type: string, o : object, panel: number = 1) {
+    public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number = 1) {
 
         this.documentStart(o['title']);
 
@@ -167,7 +167,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentEnd();
 
-        this.preview('xxx://internal/' + type, this.m_CurrentDocument, o['title'], panel);
+        this.preview('xxx://internal/' + type, this.m_CurrentDocument, tabTitle, panel);
     }
 
     private m_CurrentDocument = '';
@@ -188,6 +188,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write(css);
         this.write('<script>' + script + '</script>');
         this.write("<body onload='onPageLoaded();'>");
+
+        if (title) {
+            this.write('<h2>' + title + '</h2>');
+        }
    }
 
     private documentEnd() {
