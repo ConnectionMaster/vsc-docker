@@ -1,6 +1,7 @@
 
 import { Docker } from './docker';
 import { FileBrowser } from './file-browser';
+import * as vscode from 'vscode';
 
 export class FileBrowserDocker extends FileBrowser
 {
@@ -37,6 +38,24 @@ export class FileBrowserDocker extends FileBrowser
     getPanel(): number
     {
         return 1;
+    }
+
+    getFullPath()
+    {
+        return this.m_ContainerId + ':' +  this.m_CurrentDirectory;
+    }
+
+    copy(from: string, to: string)
+    {
+        var __this: FileBrowserDocker = this;
+        this.m_Docker.cp(from, to, function(result) {
+            if (result) {
+                vscode.window.showInformationMessage('Files copied!');
+                __this.m_OppositeBrowser.refresh();
+            } else {
+                vscode.window.showErrorMessage('Operation failed!');
+            }
+        });
     }
 
     private m_Docker: Docker = null;

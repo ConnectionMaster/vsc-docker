@@ -43,4 +43,15 @@ export class FileBrowserLocal extends FileBrowser
     {
         return 2;
     }
+
+    getFullPath()
+    {
+        return this.m_CurrentDirectory;
+    }
+
+    copy(from: string, to: string)
+    {
+        // use FileBrowserDocker to perform copy operation
+        this.m_OppositeBrowser.copy(from, to);   
+    }
 }

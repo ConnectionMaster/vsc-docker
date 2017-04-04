@@ -72,19 +72,19 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     registerCommand(context, 'extension.fileOpen', (...p:any[]) => {
-        fileOpen(p[0], p[1]);
+        g_FileBrowserDocker.open(p[0]);
     });
 
     registerCommand(context, 'extension.fileOptions', (...p:any[]) => {
-        fileOptions(p[0], p[1]);
+        g_FileBrowserDocker.options(p[0]);
     });
 
     registerCommand(context, 'extension.localFileOpen', (...p:any[]) => {
-        localFileOpen(p[0]);
+        g_FileBrowserLocal.open(p[0]);
     });
 
     registerCommand(context, 'extension.localFileOptions', (...p:any[]) => {
-        localFileOptions(p[0]);
+        g_FileBrowserLocal.options(p[0]);
     });
 
     var item = vscode.window.createStatusBarItem();
@@ -326,67 +326,9 @@ function displayContainerOptions(id: string, status: string) {
             
             g_FileBrowserLocal = new FileBrowserLocal(localPath);
             g_FileBrowserLocal.open('');
-        }
-    })
-}
 
-function fileOpen(name: string, access: string)
-{
-    g_FileBrowserDocker.open(name);
-}
-
-function fileOptions(name: string, access: string) {
-    var items:string[] = [];
-
-    if (access[0] == 'd') {
-        items.push('Copy');
-        items.push('Delete');
-        items.push('Open');
-        items.push('Rename');
-    } else if (access[0] == 'l') {
-
-    } else {
-        items.push('Copy');
-        items.push('Delete file');
-        items.push('Open File');
-        items.push('Rename File');
-    }
-
-    vscode.window.showQuickPick(items).then( selected => {
-        if (selected == 'Copy') {
-            docker.cp(g_FileBrowserDocker.getPath() + '/' + name, g_FileBrowserLocal.getPath(), function(result) {
-                if (result) {
-                    vscode.window.showInformationMessage('Files copied!');
-                } else {
-                    vscode.window.showErrorMessage('Operation failed!');
-                }
-            });
-        } else if (selected == 'Remove') {
-        } else if (selected == 'Pull') {
-        } else if (selected == 'Push') {
-        }
-    })
-}
-
-function localFileOpen(name: string) {
-    g_FileBrowserLocal.open(name);
-}
-
-function localFileOptions(name: string) {
-    var items:string[] = [];
-
-    items.push('Open');
-    items.push('Copy');
-
-    vscode.window.showQuickPick(items).then( selected => {
-        if (selected == 'Copy') {
-            docker.cp(path + '/' + name, g_FileBrowserDocker.getPath(), function(result) {
-                if (result) {
-                    vscode.window.showInformationMessage('Files copied!');
-                } else {
-                    vscode.window.showErrorMessage('Operation failed!');
-                }
-            });
+            g_FileBrowserDocker.setOppositeBrowser(g_FileBrowserLocal);
+            g_FileBrowserLocal.setOppositeBrowser(g_FileBrowserDocker);
         }
     })
 }
