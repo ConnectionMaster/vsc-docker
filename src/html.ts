@@ -99,6 +99,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                 if (onSelect) {
                     var command = onSelect[0];
                     var params = [];
+                    var useHandler = false;
+
+                    if (!command.startsWith('command:')) {
+                        command = 'command:extension.handler';
+                        useHandler = true;
+                    }
 
                     for (var x: number = 1; x < onSelect.length; x++) {
                         if (onSelect[x][0] == '$') {
@@ -111,7 +117,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                             params.push(onSelect[x]);
                         }
                     }
-                    link = encodeURI(command + '?' + JSON.stringify(params));
+                    if (!useHandler) {
+                        link = encodeURI(command + '?' + JSON.stringify(params));
+                    } else {
+                        // XXX - this is a hack for container commands -- must find proper solution
+                        link = encodeURI(command + '?' + JSON.stringify([ [onSelect[0]].concat(params), container]));
+                    }
                 }
 
                 // prepare onclick for this row here
