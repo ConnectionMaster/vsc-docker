@@ -163,7 +163,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentTableEnd();
 
-        
+        // any action buttons?
+        if (o.hasOwnProperty('actions')) {
+            for (var i: number = 0; i < o['actions'].length; i++) {
+                this.documentButtonLink(o['actions'][i].name, encodeURI(o['actions'][i].link));
+            }
+        }
 
         this.documentEnd();
 
@@ -263,6 +268,15 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentButtonJs(text, js) {
         this.write("<button onclick='" + js + "'>" + text + "</button>");
     }
+
+    private documentButtonLink(text, link) {
+
+        this.documentButtonJs(text, 'document.getElementById("btn_' + this.m_NextBtn + '_a").click()');
+        this.m_GlobalLinks += "<a href='" + link + "' id='btn_" + this.m_NextBtn + "_a' />"; 
+        this.m_NextBtn++;       
+    }
+
+    private m_NextBtn: number = 0;
 
     private documentWriteLink(text, link) {
         this.write("<a href='" + link + "'>" + text + "</a>");
