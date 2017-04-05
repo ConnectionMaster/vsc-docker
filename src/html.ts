@@ -68,13 +68,17 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
+        this.write('<br/><br/>');
         this.documentStart(o['title']);
 
         if (o.hasOwnProperty('description')) {
+            this.write('<br/><br/>');
             this.documentParagraph(o['description']);
         }
 
         if (o.hasOwnProperty('headers')) {
+
+            this.write('<br/><br/>');
 
             this.documentTableStart(o['headers']);
 
@@ -183,6 +187,9 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         // any action buttons?
         if (o.hasOwnProperty('actions')) {
+
+            this.write('<br/><br/>');
+
             for (var i: number = 0; i < o['actions'].length; i++) {
                 var link: string = JSON.stringify([ o['actions'][i].link, container ]);
 
