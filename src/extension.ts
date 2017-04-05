@@ -560,6 +560,23 @@ function cmdHandler(json: any, container: string) {
                             out.appendLine('\u2b24');
                         });
                     }
+                    break;
+                case 'install':
+                    // install required container and launch welcome screen
+                    docker.pull(params[0], function(result) {
+                        if (result) {
+                            startContainerFromTerminal(params[0], true, function (result) {
+                                // image is now started
+
+                                // send command to the container
+                                docker.execCmd(params[0], ['docker:welcome'], function(result) {});
+                            });
+
+                        } else {
+
+                        }
+                    })
+                    break;
             }
         } else if (cmdPrefix == 'docker') {
             docker.execCmd(container, params, function(result) {});
