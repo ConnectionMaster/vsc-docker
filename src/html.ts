@@ -70,6 +70,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentStart(o['title']);
 
+        if (o.hasOwnProperty('description')) {
+            this.documentParagraph(o['description']);
+        }
+
         this.documentTableStart(o['headers']);
 
         var onSelect: any[] = undefined;
