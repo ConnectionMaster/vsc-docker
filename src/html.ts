@@ -225,7 +225,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     private documentEnd() {
         this.write(this.m_GlobalLinks);
-        this.write("<p id='para'>...</p>");
         this.write("</body>");
         this.write("</html>");
     }
