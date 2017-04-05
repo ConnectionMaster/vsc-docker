@@ -567,7 +567,7 @@ function cmdHandler(json: any, container: string) {
 
         vscode.commands.executeCommand(cmd, params);
     } catch (e) {
-        console.log("Parsing JSON failstartContainerFromTerminaled:");
+        console.log("Parsing JSON failed:");
         console.log(json);
     }
 }
