@@ -49,10 +49,17 @@ table {border-spacing: 0; } /* IMPORTANT, I REMOVED border-collapse: collapse; F
 
 /*This is not important*/
 body{
-	font-family:Arial, Helvetica, sans-serif;
-	background: url(background.jpg);
-	margin:0 auto;
+	font-family:Segoe UI Webfont, Helvetica Neue, sans-serif;
+	background: white;
+	margin:20px;
+	padding: 20px;
 }
+
+h2{
+	font-weight: normal;
+	font-family: Segoe UI;
+}
+
 a:link {
 	color: #666;
 	font-weight: bold;
@@ -67,6 +74,11 @@ a:active,
 a:hover {
 	color: #bd5a35;
 	text-decoration:underline;
+}
+
+button {
+	padding: 10px;
+	margin: 10px;
 }
 
 
@@ -89,7 +101,7 @@ table a:hover {
 	text-decoration:underline;
 }
 table {
-	font-family:Arial, Helvetica, sans-serif;
+	font-family:Segoe UI Webfont, Helvetica, sans-serif;
 	color:#666;
 	font-size:12px;
 	text-shadow: 1px 1px 0px #fff;
