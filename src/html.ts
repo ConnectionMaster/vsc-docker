@@ -66,7 +66,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel);
     }
 
-    public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number = 1) {
+    public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
         this.documentStart(o['title']);
 
@@ -74,103 +74,112 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             this.documentParagraph(o['description']);
         }
 
-        this.documentTableStart(o['headers']);
+        if (o.hasOwnProperty('headers')) {
 
-        var onSelect: any[] = undefined;
-        var onAltSelect: any[] = undefined;
+            this.documentTableStart(o['headers']);
 
-        // check if we have onSelect pattern
-        if (o.hasOwnProperty('onSelect')) {
-            onSelect = o['onSelect'];
-        }
+            var onSelect: any[] = undefined;
+            var onAltSelect: any[] = undefined;
 
-        // check if we have onAltSelect pattern
-        if (o.hasOwnProperty('onAltSelect')) {
-            onAltSelect = o['onAltSelect'];
-        }
-
-        for (var i: number = 0; i < o['rows'].length; i++) {
-            var link = '';
-            var altLink = '';
-
-            // prepare onclick for this row here
-            if (onSelect) {
-                var command = onSelect[0];
-                var params = [];
-
-                for (var x: number = 1; x < onSelect.length; x++) {
-                    if (onSelect[x][0] == '$') {
-                        // XXX try to get value
-                        var field: string = onSelect[x].substring(1);
-                        var value: string = o['rows'][i][field];
-
-                        params.push(value);
-                    } else {
-                        params.push(onSelect[x]);
-                    }
-                }
-                link = encodeURI(command + '?' + JSON.stringify(params));
+            // check if we have onSelect pattern
+            if (o.hasOwnProperty('onSelect')) {
+                onSelect = o['onSelect'];
             }
 
-            // prepare onclick for this row here
-            if (onAltSelect) {
-                var command = onAltSelect[0];
-                var params = [];
-
-                for (var x: number = 1; x < onAltSelect.length; x++) {
-                    if (onAltSelect[x][0] == '$') {
-                        // XXX try to get value
-                        var field: string = onAltSelect[x].substring(1);
-                        var value: string = o['rows'][i][field];
-
-                        params.push(value);
-                    } else {
-                        params.push(onAltSelect[x]);
-                    }
-                }
-                altLink = encodeURI(command + '?' + JSON.stringify(params));
+            // check if we have onAltSelect pattern
+            if (o.hasOwnProperty('onAltSelect')) {
+                onAltSelect = o['onAltSelect'];
             }
 
+            for (var i: number = 0; i < o['rows'].length; i++) {
+                var link = '';
+                var altLink = '';
 
-            this.documentTableRowStart(i, link, altLink);
-
-            for (var j: number = 0; j < o['headers'].length; j++) {
-
-                if (typeof o['headers'][j] == 'string') {
-                    this.documentTableCell(o['rows'][i][o['headers'][j]]);
-                } else {
-                    var def = o['headers'][j];
-                    var command = def[1];
+                // prepare onclick for this row here
+                if (onSelect) {
+                    var command = onSelect[0];
                     var params = [];
 
-                    for (var x: number = 2; x < def.length; x++) {
-                        if (def[x][0] == '$') {
+                    for (var x: number = 1; x < onSelect.length; x++) {
+                        if (onSelect[x][0] == '$') {
                             // XXX try to get value
-                            var field: string = def[x].substring(1);
+                            var field: string = onSelect[x].substring(1);
                             var value: string = o['rows'][i][field];
 
                             params.push(value);
                         } else {
-                            params.push(def[x]);
+                            params.push(onSelect[x]);
                         }
                     }
+                    link = encodeURI(command + '?' + JSON.stringify(params));
+                }
 
-                    // generate link
-                    var link: string = encodeURI(command + '?' + JSON.stringify(params));
+                // prepare onclick for this row here
+                if (onAltSelect) {
+                    var command = onAltSelect[0];
+                    var params = [];
 
-                    this.documentTableCellLink(def[0], link);
-                } 
+                    for (var x: number = 1; x < onAltSelect.length; x++) {
+                        if (onAltSelect[x][0] == '$') {
+                            // XXX try to get value
+                            var field: string = onAltSelect[x].substring(1);
+                            var value: string = o['rows'][i][field];
+
+                            params.push(value);
+                        } else {
+                            params.push(onAltSelect[x]);
+                        }
+                    }
+                    altLink = encodeURI(command + '?' + JSON.stringify(params));
+                }
+
+
+                this.documentTableRowStart(i, link, altLink);
+
+                for (var j: number = 0; j < o['headers'].length; j++) {
+
+                    if (typeof o['headers'][j] == 'string') {
+                        this.documentTableCell(o['rows'][i][o['headers'][j]]);
+                    } else {
+                        var def = o['headers'][j];
+                        var command = def[1];
+                        var params = [];
+
+                        for (var x: number = 2; x < def.length; x++) {
+                            if (def[x][0] == '$') {
+                                // XXX try to get value
+                                var field: string = def[x].substring(1);
+                                var value: string = o['rows'][i][field];
+
+                                params.push(value);
+                            } else {
+                                params.push(def[x]);
+                            }
+                        }
+
+                        // generate link
+                        var link: string = encodeURI(command + '?' + JSON.stringify(params));
+
+                        this.documentTableCellLink(def[0], link);
+                    } 
+                }
+
+                this.documentTableRowEnd();
             }
 
-            this.documentTableRowEnd();
+            this.documentTableEnd();
         }
-
-        this.documentTableEnd();
 
         // any action buttons?
         if (o.hasOwnProperty('actions')) {
             for (var i: number = 0; i < o['actions'].length; i++) {
-                this.documentButtonLink(o['actions'][i].name, encodeURI(o['actions'][i].link));
+                var link: string = JSON.stringify([ o['actions'][i].link, container ]);
+
+                if (!link.startsWith('command:')) {
+                    link = 'command:extension.handler?' + link;
+                }
+
+                this.documentButtonLink(o['actions'][i].name, encodeURI(link));
             }
         }
 

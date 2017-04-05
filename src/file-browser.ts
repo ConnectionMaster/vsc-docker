@@ -67,7 +67,7 @@ export abstract class FileBrowser
 
         dir['title'] = this.m_CurrentDirectory;
 
-        html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), dir, this.getPanel());
+        html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), dir, this.getPanel(), '');
 
         this.m_CurrentContent = dir;
     }

@@ -87,6 +87,10 @@ export function activate(context: vscode.ExtensionContext) {
         g_FileBrowserLocal.options(p[0]);
     });
 
+    registerCommand(context, 'extension.handler', (...p:any[]) => {
+        cmdHandler(p[0], p[1]);
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "\u27a4\u27a4 Docker Runner \u27a4\u27a4";
@@ -140,7 +144,7 @@ function displayMainMenu() {
                                 result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
 
                                 // XXX - just for testing purposes here
-                                html.createPreviewFromObject('docker', 'Search Result', result);
+                                html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
                             })
                         } )
                         break;
@@ -351,7 +355,7 @@ function displayImageOptions(name: string, repository: string) {
                 result['title'] = 'History of ' + name;
 
                 // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', 'History', result);
+                html.createPreviewFromObject('docker', 'History', result, 1, null);
             })
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
@@ -404,7 +408,7 @@ function queryImages() {
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
-        html.createPreviewFromObject('docker','Images', result);
+        html.createPreviewFromObject('docker','Images', result, 1, null);
     })       
 }
 
@@ -415,7 +419,7 @@ function queryContainers() {
         result['title'] = 'Containers';
         result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
 
-        html.createPreviewFromObject('docker', 'Containers', result);
+        html.createPreviewFromObject('docker', 'Containers', result, 1, '');
     })
 }
 
@@ -497,6 +501,9 @@ function cmdHandler(json: any, container: string) {
                     break;
                 case 'html':
                     html.preview('extension', params[0], 'Info', 1);
+                    break;
+                case 'form':
+                    html.createPreviewFromObject("extension", "Extension", params[0], 1, container);
                     break;
                 case 'status':
                     var name: string = params[0].name;
