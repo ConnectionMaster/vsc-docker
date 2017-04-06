@@ -28,7 +28,7 @@ var g_FileBrowserDocker: FileBrowserDocker = null;
 var g_FileBrowserLocal: FileBrowserLocal = null;
 var copyPaste = require('copy-paste');
 
-var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4\u27a4 Docker Runner \u27a4\u27a4");
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker Runner");
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -102,7 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "\u27a4\u27a4 Docker Runner \u27a4\u27a4";
+    item.text = "\u27a4 Docker Runner";
     item.command = "extension.openMainMenu";
     item.show();
 
