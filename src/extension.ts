@@ -126,7 +126,7 @@ function displayMainMenu() {
                 vscode.window.showTextDocument(document);
             });
         } else if (selected == 'Search Images') {
-            vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
+            vscode.window.showInputBox( { prompt: "Search string" } ).then( (filter) => {
                 var items:string[] = [];
 
                 docker.search(filter, function (result: object) {
