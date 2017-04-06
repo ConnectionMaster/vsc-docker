@@ -1,9 +1,10 @@
 {
   "name": "vsc-docker",
-  "displayName": "vsc-docker",
-  "description": "VSC Docker Integration",
-  "version": "0.0.1",
+  "displayName": "Docker Runner",
+  "description": "Docker Integration for VSC",
+  "version": "0.0.2",
   "publisher": "Zim",
+  "repository": "https://github.com/zikalino/vsc-docker",
   "engines": {
     "vscode": "^1.10.0"
   },
