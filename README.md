@@ -1,20 +1,21 @@
-# VSC + Docker for IoT Extension
+# Docker Runner - Docker Integration for VSC
 
-## Start working
+Please note this is an early alpha version, so it may have bugs and missing features.
+However I think it can be already very useful.
+I am still experimenting a lot and I am planning to add much more features in the future. 
 
-After cloning this repo, go to the extension directory and run **npm install**
+## How to start?
 
+Press **Alt+Ctrl+D** to activate.
 
-## Detecting compatible Docker containers
+## What this extension can do for you now?
 
-Extension searches DockerHub for compatible containers. Their names have to contain **xvsc** signature in their name.
+- Search and pull Docker images from Docker Hub
+- Easily manage local images
+- Manage local containers
+- Easily copy files between local filesystem and container file system
+- Pin your favourite containers to the main menu
 
-## Container capabilities
+## What are my plans for the future?
 
-Extension should be able to query container for capabilities by running following command:
-
-  docker run <container-name> capabilities
-
-Container should return a JSON formatted string contained capabilities definitions.
-
-TBD: define container capabilities  
+TBD
