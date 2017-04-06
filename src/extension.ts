@@ -109,11 +109,11 @@ export function deactivate() {
 function displayMainMenu() {
     var items:string[] = [];
 
-    items.push('Search Images');
-    items.push('Local Containers');
     items.push('Local Images');
-    items.push('Info');
+    items.push('Local Containers');
+    items.push('Search Images');
     items.push('Edit Configuration');
+    items.push('Info');
     items.push('________________');
 
     for (var item in g_Config) {
