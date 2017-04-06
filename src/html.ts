@@ -191,13 +191,20 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             this.write('<br/><br/>');
 
             for (var i: number = 0; i < o['actions'].length; i++) {
-                var link: string = JSON.stringify([ o['actions'][i].link, container ]);
 
-                if (!link.startsWith('command:')) {
-                    link = 'command:extension.handler?' + link;
+                if (o['actions'][i].link[0].startsWith('command:')) {
+                    var link: string = o['actions'][i].link[0];
+
+                    this.documentButtonLink(o['actions'][i].name, encodeURI(link));
+                } else {
+                    var link: string = JSON.stringify([ o['actions'][i].link, container ]);
+
+                    if (!link.startsWith('command:')) {
+                        link = 'command:extension.handler?' + link;
+                    }
+
+                    this.documentButtonLink(o['actions'][i].name, encodeURI(link));
                 }
-
-                this.documentButtonLink(o['actions'][i].name, encodeURI(link));
             }
         }
 

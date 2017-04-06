@@ -399,6 +399,8 @@ function queryImages() {
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
+        result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
+
         html.createPreviewFromObject('docker','Images', result, 1, null);
     })       
 }
@@ -409,6 +411,8 @@ function queryContainers() {
         // add complex definition to the headers
         result['title'] = 'Containers';
         result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
+
+        result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 
         html.createPreviewFromObject('docker', 'Containers', result, 1, '');
     })
