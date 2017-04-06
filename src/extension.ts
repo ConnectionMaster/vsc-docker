@@ -404,7 +404,6 @@ function queryImages() {
 
         // add complex definition to the headers
         result['title'] = 'Docker Images';
-        result['headers'].push(['More...', 'command:extension.imageOptions', '$image id', '$repository']);
 
         result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
