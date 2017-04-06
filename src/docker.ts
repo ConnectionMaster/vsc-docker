@@ -265,7 +265,7 @@ export class Docker {
         stream.on('data', (buffer: Buffer) => {
             var decoded: string = decoder.write(buffer);
             data.push(decoded);
-            this.m_OutputHandler(decoded);
+            //this.m_OutputHandler(decoded);
 
             // just make a single string...
             data[0] = data.join('');

@@ -577,6 +577,10 @@ function cmdHandler(json: any, container: string) {
                         }
                     })
                     break;
+                case 'log':
+                    out.appendLine(params[0]);
+                    out.show();
+                    break;
             }
         } else if (cmdPrefix == 'docker') {
             docker.execCmd(container, params, function(result) {});
