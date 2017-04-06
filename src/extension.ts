@@ -345,7 +345,11 @@ function displayImageOptions(name: string, repository: string) {
             })
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
-                vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
+                if (result) {
+                    vscode.window.showInformationMessage('Image removed!');                    
+                } else {
+                    vscode.window.showErrorMessage('Removing image failed!');
+                }
 
                 queryImages();            
             })
