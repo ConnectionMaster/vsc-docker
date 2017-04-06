@@ -133,8 +133,6 @@ function displayMainMenu() {
 
                     // add complex definition to the headers
                     result['title'] = 'Find Docker Images';
-                    result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
-
                     result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
 
                     // XXX - just for testing purposes here
@@ -412,25 +410,31 @@ function queryContainers() {
 
 function installImage(id: string, description: string) {
 
-    docker.getConfig(id, function(config) {
-        if (config) {
-            vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!");
-            g_Config[id].config = config;
-            g_Config[id].config.compatible = true;
+    docker.pull(id, function(result) {
+        if (result) {
+            docker.getConfig(id, function(config) {
+                if (config) {
+                    vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!");
+                    g_Config[id].config = config;
+                    g_Config[id].config.compatible = true;
+                } else {
+                    vscode.window.showInformationMessage("Installed generic image!");
+
+                    g_Config[id].config = {};
+                    g_Config[id].config.compatible = false;
+                }
+
+                g_Config[id].menu = {
+                    items: [ "Shell", "Execute" ],
+                    commands: [ "ide:bash", "ide:execute"] 
+                };
+
+                saveConfig();
+            });            
         } else {
-            vscode.window.showInformationMessage("Installed generic image!");
-
-            g_Config[id].config = {};
-            g_Config[id].config.compatible = false;
+            vscode.window.showErrorMessage('Failed to pull image!');
         }
-
-        g_Config[id].menu = {
-            items: [ "Shell", "Execute" ],
-            commands: [ "ide:bash", "ide:execute"] 
-        };
-
-        saveConfig();
-    });
+    })
 }
 
 
