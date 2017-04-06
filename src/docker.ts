@@ -191,7 +191,8 @@ export class Docker {
     }
 
     private query(params: string[], parse: boolean, cb) {
-        // this function will call docker command, and parse output
+
+        this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
 
         const child = cp.spawn('docker', params);
         const stdout = this.collectData(child.stdout, 'utf8', '', false);
