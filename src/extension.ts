@@ -109,56 +109,44 @@ export function deactivate() {
 function displayMainMenu() {
     var items:string[] = [];
 
+    items.push('Search Images');
+    items.push('Local Containers');
+    items.push('Local Images');
+    items.push('Info');
+    items.push('Edit Configuration');
+    items.push('________________');
+
     for (var item in g_Config) {
         items.push((g_Terminals.hasOwnProperty(docker.nameFromId(item)) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
     }
 
-    items.push('Edit Configuration');
-
-    items.push('Docker...');
-
-    vscode.window.showQuickPick(items).then( selected => {
+   vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Edit Configuration') {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
-        } else if (selected == 'Docker...') {
-            items = [];
-            items.push('Search Images');
-            items.push('Local Containers');
-            items.push('Local Images');
-            items.push('Info');
+        } else if (selected == 'Search Images') {
+            vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
+                var items:string[] = [];
 
-            vscode.window.showQuickPick(items).then( selected => {
-                switch (selected) {
-                    case 'Search Images':
-                        vscode.window.showInputBox( { prompt: "Search string", value: 'xvsc'} ).then( (filter) => {
-                            var items:string[] = [];
+                docker.search(filter, function (result: object) {
 
-                            docker.search(filter, function (result: object) {
+                    // add complex definition to the headers
+                    result['title'] = 'Find Docker Images';
+                    result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
 
-                                // add complex definition to the headers
-                                result['title'] = 'Find Docker Images';
-                                result['headers'].push(['Pull & Add', 'command:extension.installImage', '$name', '$description']);
+                    result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
 
-                                result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
-
-                                // XXX - just for testing purposes here
-                                html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
-                            })
-                        } )
-                        break;
-                    case 'Local Containers':
-                        queryContainers();
-                        break;
-                    case 'Local Images':
-                        queryImages();
-                        break;
-                    case 'Info':
-                        displayInfo();
-                        break;
-                }
-            });            
+                    // XXX - just for testing purposes here
+                    html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
+                })
+            } )
+        } else if (selected == 'Local Containers') {
+            queryContainers();
+        } else if (selected == 'Local Images') {
+            queryImages();
+        } else if (selected == 'Info') {
+            displayInfo();
         } else {
             var image: string = selected.split('[')[1].split(']')[0];
             displayContainerMenu(image);
