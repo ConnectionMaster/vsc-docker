@@ -124,7 +124,7 @@ export class Docker {
     }
 
     public getConfig(id, cb) {
-        this. query(['run', id, 'config'], false, cb);
+        this. query(['run', '--rm', id, 'config'], false, cb);
     }
 
     public search(filter: string, cb) {
