@@ -55,12 +55,9 @@ export function activate(context: vscode.ExtensionContext) {
          })
 
     });
-        
-    registerCommand(context, 'extension.installImage', (...p:any[]) => {
-            g_Config[p[0]] = { description: p[1] };
-            saveConfig();
 
-            installImage(p[0], p[1]);
+    registerCommand(context, 'extension.installImageOptions', (...p:any[]) => {
+            installImageOptions(p[0], p[1]);
     });
 
     registerCommand(context, 'extension.containerOptions', (...p:any[]) => {
@@ -133,7 +130,7 @@ function displayMainMenu() {
 
                     // add complex definition to the headers
                     result['title'] = 'Find Docker Images';
-                    result['onSelect'] = ['command:extension.installImage', '$name', '$description'];
+                    result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
                     // XXX - just for testing purposes here
                     html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
@@ -412,35 +409,58 @@ function queryContainers() {
     })
 }
 
-function installImage(id: string, description: string) {
+function installImageOptions(id: string, description: string) {
+
+    var items:string[] = [];
+
+    items.push('Pull');
+    items.push('Pull & Pin to the Menu');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == 'Pull') {
+            installImage(id, description, false);
+        } else if (selected == 'Pull & Pin to the Menu') {
+            installImage(id, description, true);
+        }
+    });
+}
+ 
+
+function installImage(id: string, description: string, pin: boolean) {
 
     docker.pull(id, function(result) {
         if (result) {
-            docker.getConfig(id, function(config) {
-                if (config) {
-                    vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!");
-                    g_Config[id].config = config;
-                    g_Config[id].config.compatible = true;
-                } else {
-                    vscode.window.showInformationMessage("Installed generic image!");
+            if (pin) {
+                docker.getConfig(id, function(config) {
+                    if (config) {
+                        vscode.window.showInformationMessage("Installed Visual Studio Code compatible image!");
+                        g_Config[id] = {};
+                        g_Config[id].config = config;
+                        g_Config[id].config.compatible = true;
+                    } else {
+                        vscode.window.showInformationMessage("Installed generic image!");
 
-                    g_Config[id].config = {};
-                    g_Config[id].config.compatible = false;
-                }
+                        g_Config[id] = {};
+                        g_Config[id].config = {};
+                        g_Config[id].config.compatible = false;
+                        g_Config[id].description = description;
+                    }
 
-                g_Config[id].menu = {
-                    items: [ "Shell", "Execute" ],
-                    commands: [ "ide:bash", "ide:execute"] 
-                };
+                    g_Config[id].menu = {
+                        items: [ "Shell", "Execute" ],
+                        commands: [ "ide:bash", "ide:execute"] 
+                    };
 
-                saveConfig();
-            });            
+                    saveConfig();
+                });
+            } else {
+                vscode.window.showInformationMessage("Image pulled!");
+            }            
         } else {
             vscode.window.showErrorMessage('Failed to pull image!');
         }
     })
 }
-
 
 function logHandler(data: string) {
     out.append(data);
