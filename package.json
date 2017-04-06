@@ -18,7 +18,19 @@
     "commands": [
       {
         "command": "extension.openMainMenu",
-        "title": "DockerRunner: Main Menu"
+        "title": "DockerRunner: Menu"
+      },
+      {
+        "command": "extension.showLocalImages",
+        "title": "DockerRunner: Images"
+      },
+      {
+        "command": "extension.showLocalContainers",
+        "title": "DockerRunner: Containers"
+      },
+      {
+        "command": "extension.searchImages",
+        "title": "DockerRunner: Search Images"
       }
     ],
     "keybindings": [

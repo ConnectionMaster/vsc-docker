@@ -88,6 +88,18 @@ export function activate(context: vscode.ExtensionContext) {
         cmdHandler(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.showLocalImages', (...p:any[]) => {
+        queryImages();
+    });
+
+    registerCommand(context, 'extension.showLocalContainers', (...p:any[]) => {
+        queryContainers();
+    });
+
+    registerCommand(context, 'extension.searchImages', (...p:any[]) => {
+        searchImages();
+    });
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "\u27a4\u27a4 Docker Runner \u27a4\u27a4";
@@ -123,19 +135,7 @@ function displayMainMenu() {
                 vscode.window.showTextDocument(document);
             });
         } else if (selected == 'Search Images') {
-            vscode.window.showInputBox( { prompt: "Search string" } ).then( (filter) => {
-                var items:string[] = [];
-
-                docker.search(filter, function (result: object) {
-
-                    // add complex definition to the headers
-                    result['title'] = 'Find Docker Images';
-                    result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
-
-                    // XXX - just for testing purposes here
-                    html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
-                })
-            } )
+            searchImages();
         } else if (selected == 'Local Containers') {
             queryContainers();
         } else if (selected == 'Local Images') {
@@ -412,6 +412,22 @@ function queryContainers() {
 
         html.createPreviewFromObject('docker', 'Containers', result, 1, '');
     })
+}
+
+function searchImages() {
+    vscode.window.showInputBox( { prompt: "Search string" } ).then( (filter) => {
+        var items:string[] = [];
+
+        docker.search(filter, function (result: object) {
+
+            // add complex definition to the headers
+            result['title'] = 'Find Docker Images';
+            result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
+
+            // XXX - just for testing purposes here
+            html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
+        })
+    } )
 }
 
 function installImageOptions(id: string, description: string) {
