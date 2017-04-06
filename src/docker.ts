@@ -24,13 +24,6 @@ export class Docker {
         return id.replace('/', '_');
     }
 
-    public searchImages(filter: string): object {
-
-        console.log("SEARCH IMAGES CALLED");
-
-        return null;
-    }
-
     public isRunning(id: string): boolean {
         return this.m_Containers.hasOwnProperty(id);
     }
