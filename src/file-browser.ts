@@ -49,6 +49,7 @@ export abstract class FileBrowser
                 this.copy(this.getFullPath() + '/' + name, this.m_OppositeBrowser.getFullPath());
                 this.m_OppositeBrowser.refresh();
             } else if (selected == 'Open') {
+                this.open(name);
             }
         })
         
