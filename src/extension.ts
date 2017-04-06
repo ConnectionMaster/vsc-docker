@@ -348,7 +348,12 @@ function displayImageOptions(name: string, repository: string) {
                     vscode.window.showErrorMessage('Removing image failed!');
                 }
 
-                queryImages();            
+                queryImages();
+
+                if (g_Config.hasOwnProperty(repository)) {
+                    delete g_Config[repository];
+                    saveConfig();
+                }
             })
         } else if (selected == 'Pull') {
             docker.pull(repository, function(result) {
