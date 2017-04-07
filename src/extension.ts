@@ -473,7 +473,7 @@ function installImage(id: string, description: string, pin: boolean) {
 
                     g_Config[id].menu = {
                         items: [ "Shell", "Execute" ],
-                        commands: [ "ide:bash", "ide:execute"] 
+                        commands: [ ["ide:bash"], ["ide:execute"]] 
                     };
 
                     saveConfig();
