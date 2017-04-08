@@ -1,62 +1,63 @@
 {
-  "name": "vsc-docker",
-  "displayName": "Docker Runner",
-  "description": "Docker Integration for VSC",
-  "version": "0.0.5",
-  "publisher": "Zim",
-  "repository": "https://github.com/zikalino/vsc-docker",
-  "engines": {
-    "vscode": "^1.10.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.openMainMenu"
-  ],
-  "main": "./out/src/extension",
-  "contributes": {
-    "commands": [
-      {
-        "command": "extension.openMainMenu",
-        "title": "DockerRunner: Menu"
-      },
-      {
-        "command": "extension.showLocalImages",
-        "title": "DockerRunner: Images"
-      },
-      {
-        "command": "extension.showLocalContainers",
-        "title": "DockerRunner: Containers"
-      },
-      {
-        "command": "extension.searchImages",
-        "title": "DockerRunner: Search Images"
-      }
+    "name": "vsc-docker",
+    "displayName": "Docker Runner",
+    "description": "Docker Integration for VSC",
+    "version": "0.1.0",
+    "publisher": "Zim",
+    "repository": "https://github.com/zikalino/vsc-docker",
+    "icon": "vsc-docker-icon.png",
+    "engines": {
+        "vscode": "^1.10.0"
+    },
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "key": "alt+ctrl+d",
-        "command": "extension.openMainMenu"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
-  },
-  "devDependencies": {
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0",
-    "mocha": "^2.3.3",
-    "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
-  },
-  "dependencies": {
-    "ansi-to-html": "^0.6.0",
-    "copy-paste": "^1.3.0",
-    "opn": "^4.0.2"
-  }
+    "activationEvents": [
+        "onCommand:extension.openMainMenu"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.openMainMenu",
+                "title": "DockerRunner: Menu"
+            },
+            {
+                "command": "extension.showLocalImages",
+                "title": "DockerRunner: Images"
+            },
+            {
+                "command": "extension.showLocalContainers",
+                "title": "DockerRunner: Containers"
+            },
+            {
+                "command": "extension.searchImages",
+                "title": "DockerRunner: Search Images"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "alt+ctrl+d",
+                "command": "extension.openMainMenu"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "ansi-to-html": "^0.6.0",
+        "copy-paste": "^1.3.0",
+        "opn": "^4.0.2"
+    }
 }
