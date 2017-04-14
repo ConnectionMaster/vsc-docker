@@ -12,6 +12,8 @@ export abstract class FileBrowser
     public setOppositeBrowser(browser: FileBrowser)
     {
         this.m_OppositeBrowser = browser;
+
+        this.refreshHtml();
     }
 
     public open(name: string)
@@ -64,13 +66,18 @@ export abstract class FileBrowser
 
     protected preview(dir: any)
     {
-        var html: HtmlView = HtmlView.getInstance();
-
         dir['title'] = this.m_CurrentDirectory;
-
-        html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), dir, this.getPanel(), '');
-
         this.m_CurrentContent = dir;
+        this.refreshHtml();
+
+    }
+
+    protected refreshHtml() {
+        if (this.m_OppositeBrowser && this.m_CurrentContent && this.m_OppositeBrowser.m_CurrentContent) {
+            var html: HtmlView = HtmlView.getInstance();
+            var o: {} = { title: 'File Browser', panels: [this.m_CurrentContent, this.m_OppositeBrowser.m_CurrentContent] };
+            html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), o, 1, '');
+        }
     }
 
     public getPath() : string
