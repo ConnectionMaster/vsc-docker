@@ -72,8 +72,8 @@ function onPageResize() {
     while (document.getElementById("panel_" + children)) {
         children++;
     }
-    
-    document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
+
+    //document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
 
     for (var i = 0; i < children; i++) {
 

@@ -68,7 +68,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
-        this.documentStart(o['title']);
+        this.documentStart(undefined);
 
         if (o.hasOwnProperty('panels')) {
             for (var i: number = 0; i < o['panels'].length; i++) {
@@ -84,7 +84,11 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private createPanel(o: object, panel: number, container: string) {
-        this.write('<div id="panel_' + panel + '" style="background-color:#00FF00;position:absolute;" >');
+        this.write('<div id="panel_' + panel + '" style="position:absolute;" >');
+
+        if (o.hasOwnProperty('title')) {
+            this.write('<h2>' + o['title'] + '</h2>');
+        }
 
         if (o.hasOwnProperty('description')) {
             this.write('<br/><br/>');
@@ -242,12 +246,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("</head>");
         this.write(css);
         this.write('<script>' + script + '</script>');
-        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();'><div id='fuka' style='background-color:#00FF00;position:absolute; left:100px; top:100px;'>XYZ</div><div id='muka' style='background-color:#0000FF'>FUKA</div>");
+        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();'><div id='muka'></div>");
 
         if (title) {
             this.write('<h2>' + title + '</h2>');
         }
-   }
+    }
 
     private documentEnd() {
         this.write(this.m_GlobalLinks);
