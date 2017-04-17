@@ -1,29 +1,41 @@
 
 var focused = -1;
+var focusedPanel = 0;
 var blockEnter = false;
 
 function tableKeyDown(event) {
 
-    var table = document.getElementById("tr_0").parentNode;
+    var table = document.getElementById("tr_" + focusedPanel + "_0").parentNode;
+
+    document.getElementById("muka").innerHTML = 'KEY: ' + event.key;    
+
 
     if (event.key == 'ArrowDown') {
+
         focused++;
+
+        document.getElementById("muka").innerHTML = 'FOCUSING: ' + 'tr_' + focusedPanel + '_' + focused + ' (' + table.childNodes.length + ')';    
+
         if (focused > table.childNodes.length -  2) focused = 0;
-        document.getElementById('tr_' + focused).focus();
+        document.getElementById('tr_' + focusedPanel + '_' + focused).focus();
+
     } else if (event.key == 'ArrowUp') {
         focused--;
 
         if (focused < 0) focused = focused = table.childNodes.length - 2;
 
-        document.getElementById('tr_' + focused).focus();
+        document.getElementById('tr_' + focusedPanel + '_' + focused).focus();
     } else if (event.key == 'ArrowRight') {
-        document.getElementById("tr_" + focused + "_a_alt").click();
+        document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
     } else if (event.key == 'Enter') {
         if (blockEnter)
             return;
         if (focused >= 0) {
-            document.getElementById("tr_" + focused + "_a").click();
+            document.getElementById("tr_" + focusedPanel + '_' + focused + "_a").click();
         }
+    } else if (event.key == 'Tab') {
+        focusedPanel = (focusedPanel == 0) ? 1 : 0;
+        document.getElementById("tr_" + focusedPanel + "_0").focus();        
     }
 
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
@@ -34,8 +46,9 @@ function tableKeyDown(event) {
 function tableKeyUp(event) {
 }
 
-function tableGotFocus() {
-    //document.getElementById('para').innerText += "*GOT*";
+function tableGotFocus(panel) {
+    focusedPanel = panel;
+    document.getElementById('para').innerText += "PANEL: " + panel;
     blockEnter = true;
     window.setTimeout(function() {
         blockEnter = false;
@@ -47,7 +60,7 @@ function tableLostFocus() {
 }
 
 function tableRowFocus(event) {
-    focused = Number(event.target.id.split('_')[1]);
+    focused = Number(event.target.id.split('_')[2]);
 }
 
 function tableRowBlur(event) {
@@ -56,11 +69,11 @@ function tableRowBlur(event) {
 
 function tableRowClick(event) {
     var idx = Number(event.target.parentNode.id.split('_')[1]);
-    document.getElementById("tr_" + idx + "_a").click();
+    document.getElementById("tr_" + focusedPanel + '_' + idx + "_a").click();
 }
 
 function onPageLoaded() {
-    document.getElementById("tr_0").focus();
+    document.getElementById("tr_0_0").focus();
 }
 
 var count = 0;
@@ -73,7 +86,7 @@ function onPageResize() {
         children++;
     }
 
-    //document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
+    document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
 
     for (var i = 0; i < children; i++) {
 

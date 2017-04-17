@@ -99,7 +99,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
             this.write('<br/><br/>');
 
-            this.documentTableStart(o['headers']);
+            this.documentTableStart(panel, o['headers']);
 
             var onSelect: any[] = undefined;
             var onAltSelect: any[] = undefined;
@@ -168,7 +168,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                 }
 
 
-                this.documentTableRowStart(i, link, altLink);
+                this.documentTableRowStart(panel, i, link, altLink);
 
                 for (var j: number = 0; j < o['headers'].length; j++) {
 
@@ -265,10 +265,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     private tabIndex = 1;
 
-    private documentTableStart(headers) {
-        this.write("<table cellspacing='0' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus();' onfocusout='tableLostFocus(event)' >");
+    private documentTableStart(panel: number, headers) {
+        this.write("<table cellspacing='0' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus(" + panel + ");' onfocusout='tableLostFocus(event)' >");
 
-        this.documentTableRowStart(-1, '', '');
+        this.documentTableRowStart(panel, -1, '', '');
 
         for (var i in headers) {
             if (typeof headers[i] == 'string') {
@@ -286,16 +286,16 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
 
-    private documentTableRowStart(idx, link, altLink) {
+    private documentTableRowStart(panel: number, idx: number, link, altLink) {
 
         if (idx >= 0) {
-            this.write('<tr id="tr_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)" onfocusout="tableRowBlur(event)">');
+            this.write('<tr id="tr_' + panel + '_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)" onfocusout="tableRowBlur(event)">');
         } else {
             this.write('<tr>');
         }
 
-        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' ></a>";
-        this.m_GlobalLinks += "<a href='" + altLink + "' id='tr_" + idx + "_a_alt' />";
+        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + panel + '_' + idx + "_a' ></a>";
+        this.m_GlobalLinks += "<a href='" + altLink + "' id='tr_" + panel + '_' + idx + "_a_alt' />";
     }
 
     private documentTableRowEnd() {
