@@ -246,7 +246,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("</head>");
         this.write(css);
         this.write('<script>' + script + '</script>');
-        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();'><div id='muka'></div>");
+        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' style='overflow:hidden'><div id='muka'></div>");
 
         if (title) {
             this.write('<h2>' + title + '</h2>');
@@ -294,7 +294,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             this.write('<tr>');
         }
 
-        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' />";
+        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + idx + "_a' ></a>";
         this.m_GlobalLinks += "<a href='" + altLink + "' id='tr_" + idx + "_a_alt' />";
     }
 
