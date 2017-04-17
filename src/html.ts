@@ -84,7 +84,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private createPanel(o: object, panel: number, container: string) {
-        this.write('<div id="panel_' + panel + '" style="position:absolute;" >');
+        this.write('<div id="panel_' + panel + '" style="position:absolute;padding: 10px;" >');
 
         if (o.hasOwnProperty('title')) {
             this.write('<h2>' + o['title'] + '</h2>');
