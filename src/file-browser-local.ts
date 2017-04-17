@@ -6,7 +6,7 @@ export class FileBrowserLocal extends FileBrowser
 {
     constructor(path: string = '/')
     {
-         super(path);
+         super(path, false);
     }
 
     dir()

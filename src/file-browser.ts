@@ -4,9 +4,10 @@ import * as vscode from 'vscode';
 
 export abstract class FileBrowser
 {
-    constructor(path: string = '/')
+    constructor(path: string = '/', left: boolean)
     {
         this.m_CurrentDirectory = path;
+        this.m_Left = left;
     }
 
     public setOppositeBrowser(browser: FileBrowser)
@@ -75,7 +76,7 @@ export abstract class FileBrowser
     protected refreshHtml() {
         if (this.m_OppositeBrowser && this.m_CurrentContent && this.m_OppositeBrowser.m_CurrentContent) {
             var html: HtmlView = HtmlView.getInstance();
-            var o: {} = { title: 'File Browser', panels: [this.m_CurrentContent, this.m_OppositeBrowser.m_CurrentContent] };
+            var o: {} = { title: 'File Browser', panels: this.m_Left ? [this.m_CurrentContent, this.m_OppositeBrowser.m_CurrentContent] : [this.m_OppositeBrowser.m_CurrentContent, this.m_CurrentContent] };
             html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), o, 1, '');
         }
     }
@@ -93,4 +94,5 @@ export abstract class FileBrowser
     protected m_CurrentDirectory: string = '';
     protected m_OppositeBrowser: FileBrowser;
     private m_CurrentContent: any;
+    private m_Left: boolean = false;
 }

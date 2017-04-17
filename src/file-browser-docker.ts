@@ -7,7 +7,7 @@ export class FileBrowserDocker extends FileBrowser
 {
     constructor(docker: Docker, containerId: string, path: string = '/')
     {
-        super(path);
+        super(path, true);
         this.m_Docker = docker;
         this.m_ContainerId = containerId;
     }
