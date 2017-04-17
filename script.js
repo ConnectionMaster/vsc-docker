@@ -7,14 +7,9 @@ function tableKeyDown(event) {
 
     var table = document.getElementById("tr_" + focusedPanel + "_0").parentNode;
 
-    document.getElementById("muka").innerHTML = 'KEY: ' + event.key;    
-
-
     if (event.key == 'ArrowDown') {
 
         focused++;
-
-        document.getElementById("muka").innerHTML = 'FOCUSING: ' + 'tr_' + focusedPanel + '_' + focused + ' (' + table.childNodes.length + ')';    
 
         if (focused > table.childNodes.length -  2) focused = 0;
         document.getElementById('tr_' + focusedPanel + '_' + focused).focus();
@@ -35,7 +30,8 @@ function tableKeyDown(event) {
         }
     } else if (event.key == 'Tab') {
         focusedPanel = (focusedPanel == 0) ? 1 : 0;
-        document.getElementById("tr_" + focusedPanel + "_0").focus();        
+        document.getElementById("tr_" + focusedPanel + "_0").focus();
+        event.preventDefault();
     }
 
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
