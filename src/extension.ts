@@ -401,7 +401,7 @@ function queryImages() {
 
         result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
 
-        html.createPreviewFromObject('docker','Images', result, 1, null);
+        html.createPreviewFromObject('images','Images', result, 1, null);
     })       
 }
 
@@ -414,7 +414,7 @@ function queryContainers() {
 
         result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 
-        html.createPreviewFromObject('docker', 'Containers', result, 1, '');
+        html.createPreviewFromObject('containers', 'Containers', result, 1, '');
     })
 }
 
