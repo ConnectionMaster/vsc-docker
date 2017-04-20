@@ -82,7 +82,7 @@ function onPageResize() {
         children++;
     }
 
-    document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
+    //document.getElementById("muka").innerHTML = 'CHILDREN: ' + children;    
 
     for (var i = 0; i < children; i++) {
 
