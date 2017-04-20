@@ -411,13 +411,17 @@ function queryImages() {
 function queryContainers() {
     docker.ps(true, function (result: object) {
 
-        // add complex definition to the headers
-        result['title'] = 'Containers';
-        result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
+        if (result) {
+            // add complex definition to the headers
+            result['title'] = 'Containers';
+            result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
 
-        result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
+            result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 
-        html.createPreviewFromObject('containers', 'Containers', result, 1, '');
+            html.createPreviewFromObject('containers', 'Containers', result, 1, '');
+        } else {
+            vscode.window.showErrorMessage('Operation failed!');                
+        }
     })
 }
 
