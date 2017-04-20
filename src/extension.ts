@@ -386,8 +386,11 @@ function registerCommand(context: vscode.ExtensionContext, name, func) {
 
 function displayInfo() {
     docker.info(function (result: object) {
-
-        html.createPreviewFromText('docker', result.toString(), 'Info');
+        if (result) {
+            html.createPreviewFromText('info', result.toString(), 'Info');
+        } else {
+            vscode.window.showErrorMessage('Operation failed!');                
+        }
     })       
 }
 
@@ -660,9 +663,11 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
         docker.ps(false, function(result) {
             var exists: boolean = false;
 
-            for (var i = 0; i < result.rows.length; i++) {
-                if (result.rows[i].names == name) {
-                    exists = true;
+            if (result) {
+                for (var i = 0; i < result.rows.length; i++) {
+                    if (result.rows[i].names == name) {
+                        exists = true;
+                    }
                 }
             }
 

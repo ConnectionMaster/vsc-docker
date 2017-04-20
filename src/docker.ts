@@ -187,7 +187,7 @@ export class Docker {
 
         this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
 
-        const child = cp.spawn('docker', params);
+        const child = cp.spawn('xdocker', params);
         const stdout = this.collectData(child.stdout, 'utf8', '', false);
         const stderr = this.collectData(child.stderr, 'utf8', '', false);
         child.on('error', err => {
