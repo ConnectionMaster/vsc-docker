@@ -43,10 +43,12 @@ export abstract class FileBrowser
     public options(name: string)
     {
         var items:string[] = [];
+        var isDirectory: boolean = false;
 
 
         if (name[0] == '[') {
             name = name.substr(1, name.length - 2);
+            isDirectory = true;
         }
 
         items.push('Open');
@@ -57,7 +59,9 @@ export abstract class FileBrowser
                 this.copy(this.getFullPath() + '/' + name, this.m_OppositeBrowser.getFullPath());
                 this.m_OppositeBrowser.refresh();
             } else if (selected == 'Open') {
-                this.open(name);
+                if (isDirectory) {
+                    this.open(name);
+                }
             }
         })
         
