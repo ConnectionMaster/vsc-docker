@@ -393,15 +393,18 @@ function displayInfo() {
 
 function queryImages() {
     docker.images(function (result: object) {
+        if (result) {
+            // add complex definition to the headers
+            result['title'] = 'Docker Images';
 
-        // add complex definition to the headers
-        result['title'] = 'Docker Images';
+            result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
 
-        result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
+            result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
 
-        result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
-
-        html.createPreviewFromObject('images','Images', result, 1, null);
+            html.createPreviewFromObject('images','Images', result, 1, null);
+        } else {
+            vscode.window.showErrorMessage('Operation failed!');                
+        }
     })       
 }
 
