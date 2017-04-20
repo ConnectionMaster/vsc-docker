@@ -70,7 +70,7 @@ export class Docker {
             var lines: string[] = s.split('\n');
             var out: {} = {
                 title: path,
-                headers: ['access', 'subdirs', 'user', 'group', 'size', 'date', 'name'],
+                headers: ['name', 'size', 'date', 'access', 'user', 'group', 'subdirs'],
                 rows: []
             };
 
