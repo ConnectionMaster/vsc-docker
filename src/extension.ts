@@ -424,12 +424,16 @@ function searchImages() {
 
         docker.search(filter, function (result: object) {
 
-            // add complex definition to the headers
-            result['title'] = 'Find Docker Images';
-            result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
+            if (result) {
+                // add complex definition to the headers
+                result['title'] = 'Find Docker Images';
+                result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
-            // XXX - just for testing purposes here
-            html.createPreviewFromObject('docker', 'Search Result', result, 1, null);
+                // XXX - just for testing purposes here
+                html.createPreviewFromObject('docker', 'Search', result, 1, null);
+            } else {
+                vscode.window.showErrorMessage('Search failed!');                
+            }
         })
     } )
 }
