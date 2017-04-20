@@ -19,11 +19,11 @@ export class FileBrowserLocal extends FileBrowser
         };
         var dirs = fs.readdirSync(this.m_CurrentDirectory);
 
-        dir.rows.push({ name: '.' });
-        dir.rows.push({ name: '..' });
+        dir.rows.push({ name: '.', isDirectory: true });
+        dir.rows.push({ name: '..', isDirectory: true });
 
         for (var i: number = 0; i < dirs.length; i++) {
-            dir.rows.push({ name: dirs[i] });
+            dir.rows.push({ name: dirs[i], isDirectory: false });
         }
 
         this.preview(dir);            

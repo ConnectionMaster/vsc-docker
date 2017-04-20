@@ -44,6 +44,11 @@ export abstract class FileBrowser
     {
         var items:string[] = [];
 
+
+        if (name[0] == '[') {
+            name = name.substr(1, name.length - 2);
+        }
+
         items.push('Open');
         items.push('Copy');
 
@@ -67,6 +72,12 @@ export abstract class FileBrowser
 
     protected preview(dir: any)
     {
+        for (var i: number = 0; i < dir.rows.length; i++) {
+            if (dir.rows[i].isDirectory) {
+                dir.rows[i].name = '[' + dir.rows[i].name + ']';
+            } 
+        }
+        
         dir['title'] = this.m_CurrentDirectory;
         this.m_CurrentContent = dir;
         this.refreshHtml();

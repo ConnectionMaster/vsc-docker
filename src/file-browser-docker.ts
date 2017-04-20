@@ -17,6 +17,10 @@ export class FileBrowserDocker extends FileBrowser
         var __this: FileBrowserDocker = this;
         this.m_Docker.dir(this.m_ContainerId, this.m_CurrentDirectory, function(dir) {
 
+            for (var i: number = 0; i < dir.rows.length; i++) {
+                dir.rows[i].isDirectory = (dir.rows[i].access[0] == 'd'); 
+            }
+
             dir['onSelect'] = ['command:extension.fileOptions', '$name', '$access'];
             dir['onAltSelect'] = ['command:extension.fileOpen', '$name', '$access'];
 
