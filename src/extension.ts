@@ -88,6 +88,15 @@ export function activate(context: vscode.ExtensionContext) {
         cmdHandler(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.htmlEvent', (...p:any[]) => {
+        // parameters:
+        //  1) document
+        //  2) element id
+        //  3) event type
+        //  4) event param
+        html.handleEvent(p[0], p[1], p[2], p[3]);
+    });
+
     registerCommand(context, 'extension.showLocalImages', (...p:any[]) => {
         queryImages();
     });

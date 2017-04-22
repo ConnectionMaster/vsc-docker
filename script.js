@@ -32,6 +32,9 @@ function tableKeyDown(event) {
         focusedPanel = (focusedPanel == 0) ? 1 : 0;
         document.getElementById("tr_" + focusedPanel + "_0").focus();
         event.preventDefault();
+    } else if (event.key == 'Delete') {
+        // pass delete tek to the framework
+        sendEventToFramework('tr_' + focusedPanel + '_' + focused, 'KeyDown', 'Delete');
     }
 
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
@@ -66,6 +69,16 @@ function tableRowBlur(event) {
 function tableRowClick(event) {
     var idx = Number(event.target.parentNode.id.split('_')[1]);
     document.getElementById("tr_" + focusedPanel + '_' + idx + "_a").click();
+}
+
+function sendEventToFramework(element, event, param) {
+    var href =  document.getElementById("event_handler_a").getAttribute('href');
+    href = href.replace('xdocumentx', 'muka');
+    href = href.replace('xelementx', element);
+    href = href.replace('xeventx', event);
+    href = href.replace('xparamx', param);
+    document.getElementById("event_handler_a").setAttribute('href', href);
+    document.getElementById("event_handler_a").click();
 }
 
 function onPageLoaded() {

@@ -13,6 +13,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         return provider;
     }
 
+    public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
+
+    }
+
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
 
         var uriString: string = uri.toString();
@@ -251,6 +255,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         if (title) {
             this.write('<h2>' + title + '</h2>');
         }
+
+        var link = encodeURI('command:extension.htmlEvent?' + JSON.stringify(['xdocumentx', 'xelementx', 'xeventx', 'xparamx'])); 
+
+        this.m_GlobalLinks += "<a href='" + link + "' id='event_handler_a' ></a>";
     }
 
     private documentEnd() {
