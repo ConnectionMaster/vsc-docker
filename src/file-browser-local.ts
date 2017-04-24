@@ -12,18 +12,21 @@ export class FileBrowserLocal extends FileBrowser
     dir()
     {
         var dir = {
-            headers: ['name'],
+            headers: ['name', 'size', 'date'],
             rows: [],            
             onSelect: ['command:extension.localFileOptions', '$name'],
             onAltSelect: ['command:extension.localFileOpen', '$name']
         };
         var dirs = fs.readdirSync(this.m_CurrentDirectory);
 
-        dir.rows.push({ name: '.', isDirectory: true });
-        dir.rows.push({ name: '..', isDirectory: true });
+        dir.rows.push({ name: '.', isDirectory: true, size: '', date: '' });
+        dir.rows.push({ name: '..', isDirectory: true, size: '', date: '' });
 
         for (var i: number = 0; i < dirs.length; i++) {
-            dir.rows.push({ name: dirs[i], isDirectory: false });
+
+            var stats = fs.statSync(this.m_CurrentDirectory + '/' + dirs[i]);
+
+            dir.rows.push({ name: dirs[i], isDirectory: stats.isDirectory(), size: stats.size.toString(), date: stats.mtime.toString() });
         }
 
         this.preview(dir);            
