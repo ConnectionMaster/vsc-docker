@@ -17,39 +17,43 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
 
         if (eventType == 'DoubleClick') {
-            // get panel id and element index from element
-            var panel: number = 0;
-            var idx: number = 0;
+            this.executeCommand(element, 'onDefault');
+        }
+    }
 
-            var temp: string[] = element.split('_');
-            panel = Number(temp[1]);
-            idx = Number(temp[2]);
+    private executeCommand(element: string, type: string) {
+        // get panel id and element index from element
+        var panel: number = 0;
+        var idx: number = 0;
 
-            // get OnDoubleClick
-                // XXX - this should be made obsolete and removed
-            // check if we have onAltSelect pattern
-            var onDefault: any[] = undefined;
-            if (this.m_PanelData[panel].hasOwnProperty('onDefault')) {
-                onDefault = this.m_PanelData[panel]['onDefault'];
-            }
-            if (onDefault) {
-                var command = onDefault[0];
-                var params = [ command.split(':')[1] ];
+        var temp: string[] = element.split('_');
+        panel = Number(temp[1]);
+        idx = Number(temp[2]);
 
-                for (var x: number = 1; x < onDefault.length; x++) {
-                    if (onDefault[x][0] == '$') {
-                        // XXX try to get value
-                        var field: string = onDefault[x].substring(1);
-                        var value: string = this.m_PanelData[panel]['rows'][idx][field];
+        // get OnDoubleClick
+            // XXX - this should be made obsolete and removed
+        // check if we have onAltSelect pattern
+        var handler: any[] = undefined;
+        if (this.m_PanelData[panel].hasOwnProperty(type)) {
+            handler = this.m_PanelData[panel][type];
+        }
+        if (handler) {
+            var command = handler[0];
+            var params = [ command.split(':')[1] ];
 
-                        params.push(value);
-                    } else {
-                        params.push(onDefault[x]);
-                    }
+            for (var x: number = 1; x < handler.length; x++) {
+                if (handler[x][0] == '$') {
+                    // XXX try to get value
+                    var field: string = handler[x].substring(1);
+                    var value: string = this.m_PanelData[panel]['rows'][idx][field];
+
+                    params.push(value);
+                } else {
+                    params.push(handler[x]);
                 }
-                // XXX - execute command
-                vscode.commands.executeCommand.apply(vscode.commands, params);
             }
+            // XXX - execute command
+            vscode.commands.executeCommand.apply(vscode.commands, params);
         }
     }
 
