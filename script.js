@@ -2,6 +2,7 @@
 var focused = -1;
 var focusedPanel = 0;
 var blockEnter = false;
+var handlerHref = '';
 
 function tableKeyDown(event) {
 
@@ -92,19 +93,23 @@ function tableRowRightClick(event) {
 }
 
 function tableRowDoubleClick(event) {
-    var idx = Number(event.target.parentNode.id.split('_')[1]);
+    sendEventToFramework(event.target.parentNode.id, 'DoubleClick', '');
 
-    sendEventToFramework('tr_0_' + idx, 'DoubleClick', 'XXX-PARAM-XXX');
+    //document.getElementById('muka').innerText = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ' + event.target.parentNode.id;
 
-    document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
+    //document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
 }
 
 
 function sendEventToFramework(element, event, param) {
 
-    // XXX - this is wrong, works correctly only for the first time
-    var href =  document.getElementById("event_handler_a").getAttribute('href');
-    href = href.replace('xdocumentx', 'muka');
+    if (handlerHref == '') {
+        handlerHref = document.getElementById("event_handler_a").getAttribute('href');
+    }
+
+    var href = handlerHref; 
+    // document will be prepended to the file
+    href = href.replace('xdocumentx', documentId);
     href = href.replace('xelementx', element);
     href = href.replace('xeventx', event);
     href = href.replace('xparamx', param);

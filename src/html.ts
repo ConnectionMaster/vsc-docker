@@ -15,6 +15,42 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
         console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
+
+        if (eventType == 'DoubleClick') {
+            // get panel id and element index from element
+            var panel: number = 0;
+            var idx: number = 0;
+
+            var temp: string[] = element.split('_');
+            panel = Number(temp[1]);
+            idx = Number(temp[2]);
+
+            // get OnDoubleClick
+                // XXX - this should be made obsolete and removed
+            // check if we have onAltSelect pattern
+            var onDefault: any[] = undefined;
+            if (this.m_PanelData[panel].hasOwnProperty('onDefault')) {
+                onDefault = this.m_PanelData[panel]['onDefault'];
+            }
+            if (onDefault) {
+                var command = onDefault[0];
+                var params = [ command.split(':')[1] ];
+
+                for (var x: number = 1; x < onDefault.length; x++) {
+                    if (onDefault[x][0] == '$') {
+                        // XXX try to get value
+                        var field: string = onDefault[x].substring(1);
+                        var value: string = this.m_PanelData[panel]['rows'][idx][field];
+
+                        params.push(value);
+                    } else {
+                        params.push(onDefault[x]);
+                    }
+                }
+                // XXX - execute command
+                vscode.commands.executeCommand.apply(vscode.commands, params);
+            }
+        }
     }
 
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
@@ -63,7 +99,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
 
-        this.documentStart(title);
+        this.documentStart(title, type);
         this.documentParagraph(text);
         this.documentEnd();
 
@@ -72,7 +108,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
     public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
-        this.documentStart(undefined);
+        this.documentStart(undefined, type);
 
         if (o.hasOwnProperty('panels')) {
             for (var i: number = 0; i < o['panels'].length; i++) {
@@ -88,6 +124,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private createPanel(o: object, panel: number, container: string) {
+        this.m_PanelData[panel] = o;
+        
         this.write('<div id="panel_' + panel + '" style="position:absolute;padding: 10px;" >');
 
         if (o.hasOwnProperty('title')) {
@@ -107,7 +145,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
             var onSelect: any[] = undefined;
             var onAltSelect: any[] = undefined;
-            var onDefault: any[] = undefined;
 
             // check if we have onSelect pattern
             if (o.hasOwnProperty('onSelect')) {
@@ -117,11 +154,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             // check if we have onAltSelect pattern
             if (o.hasOwnProperty('onAltSelect')) {
                 onAltSelect = o['onAltSelect'];
-            }
-
-            // check if we have onAltSelect pattern
-            if (o.hasOwnProperty('onDefault')) {
-                onDefault = o['onDefault'];
             }
 
             for (var i: number = 0; i < o['rows'].length; i++) {
@@ -176,26 +208,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                     }
                     altLink = encodeURI(command + '?' + JSON.stringify(params));
                 }
-
-                // XXX - this should be made obsolete and removed
-                if (onDefault) {
-                    var command = onDefault[0];
-                    var params = [];
-
-                    for (var x: number = 1; x < onDefault.length; x++) {
-                        if (onDefault[x][0] == '$') {
-                            // XXX try to get value
-                            var field: string = onDefault[x].substring(1);
-                            var value: string = o['rows'][i][field];
-
-                            params.push(value);
-                        } else {
-                            params.push(onDefault[x]);
-                        }
-                    }
-                    altLink = encodeURI(command + '?' + JSON.stringify(params));
-                }
-
 
                 this.documentTableRowStart(panel, i, link, altLink);
 
@@ -262,11 +274,11 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private m_GlobalLinks = '';
     private m_ExtensionPath = '';
 
-    private documentStart(title: string) {
+    private documentStart(title: string, type: string) {
         this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
         var css = fs.readFileSync(this.m_ExtensionPath + '/css.txt')
-        var script = fs.readFileSync(this.m_ExtensionPath + '/script.js')
+        var script = "var documentId='" + type + "'\r\n" + fs.readFileSync(this.m_ExtensionPath + '/script.js')
 
         this.write('<!DOCTYPE "html">');
         this.write("<html>");
@@ -363,6 +375,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     private m_NextBtn: number = 0;
+    private m_PanelData: object[] = [];
 
     private documentWriteLink(text, link) {
         this.write("<a href='" + link + "'>" + text + "</a>");
