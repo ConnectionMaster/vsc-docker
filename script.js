@@ -36,6 +36,8 @@ function tableKeyDown(event) {
     } else if (event.key == 'Delete') {
         // pass delete tek to the framework
         sendEventToFramework('tr_' + focusedPanel + '_' + focused, 'KeyDown', 'Delete');
+    } else if (event.key == 'Escape') {
+        sendEventToFramework('tr_' + focusedPanel + '_' + focused, 'KeyDown', 'Escape');
     }
 
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {

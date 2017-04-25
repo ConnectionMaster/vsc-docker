@@ -22,6 +22,12 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         } else if (eventType == 'RightClick') {
             this.executeCommand(element, 'onOptions');
             this.executeCommand(element, 'onSelect');
+        } else if (eventType == 'KeyDown') {
+            if (eventParam == 'Delete') {
+                this.executeCommand(element, 'onDelete');
+            } else if (eventParam == 'Escape') {
+                this.executeCommand(element, 'onBack');
+            }
         }
     }
 
