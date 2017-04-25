@@ -14,7 +14,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
     public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
-
+        console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
     }
 
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
@@ -297,7 +297,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentTableRowStart(panel: number, idx: number, link, altLink) {
 
         if (idx >= 0) {
-            this.write('<tr id="tr_' + panel + '_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" onfocus="tableRowFocus(event)" onfocusout="tableRowBlur(event)">');
+            this.write('<tr id="tr_' + panel + '_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" ondblclick="tableRowDoubleClick(event);" onmousedown="tableRowRightClick(event);" onfocus="tableRowFocus(event);" onfocusout="tableRowBlur(event)">');
         } else {
             this.write('<tr>');
         }

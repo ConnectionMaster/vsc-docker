@@ -21,8 +21,10 @@ export class FileBrowserDocker extends FileBrowser
                 dir.rows[i].isDirectory = (dir.rows[i].access[0] == 'd'); 
             }
 
-            dir['onSelect'] = ['command:extension.fileOptions', '$name', '$access'];
-            dir['onAltSelect'] = ['command:extension.fileOpen', '$name', '$access'];
+            dir['onOptions'] = ['command:extension.fileOptions', '$name'],
+            dir['onDefault'] = ['command:extension.fileOpen', '$name'],
+            dir['onBack'] = ['command:extension.fileOpen', '..'],
+            dir['onDelete'] = [ 'command:extension.fileDelete', '$name']
 
             __this.preview(dir);            
         })

@@ -14,8 +14,10 @@ export class FileBrowserLocal extends FileBrowser
         var dir = {
             headers: ['name', 'size', 'date'],
             rows: [],            
-            onSelect: ['command:extension.localFileOptions', '$name'],
-            onAltSelect: ['command:extension.localFileOpen', '$name']
+            onOptions: ['command:extension.localFileOptions', '$name'],
+            onDefault: ['command:extension.localFileOpen', '$name'],
+            onBack: ['command:extension.localFileOpen', '..'],
+            onDelete: [ 'command:extension.localFileDelete', '$name']
         };
         var dirs = fs.readdirSync(this.m_CurrentDirectory);
 

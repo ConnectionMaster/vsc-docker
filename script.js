@@ -78,8 +78,25 @@ function tableRowBlur(event) {
 
 function tableRowClick(event) {
     var idx = Number(event.target.parentNode.id.split('_')[1]);
-    document.getElementById("tr_" + focusedPanel + '_' + idx + "_a").click();
 }
+
+function tableRowRightClick(event) {
+
+    if (event.button == 2) {
+        var idx = Number(event.target.parentNode.id.split('_')[1]);
+        sendEventToFramework('tr_0_' + idx, 'RightClick', 'XXX-PARAM-XXX ' + event.button );
+
+        // XXX - temporarily use old link
+        document.getElementById("tr_" + focusedPanel + '_' + idx + "_a").click();
+    }
+}
+
+function tableRowDoubleClick(event) {
+    var idx = Number(event.target.parentNode.id.split('_')[1]);
+
+    sendEventToFramework('tr_0_' + idx, 'DoubleClick', 'XXX-PARAM-XXX');
+}
+
 
 function sendEventToFramework(element, event, param) {
     var href =  document.getElementById("event_handler_a").getAttribute('href');
