@@ -47,7 +47,17 @@ function tableKeyUp(event) {
 
 function tableGotFocus(panel) {
     focusedPanel = panel;
-    document.getElementById('para').innerText += "PANEL: " + panel;
+
+    for (var i = 0; i < 99; i++) {
+        var p = document.getElementById('panel_' + i);
+
+        if (p) {
+            p.className = ((i == panel) ? 'selected_header' : '');
+        } else {
+            break;
+        }
+    }
+
     blockEnter = true;
     window.setTimeout(function() {
         blockEnter = false;
