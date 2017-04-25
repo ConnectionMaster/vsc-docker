@@ -18,6 +18,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         if (eventType == 'DoubleClick') {
             this.executeCommand(element, 'onDefault');
+            this.executeCommand(element, 'onAltSelect');
+        } else if (eventType == 'RightClick') {
+            this.executeCommand(element, 'onOptions');
+            this.executeCommand(element, 'onSelect');
         }
     }
 
@@ -161,59 +165,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             }
 
             for (var i: number = 0; i < o['rows'].length; i++) {
-                var link = '';
-                var altLink = '';
 
-                // prepare onclick for this row here
-                if (onSelect) {
-                    var command = onSelect[0];
-                    var params = [];
-                    var useHandler = false;
-
-                    if (!command.startsWith('command:')) {
-                        command = 'command:extension.handler';
-                        useHandler = true;
-                    }
-
-                    for (var x: number = 1; x < onSelect.length; x++) {
-                        if (onSelect[x][0] == '$') {
-                            // XXX try to get value
-                            var field: string = onSelect[x].substring(1);
-                            var value: string = o['rows'][i][field];
-
-                            params.push(value);
-                        } else {
-                            params.push(onSelect[x]);
-                        }
-                    }
-                    if (!useHandler) {
-                        link = encodeURI(command + '?' + JSON.stringify(params));
-                    } else {
-                        // XXX - this is a hack for container commands -- must find proper solution
-                        link = encodeURI(command + '?' + JSON.stringify([ [onSelect[0]].concat(params), container]));
-                    }
-                }
-
-                // prepare onclick for this row here
-                if (onAltSelect) {
-                    var command = onAltSelect[0];
-                    var params = [];
-
-                    for (var x: number = 1; x < onAltSelect.length; x++) {
-                        if (onAltSelect[x][0] == '$') {
-                            // XXX try to get value
-                            var field: string = onAltSelect[x].substring(1);
-                            var value: string = o['rows'][i][field];
-
-                            params.push(value);
-                        } else {
-                            params.push(onAltSelect[x]);
-                        }
-                    }
-                    altLink = encodeURI(command + '?' + JSON.stringify(params));
-                }
-
-                this.documentTableRowStart(panel, i, link, altLink);
+                this.documentTableRowStart(panel, i);
 
                 for (var j: number = 0; j < o['headers'].length; j++) {
 
@@ -317,7 +270,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentTableStart(panel: number, headers) {
         this.write("<table id='panel_" + panel + "' cellspacing='0' width='100%' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus(" + panel + ");' onfocusout='tableLostFocus(event)' >");
 
-        this.documentTableRowStart(panel, -1, '', '');
+        this.documentTableRowStart(panel, -1);
 
         for (var i in headers) {
             if (typeof headers[i] == 'string') {
@@ -335,16 +288,13 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     }
 
 
-    private documentTableRowStart(panel: number, idx: number, link, altLink) {
+    private documentTableRowStart(panel: number, idx: number) {
 
         if (idx >= 0) {
             this.write('<tr id="tr_' + panel + '_' + idx + '" tabindex="' + this.tabIndex++ + '" onclick="tableRowClick(event);" ondblclick="tableRowDoubleClick(event);" onmousedown="tableRowRightClick(event);" onfocus="tableRowFocus(event);" onfocusout="tableRowBlur(event)">');
         } else {
             this.write('<tr>');
         }
-
-        this.m_GlobalLinks += "<a href='" + link + "' id='tr_" + panel + '_' + idx + "_a' ></a>";
-        this.m_GlobalLinks += "<a href='" + altLink + "' id='tr_" + panel + '_' + idx + "_a_alt' />";
     }
 
     private documentTableRowEnd() {

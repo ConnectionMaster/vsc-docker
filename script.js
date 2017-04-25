@@ -22,12 +22,12 @@ function tableKeyDown(event) {
 
         document.getElementById('tr_' + focusedPanel + '_' + focused).focus();
     } else if (event.key == 'ArrowRight') {
-        document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
+        sendEventToFramework("tr_" + focusedPanel + '_' + focused, 'DoubleClick', '');
     } else if (event.key == 'Enter') {
         if (blockEnter)
             return;
         if (focused >= 0) {
-            document.getElementById("tr_" + focusedPanel + '_' + focused + "_a").click();
+            sendEventToFramework("tr_" + focusedPanel + '_' + focused, 'RightClick', '');
         }
     } else if (event.key == 'Tab') {
         focusedPanel = (focusedPanel == 0) ? 1 : 0;
@@ -78,26 +78,18 @@ function tableRowBlur(event) {
 }
 
 function tableRowClick(event) {
-    var idx = Number(event.target.parentNode.id.split('_')[1]);
+    // XXX - do nothing here
 }
 
 function tableRowRightClick(event) {
 
     if (event.button == 2) {
-        var idx = Number(event.target.parentNode.id.split('_')[1]);
-        sendEventToFramework('tr_0_' + idx, 'RightClick', 'XXX-PARAM-XXX ' + event.button );
-
-        // XXX - temporarily use old link
-        document.getElementById("tr_" + focusedPanel + '_' + idx + "_a").click();
+        sendEventToFramework(event.target.parentNode.id, 'RightClick', 'XXX-PARAM-XXX ' + event.button );
     }
 }
 
 function tableRowDoubleClick(event) {
     sendEventToFramework(event.target.parentNode.id, 'DoubleClick', '');
-
-    //document.getElementById('muka').innerText = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ' + event.target.parentNode.id;
-
-    //document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
 }
 
 
