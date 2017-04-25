@@ -107,6 +107,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
             var onSelect: any[] = undefined;
             var onAltSelect: any[] = undefined;
+            var onDefault: any[] = undefined;
 
             // check if we have onSelect pattern
             if (o.hasOwnProperty('onSelect')) {
@@ -116,6 +117,11 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             // check if we have onAltSelect pattern
             if (o.hasOwnProperty('onAltSelect')) {
                 onAltSelect = o['onAltSelect'];
+            }
+
+            // check if we have onAltSelect pattern
+            if (o.hasOwnProperty('onDefault')) {
+                onDefault = o['onDefault'];
             }
 
             for (var i: number = 0; i < o['rows'].length; i++) {
@@ -166,6 +172,25 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                             params.push(value);
                         } else {
                             params.push(onAltSelect[x]);
+                        }
+                    }
+                    altLink = encodeURI(command + '?' + JSON.stringify(params));
+                }
+
+                // XXX - this should be made obsolete and removed
+                if (onDefault) {
+                    var command = onDefault[0];
+                    var params = [];
+
+                    for (var x: number = 1; x < onDefault.length; x++) {
+                        if (onDefault[x][0] == '$') {
+                            // XXX try to get value
+                            var field: string = onDefault[x].substring(1);
+                            var value: string = o['rows'][i][field];
+
+                            params.push(value);
+                        } else {
+                            params.push(onDefault[x]);
                         }
                     }
                     altLink = encodeURI(command + '?' + JSON.stringify(params));

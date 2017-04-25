@@ -95,10 +95,14 @@ function tableRowDoubleClick(event) {
     var idx = Number(event.target.parentNode.id.split('_')[1]);
 
     sendEventToFramework('tr_0_' + idx, 'DoubleClick', 'XXX-PARAM-XXX');
+
+    document.getElementById("tr_" + focusedPanel + '_' + focused + "_a_alt").click();
 }
 
 
 function sendEventToFramework(element, event, param) {
+
+    // XXX - this is wrong, works correctly only for the first time
     var href =  document.getElementById("event_handler_a").getAttribute('href');
     href = href.replace('xdocumentx', 'muka');
     href = href.replace('xelementx', element);

@@ -19,6 +19,13 @@ export abstract class FileBrowser
 
     public open(name: string)
     {
+        var isDirectory: boolean = false;
+
+        if (name[0] == '[') {
+            name = name.substr(1, name.length - 2);
+            isDirectory = true;
+        }
+
         if (name != '.') {
             var newPath: string = ('/' != this.m_CurrentDirectory) ? this.m_CurrentDirectory : '';
             
