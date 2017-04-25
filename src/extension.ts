@@ -76,6 +76,10 @@ export function activate(context: vscode.ExtensionContext) {
         g_FileBrowserDocker.options(p[0]);
     });
 
+    registerCommand(context, 'extension.fileDelete', (...p:any[]) => {
+        g_FileBrowserDocker.delete(p[0]);
+    });
+
     registerCommand(context, 'extension.localFileOpen', (...p:any[]) => {
         g_FileBrowserLocal.open(p[0]);
     });
@@ -83,6 +87,11 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.localFileOptions', (...p:any[]) => {
         g_FileBrowserLocal.options(p[0]);
     });
+
+    registerCommand(context, 'extension.localFileDelete', (...p:any[]) => {
+        g_FileBrowserLocal.delete(p[0]);
+    });
+
 
     registerCommand(context, 'extension.handler', (...p:any[]) => {
         cmdHandler(p[0], p[1]);

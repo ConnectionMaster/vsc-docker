@@ -119,6 +119,12 @@ export class Docker {
         this.query(['ps'].concat(all ? [ '-a'] : []), true, cb);
     }
 
+    public rmdir(id: string, path: string, cb) {
+        this.exec(id, ['rm', '-rf', path], function(s: string) {
+            cb(s);
+        })        
+    }
+
     public images(cb) {
         this.query(['images'], true, cb);
     }

@@ -9,6 +9,20 @@ export class FileBrowserLocal extends FileBrowser
          super(path, false);
     }
 
+    delete(name: string) {
+        if (name[0] == '[') {
+            name = name.substr(1, name.length - 2);
+        }
+
+        try {
+            fs.unlinkSync(this.m_CurrentDirectory + '/' + name);
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.refresh();
+    }
+
     dir()
     {
         var dir = {

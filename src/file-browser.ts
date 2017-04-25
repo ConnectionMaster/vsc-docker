@@ -70,9 +70,10 @@ export abstract class FileBrowser
                     this.open(name);
                 }
             }
-        })
-        
+        })     
     }
+
+    abstract delete(name: string);
 
     abstract dir();
     abstract getViewerName(): string;

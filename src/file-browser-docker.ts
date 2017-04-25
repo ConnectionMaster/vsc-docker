@@ -12,6 +12,13 @@ export class FileBrowserDocker extends FileBrowser
         this.m_ContainerId = containerId;
     }
 
+    delete(name: string) {
+        var __this: FileBrowserDocker = this;
+        this.m_Docker.rmdir(this.m_ContainerId, this.m_CurrentDirectory + '/' + name, function(result) {
+            __this.refresh();
+        })
+    }
+
     dir()
     {
         var __this: FileBrowserDocker = this;
