@@ -42,7 +42,18 @@ export class FileBrowserLocal extends FileBrowser
 
             var stats = fs.statSync(this.m_CurrentDirectory + '/' + dirs[i]);
 
-            dir.rows.push({ name: dirs[i], isDirectory: stats.isDirectory(), size: stats.size.toString(), date: stats.mtime.toString() });
+            if (stats.isDirectory()) {
+                dir.rows.push({ name: dirs[i], isDirectory: true, size: stats.size.toString(), date: stats.mtime.toString() });
+            }
+        }
+
+        for (var i: number = 0; i < dirs.length; i++) {
+
+            var stats = fs.statSync(this.m_CurrentDirectory + '/' + dirs[i]);
+
+            if (!stats.isDirectory()) {
+                dir.rows.push({ name: dirs[i], isDirectory: false, size: stats.size.toString(), date: stats.mtime.toString() });
+            }
         }
 
         this.preview(dir);            
