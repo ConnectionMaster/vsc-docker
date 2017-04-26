@@ -64,8 +64,16 @@ export function activate(context: vscode.ExtensionContext) {
         displayContainerOptions(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.containerDelete', (...p:any[]) => {
+        deleteContainer(p[0], p[1]);
+    });
+
     registerCommand(context, 'extension.imageOptions', (...p:any[]) => {
         displayImageOptions(p[0], p[1]);
+    });
+
+    registerCommand(context, 'extension.imageDelete', (...p:any[]) => {
+        deleteImage(p[0], p[1]);
     });
 
     registerCommand(context, 'extension.fileOpen', (...p:any[]) => {
@@ -338,6 +346,21 @@ function displayContainerOptions(id: string, status: string) {
     })
 }
 
+function deleteContainer(id: string, status: string) {
+    vscode.window.showWarningMessage('Do you want to delete "' + id + '"?', 'Delete').then ( result => {
+        if (result == 'Delete') {
+            docker.rm([ id ], true, function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container removed');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();            
+            })
+        }
+    })
+}
+
 function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
 
@@ -397,6 +420,27 @@ function displayImageOptions(name: string, repository: string) {
     })
 }
 
+function deleteImage(name: string, repository: string) {
+    vscode.window.showWarningMessage('Do you want to delete "' + name + '"?', 'Delete').then ( result => {
+        if (result == 'Delete') {
+            docker.rmi([ name ], function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Image removed!');                    
+                } else {
+                    vscode.window.showErrorMessage('Removing image failed!');
+                }
+
+                queryImages();
+
+                if (g_Config.hasOwnProperty(repository)) {
+                    delete g_Config[repository];
+                    saveConfig();
+                }
+            })
+        }
+    })
+}
+
 function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
@@ -419,6 +463,7 @@ function queryImages() {
             result['title'] = 'Docker Images';
 
             result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
+            result['onDelete'] = ['command:extension.imageDelete', '$image id', '$repository'];
 
             result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
 
@@ -436,6 +481,7 @@ function queryContainers() {
             // add complex definition to the headers
             result['title'] = 'Containers';
             result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
+            result['onDelete'] = ['command:extension.containerDelete', '$container id', '$status'];
 
             result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 
