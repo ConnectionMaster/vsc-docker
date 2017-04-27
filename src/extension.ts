@@ -416,6 +416,10 @@ function displayImageOptions(name: string, repository: string) {
 
                 queryImages();
             })
+        } else if (selected == 'Save') {
+            vscode.window.showInformationMessage('Not implemented yet!');
+        } else if (selected == 'Load') {
+            vscode.window.showInformationMessage('Not implemented yet!');
         }
     })
 }
