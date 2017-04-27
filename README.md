@@ -16,6 +16,43 @@ Press **Alt+Ctrl+D** to activate.
 - Easily copy files between local filesystem and container file system
 - Pin your favourite containers to the main menu
 
-## What are my plans for the future?
+## Search and pull images from Docker Hub
 
-TBD
+You can directly search images in Docker Hub by using **Search Images** option from the main menu.
+
+![Search Results](images/search-results.png)
+
+## Browsing local images
+
+Currently available operations:
+
+- pull
+- push
+- remove
+- history
+
+![Search Results](images/images.png)
+
+## Browsing local containers
+
+Currently available operations:
+
+- start / restart / stop / pause
+- rename
+- remove
+- diff
+- logs
+- browse filesystem
+
+
+![Search Results](images/containers.png)
+
+## Browsing container filesystem
+
+Currently available operations:
+
+- copy files between container and local filesystem
+- delete files in container and local filesystem
+- more to come...
+
+![Search Results](images/files.png)

@@ -504,7 +504,7 @@ function searchImages() {
 
             if (result) {
                 // add complex definition to the headers
-                result['title'] = 'Find Docker Images';
+                result['title'] = 'Search Docker Hub';
                 result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
                 // XXX - just for testing purposes here
