@@ -17,21 +17,21 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
 
         if (eventType == 'DoubleClick') {
-            this.executeCommand(element, 'onDefault');
-            this.executeCommand(element, 'onAltSelect');
+            this.executeCommand(tab, element, 'onDefault');
+            this.executeCommand(tab, element, 'onAltSelect');
         } else if (eventType == 'RightClick') {
-            this.executeCommand(element, 'onOptions');
-            this.executeCommand(element, 'onSelect');
+            this.executeCommand(tab, element, 'onOptions');
+            this.executeCommand(tab, element, 'onSelect');
         } else if (eventType == 'KeyDown') {
             if (eventParam == 'Delete') {
-                this.executeCommand(element, 'onDelete');
+                this.executeCommand(tab, element, 'onDelete');
             } else if (eventParam == 'Escape') {
-                this.executeCommand(element, 'onBack');
+                this.executeCommand(tab, element, 'onBack');
             }
         }
     }
 
-    private executeCommand(element: string, type: string) {
+    private executeCommand(tab: string, element: string, type: string) {
         // get panel id and element index from element
         var panel: number = 0;
         var idx: number = 0;
@@ -44,8 +44,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
             // XXX - this should be made obsolete and removed
         // check if we have onAltSelect pattern
         var handler: any[] = undefined;
-        if (this.m_PanelData[panel].hasOwnProperty(type)) {
-            handler = this.m_PanelData[panel][type];
+        if (this.m_PanelData[tab + '_' + panel].hasOwnProperty(type)) {
+            handler = this.m_PanelData[tab + '_' + panel][type];
         }
         if (handler) {
             var command = handler[0];
@@ -55,7 +55,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                 if (handler[x][0] == '$') {
                     // XXX try to get value
                     var field: string = handler[x].substring(1);
-                    var value: string = this.m_PanelData[panel]['rows'][idx][field];
+                    var value: string = this.m_PanelData[tab + '_' + panel]['rows'][idx][field];
 
                     params.push(value);
                 } else {
@@ -63,6 +63,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                 }
             }
             // XXX - execute command
+            console.log('COMMAND: ' + params.toString());
             vscode.commands.executeCommand.apply(vscode.commands, params);
         }
     }
@@ -84,7 +85,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
 	get onDidChange(): vscode.Event<vscode.Uri> { return this.onDidChangeEmitter.event; }
 
-    private m_InternalPages : {} = {};
 
 
 
@@ -126,10 +126,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         if (o.hasOwnProperty('panels')) {
             for (var i: number = 0; i < o['panels'].length; i++) {
-                this.createPanel(o['panels'][i], i, container);
+                this.createPanel(o['panels'][i], type, i, container);
             }
         } else {
-            this.createPanel(o, 0, container);
+            this.createPanel(o, type, 0, container);
         }
 
         this.documentEnd();
@@ -137,8 +137,8 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.preview('xxx://internal/' + type, this.m_CurrentDocument, tabTitle, panel);
     }
 
-    private createPanel(o: object, panel: number, container: string) {
-        this.m_PanelData[panel] = o;
+    private createPanel(o: object, tab: string, panel: number, container: string) {
+        this.m_PanelData[tab + '_' + panel] = o;
         
         this.write('<div id="panel_' + panel + '" style="position:absolute;padding: 10px;" >');
 
@@ -233,10 +233,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('</div>');
     }
 
-    private m_CurrentDocument = '';
-    private m_GlobalLinks = '';
-    private m_ExtensionPath = '';
-
     private documentStart(title: string, type: string) {
         this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
@@ -270,8 +266,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentParagraph(text: string) {
         this.write('<p>' + text + '</p>');
     }
-
-    private tabIndex = 1;
 
     private documentTableStart(panel: number, headers) {
         this.write("<table id='panel_" + panel + "' cellspacing='0' width='100%' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus(" + panel + ");' onfocusout='tableLostFocus(" + panel + ")' >");
@@ -334,9 +328,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.m_NextBtn++;       
     }
 
-    private m_NextBtn: number = 0;
-    private m_PanelData: object[] = [];
-
     private documentWriteLink(text, link) {
         this.write("<a href='" + link + "'>" + text + "</a>");
     }
@@ -344,6 +335,16 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private write(s: string) {
         this.m_CurrentDocument += s;
     }
+
+    // global variables -- not all of them should be global
+    private m_InternalPages : {} = {};
+    private m_CurrentDocument = '';
+    private m_GlobalLinks = '';
+    private m_ExtensionPath = '';
+    private tabIndex = 1;
+    private m_NextBtn: number = 0;
+    private m_PanelData: object[] = [];
+
 }
 
 var provider = new HtmlView();
