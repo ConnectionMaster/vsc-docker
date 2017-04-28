@@ -13,60 +13,6 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         return provider;
     }
 
-    public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
-        console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
-
-        if (eventType == 'DoubleClick') {
-            this.executeCommand(tab, element, 'onDefault');
-            this.executeCommand(tab, element, 'onAltSelect');
-        } else if (eventType == 'RightClick') {
-            this.executeCommand(tab, element, 'onOptions');
-            this.executeCommand(tab, element, 'onSelect');
-        } else if (eventType == 'KeyDown') {
-            if (eventParam == 'Delete') {
-                this.executeCommand(tab, element, 'onDelete');
-            } else if (eventParam == 'Escape') {
-                this.executeCommand(tab, element, 'onBack');
-            }
-        }
-    }
-
-    private executeCommand(tab: string, element: string, type: string) {
-        // get panel id and element index from element
-        var panel: number = 0;
-        var idx: number = 0;
-
-        var temp: string[] = element.split('_');
-        panel = Number(temp[1]);
-        idx = Number(temp[2]);
-
-        // get OnDoubleClick
-            // XXX - this should be made obsolete and removed
-        // check if we have onAltSelect pattern
-        var handler: any[] = undefined;
-        if (this.m_PanelData[tab + '_' + panel].hasOwnProperty(type)) {
-            handler = this.m_PanelData[tab + '_' + panel][type];
-        }
-        if (handler) {
-            var command = handler[0];
-            var params = [ command.split(':')[1] ];
-
-            for (var x: number = 1; x < handler.length; x++) {
-                if (handler[x][0] == '$') {
-                    // XXX try to get value
-                    var field: string = handler[x].substring(1);
-                    var value: string = this.m_PanelData[tab + '_' + panel]['rows'][idx][field];
-
-                    params.push(value);
-                } else {
-                    params.push(handler[x]);
-                }
-            }
-            // XXX - execute command
-            console.log('COMMAND: ' + params.toString());
-            vscode.commands.executeCommand.apply(vscode.commands, params);
-        }
-    }
 
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
 
@@ -335,6 +281,62 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private write(s: string) {
         this.m_CurrentDocument += s;
     }
+
+    public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
+        console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
+
+        if (eventType == 'DoubleClick') {
+            this.executeCommand(tab, element, 'onDefault');
+            this.executeCommand(tab, element, 'onAltSelect');
+        } else if (eventType == 'RightClick') {
+            this.executeCommand(tab, element, 'onOptions');
+            this.executeCommand(tab, element, 'onSelect');
+        } else if (eventType == 'KeyDown') {
+            if (eventParam == 'Delete') {
+                this.executeCommand(tab, element, 'onDelete');
+            } else if (eventParam == 'Escape') {
+                this.executeCommand(tab, element, 'onBack');
+            }
+        }
+    }
+
+    private executeCommand(tab: string, element: string, type: string) {
+        // get panel id and element index from element
+        var panel: number = 0;
+        var idx: number = 0;
+
+        var temp: string[] = element.split('_');
+        panel = Number(temp[1]);
+        idx = Number(temp[2]);
+
+        // get OnDoubleClick
+            // XXX - this should be made obsolete and removed
+        // check if we have onAltSelect pattern
+        var handler: any[] = undefined;
+        if (this.m_PanelData[tab + '_' + panel].hasOwnProperty(type)) {
+            handler = this.m_PanelData[tab + '_' + panel][type];
+        }
+        if (handler) {
+            var command = handler[0];
+            var params = [ command.split(':')[1] ];
+
+            for (var x: number = 1; x < handler.length; x++) {
+                if (handler[x][0] == '$') {
+                    // XXX try to get value
+                    var field: string = handler[x].substring(1);
+                    var value: string = this.m_PanelData[tab + '_' + panel]['rows'][idx][field];
+
+                    params.push(value);
+                } else {
+                    params.push(handler[x]);
+                }
+            }
+            // XXX - execute command
+            console.log('COMMAND: ' + params.toString());
+            vscode.commands.executeCommand.apply(vscode.commands, params);
+        }
+    }
+
 
     // global variables -- not all of them should be global
     private m_InternalPages : {} = {};
