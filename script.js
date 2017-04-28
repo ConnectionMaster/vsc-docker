@@ -51,15 +51,8 @@ function tableKeyUp(event) {
 function tableGotFocus(panel) {
     focusedPanel = panel;
 
-    for (var i = 0; i < 99; i++) {
-        var p = document.getElementById('panel_' + i);
-
-        if (p) {
-            p.className = ((i == panel) ? 'selected_header' : '');
-        } else {
-            break;
-        }
-    }
+    var p = document.getElementById('panel_' + panel);
+    p.className = 'selected_header';
 
     blockEnter = true;
     window.setTimeout(function() {
@@ -67,7 +60,9 @@ function tableGotFocus(panel) {
     }, 100);
 }
 
-function tableLostFocus() {
+function tableLostFocus(panel) {
+    var p = document.getElementById('panel_' + panel);
+    p.className = '';
     //document.getElementById('para').innerText += "*LOST*";
 }
 
