@@ -63,7 +63,6 @@ function tableGotFocus(panel) {
 function tableLostFocus(panel) {
     var p = document.getElementById('panel_' + panel);
     p.className = '';
-    //document.getElementById('para').innerText += "*LOST*";
 }
 
 function tableRowFocus(event) {
