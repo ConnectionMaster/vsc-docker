@@ -9,11 +9,18 @@ var convert = new Convert();
 
 export class HtmlView implements vscode.TextDocumentContentProvider {
 
+    /**
+     * Get static instance of HtmlView object
+     */
     public static getInstance() : HtmlView {
         return provider;
     }
 
-
+    /**
+     * Provide document for specific URI. This function is used by VSCode
+     * @param uri 
+     * @param token 
+     */
     public provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) : vscode.ProviderResult<string> {
 
         var uriString: string = uri.toString();
@@ -26,14 +33,20 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         }
     };
 
-
+    /**
+     * Used by VSCode
+     */
 	public onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 
 	get onDidChange(): vscode.Event<vscode.Uri> { return this.onDidChangeEmitter.event; }
 
-
-
-
+    /**
+     * View HTML document
+     * @param uri 
+     * @param html 
+     * @param title 
+     * @param panel 
+     */
     public preview(uri: string, html: string, title: string, panel: number) {
         this.m_InternalPages[uri] = html; 
 
@@ -51,10 +64,22 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         vscode.commands.executeCommand('vscode.previewHtml', uri, panel, title);
     }
 
+    /**
+     * Setting current extension path.
+     * It's used to load CSS, JS, and other relevant files.
+     * @param path 
+     */
     public setExtensionPath(path: string) {
         this.m_ExtensionPath = path;
     }
 
+    /**
+     * View text document as HTML
+     * @param type 
+     * @param text 
+     * @param title 
+     * @param panel 
+     */
     public createPreviewFromText(type: string, text: string, title: string, panel: number = 1) {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
@@ -66,6 +91,14 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel);
     }
 
+    /**
+     * Create HTML document from JSON object
+     * @param type 
+     * @param tabTitle 
+     * @param o 
+     * @param panel 
+     * @param container 
+     */
     public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
         this.documentStart(undefined, type);
@@ -83,6 +116,13 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.preview('xxx://internal/' + type, this.m_CurrentDocument, tabTitle, panel);
     }
 
+    /**
+     * Create single panel in HTML document
+     * @param o 
+     * @param tab 
+     * @param panel 
+     * @param container 
+     */
     private createPanel(o: object, tab: string, panel: number, container: string) {
         this.m_PanelData[tab + '_' + panel] = o;
         
@@ -179,6 +219,11 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('</div>');
     }
 
+    /**
+     * Start HTML Document
+     * @param title 
+     * @param type 
+     */
     private documentStart(title: string, type: string) {
         this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
@@ -203,16 +248,28 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.m_GlobalLinks += "<a href='" + link + "' id='event_handler_a' ></a>";
     }
 
+    /**
+     * Finalise HTML document
+     */
     private documentEnd() {
         this.write(this.m_GlobalLinks);
         this.write("</body>");
         this.write("</html>");
     }
 
+    /**
+     * Write text in paragraph
+     * @param text 
+     */
     private documentParagraph(text: string) {
         this.write('<p>' + text + '</p>');
     }
 
+    /**
+     * Start table
+     * @param panel 
+     * @param headers 
+     */
     private documentTableStart(panel: number, headers) {
         this.write("<table id='panel_" + panel + "' cellspacing='0' width='100%' tabindex='1' onkeydown='tableKeyDown(event)' onkeyup='tableKeyUp();' onfocusin='tableGotFocus(" + panel + ");' onfocusout='tableLostFocus(" + panel + ")' >");
 
@@ -229,11 +286,19 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.documentTableRowEnd();
     }
 
+    /**
+     * End table
+     */
     private documentTableEnd() {
         this.write('</table>');
     }
 
 
+    /**
+     * Start table row
+     * @param panel 
+     * @param idx 
+     */
     private documentTableRowStart(panel: number, idx: number) {
 
         if (idx >= 0) {
@@ -243,26 +308,48 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         }
     }
 
+    /**
+     * End table row
+     */
     private documentTableRowEnd() {
         this.write('</tr>');
     }
 
+    /**
+     * Write table cell
+     * @param text 
+     */
     private documentTableCell(text) {
         this.write('<td>' + convert.toHtml(text) + '</td>');
     }
 
+    /**
+     * Write table cell with link
+     * @param text 
+     * @param link 
+     */
     private documentTableCellLink(text, link) {
         this.write('<td>');
         this.documentWriteLink(text, link);
         this.write('</td>');
     }
 
+    /**
+     * Write table cell button
+     * @param text 
+     * @param url 
+     */
     private documentTableButton(text, url) {
         var js = 'window.location.href="' + url + '"';
 
         this.write("<td><button onclick='" + js + "'>" + text + "</button></td>");
     }
 
+    /**
+     * Create JS button
+     * @param text 
+     * @param js 
+     */
     private documentButtonJs(text, js) {
         this.write("<button onclick='" + js + "'>" + text + "</button>");
     }
@@ -282,6 +369,14 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.m_CurrentDocument += s;
     }
 
+    /**
+     * Handle event from the view.
+     * 
+     * @param tab 
+     * @param element 
+     * @param eventType 
+     * @param eventParam 
+     */
     public handleEvent(tab: string, element: string, eventType: string, eventParam: string) {
         console.log("Event: " + tab + " " + element + " " + eventType + " " + eventParam);
 
@@ -300,6 +395,13 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         }
     }
 
+    /**
+     * Execute command
+     * 
+     * @param tab 
+     * @param element 
+     * @param type 
+     */
     private executeCommand(tab: string, element: string, type: string) {
         // get panel id and element index from element
         var panel: number = 0;
