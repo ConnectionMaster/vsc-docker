@@ -1,5 +1,5 @@
 
-import { HtmlView } from './html';
+import { HtmlView } from './html-lite';
 import * as vscode from 'vscode';
 
 export abstract class FileBrowser

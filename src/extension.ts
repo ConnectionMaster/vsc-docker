@@ -5,7 +5,7 @@ import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
 import { Docker } from './docker';
-import { HtmlView } from './html';
+import { HtmlView } from './html-lite';
 
 import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';

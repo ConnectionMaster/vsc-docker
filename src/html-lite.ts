@@ -182,15 +182,15 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
     private documentStart(title: string, type: string) {
         this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
-        var css = fs.readFileSync(this.m_ExtensionPath + '/css.txt')
-        var script = "var documentId='" + type + "'\r\n" + fs.readFileSync(this.m_ExtensionPath + '/script.js')
+        var css = fs.readFileSync(this.m_ExtensionPath + '/html-lite.css')
+        var script = "var documentId='" + type + "'\r\n" + fs.readFileSync(this.m_ExtensionPath + '/html-lite-script.js')
 
         this.write('<!DOCTYPE "html">');
         this.write("<html>");
         this.write("<head>");
         this.write("<title>" + title + "</title>");
         this.write("</head>");
-        this.write(css);
+        this.write('<style type="text/css">' + css + '</style>');
         this.write('<script>' + script + '</script>');
         this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' style='overflow:hidden'><div id='muka'></div>");
 
