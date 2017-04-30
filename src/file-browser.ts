@@ -100,7 +100,7 @@ export abstract class FileBrowser
         if (this.m_OppositeBrowser && this.m_CurrentContent && this.m_OppositeBrowser.m_CurrentContent) {
             var html: HtmlView = HtmlView.getInstance();
             var o: {} = { title: 'File Browser', panels: this.m_Left ? [this.m_CurrentContent, this.m_OppositeBrowser.m_CurrentContent] : [this.m_OppositeBrowser.m_CurrentContent, this.m_CurrentContent] };
-            html.createPreviewFromObject(this.getViewerName(), this.getViewerTitle(), o, 1, '');
+            html.createPreviewFromObject('fs-browser', this.getViewerTitle(), o, 1, '');
         }
     }
 
