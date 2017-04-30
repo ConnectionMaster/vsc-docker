@@ -24,9 +24,25 @@ export class FileBrowserDocker extends FileBrowser
         var __this: FileBrowserDocker = this;
         this.m_Docker.dir(this.m_ContainerId, this.m_CurrentDirectory, function(dir) {
 
+            var newRows: any[] = [];
+
             for (var i: number = 0; i < dir.rows.length; i++) {
                 dir.rows[i].isDirectory = (dir.rows[i].access[0] == 'd'); 
             }
+
+            for (var i: number = 0; i < dir.rows.length; i++) {
+                if (dir.rows[i].isDirectory) {
+                    newRows.push(dir.rows[i]);
+                } 
+            }
+
+            for (var i: number = 0; i < dir.rows.length; i++) {
+                if (!dir.rows[i].isDirectory) {
+                    newRows.push(dir.rows[i]);
+                } 
+            }
+
+            dir.rows = newRows;
 
             dir['onOptions'] = ['command:extension.fileOptions', '$name'],
             dir['onDefault'] = ['command:extension.fileOpen', '$name'],
