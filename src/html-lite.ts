@@ -84,7 +84,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
 
-        this.documentStart(title, type);
+        this.documentStart(title, type, true);
         this.documentParagraph(text);
         this.documentEnd();
 
@@ -101,7 +101,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
      */
     public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
 
-        this.documentStart(undefined, type);
+        this.documentStart(undefined, type, false);
 
         if (o.hasOwnProperty('panels')) {
             for (var i: number = 0; i < o['panels'].length; i++) {
@@ -224,7 +224,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
      * @param title 
      * @param type 
      */
-    private documentStart(title: string, type: string) {
+    private documentStart(title: string, type: string, scroll: boolean) {
         this.m_GlobalLinks = '';
         this.m_CurrentDocument = '';
         var css = fs.readFileSync(this.m_ExtensionPath + '/html-lite.css')
@@ -237,7 +237,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("</head>");
         this.write('<style type="text/css">' + css + '</style>');
         this.write('<script>' + script + '</script>');
-        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' onfocusin='onDocumentGotFocus(event)' onfocusout='onDocumentLostFocus(event)' style='overflow:hidden'><div id='muka'></div>");
+        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' onfocusin='onDocumentGotFocus(event)' onfocusout='onDocumentLostFocus(event)'" + (scroll ? "" : " style='overflow:hidden'") + "><div id='muka'></div>");
 
         if (title) {
             this.write('<h2>' + title + '</h2>');
