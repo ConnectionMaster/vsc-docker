@@ -48,6 +48,14 @@ function tableKeyDown(event) {
 function tableKeyUp(event) {
 }
 
+function onDocumentGotFocus(event) {
+    //document.getElementById("muka").innerHTML = 'XXXXXXXXXXXXXXXXXXXXXXXXX' + event.target.getAttribute('id');    
+}
+
+function onDocumentLostFocus(event) {
+    //document.getElementById("muka").innerHTML = 'XXXXXXXXXXXXXXXXXXXXXXXXX ---- LOST FOCUS';    
+}
+
 function tableGotFocus(panel) {
     focusedPanel = panel;
 

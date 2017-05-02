@@ -237,7 +237,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write("</head>");
         this.write('<style type="text/css">' + css + '</style>');
         this.write('<script>' + script + '</script>');
-        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' style='overflow:hidden'><div id='muka'></div>");
+        this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' onfocusin='onDocumentGotFocus(event)' onfocusout='onDocumentLostFocus(event)' style='overflow:hidden'><div id='muka'></div>");
 
         if (title) {
             this.write('<h2>' + title + '</h2>');
