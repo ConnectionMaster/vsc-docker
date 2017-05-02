@@ -91,30 +91,34 @@ export class Docker {
      */
     public dir(id: string, path: string, cb) {
         this.exec(id, ['ls', '-al', path], function(s: string) {
-            var lines: string[] = s.split('\n');
-            var out: {} = {
-                title: path,
-                headers: ['name', 'size', 'date', 'access', 'user', 'group', 'subdirs'],
-                rows: []
-            };
+            if (s) {
+                var lines: string[] = s.split('\n');
+                var out: {} = {
+                    title: path,
+                    headers: ['name', 'size', 'date', 'access', 'user', 'group', 'subdirs'],
+                    rows: []
+                };
 
-            for (var i: number = 1; i < lines.length; i++) {
-                if (lines[i].length > 0) {
-                    var fields: string[] = lines[i].split(/\s+/);
+                for (var i: number = 1; i < lines.length; i++) {
+                    if (lines[i].length > 0) {
+                        var fields: string[] = lines[i].split(/\s+/);
 
-                    out['rows'].push({
-                        access: fields[0],
-                        subdirs: fields[1],
-                        user: fields[2],
-                        group: fields[3],
-                        size: fields[4],
-                        date: fields[5] + ' ' + fields[6] + ' ' + fields[7],
-                        name: fields[8]
-                    });
+                        out['rows'].push({
+                            access: fields[0],
+                            subdirs: fields[1],
+                            user: fields[2],
+                            group: fields[3],
+                            size: fields[4],
+                            date: fields[5] + ' ' + fields[6] + ' ' + fields[7],
+                            name: fields[8]
+                        });
+                    }
                 }
-            }
 
-            cb(out);
+                cb(out);
+            } else {
+                cb(false);
+            }
         })        
     }
 

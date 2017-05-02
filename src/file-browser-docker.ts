@@ -24,32 +24,37 @@ export class FileBrowserDocker extends FileBrowser
         var __this: FileBrowserDocker = this;
         this.m_Docker.dir(this.m_ContainerId, this.m_CurrentDirectory, function(dir) {
 
-            var newRows: any[] = [];
+            if (dir) {
 
-            for (var i: number = 0; i < dir.rows.length; i++) {
-                dir.rows[i].isDirectory = (dir.rows[i].access[0] == 'd'); 
-            }
+                var newRows: any[] = [];
 
-            for (var i: number = 0; i < dir.rows.length; i++) {
-                if (dir.rows[i].isDirectory) {
-                    newRows.push(dir.rows[i]);
-                } 
-            }
+                for (var i: number = 0; i < dir.rows.length; i++) {
+                    dir.rows[i].isDirectory = (dir.rows[i].access[0] == 'd'); 
+                }
 
-            for (var i: number = 0; i < dir.rows.length; i++) {
-                if (!dir.rows[i].isDirectory) {
-                    newRows.push(dir.rows[i]);
-                } 
-            }
+                for (var i: number = 0; i < dir.rows.length; i++) {
+                    if (dir.rows[i].isDirectory) {
+                        newRows.push(dir.rows[i]);
+                    } 
+                }
 
-            dir.rows = newRows;
+                for (var i: number = 0; i < dir.rows.length; i++) {
+                    if (!dir.rows[i].isDirectory) {
+                        newRows.push(dir.rows[i]);
+                    } 
+                }
 
-            dir['onOptions'] = ['command:extension.fileOptions', '$name'],
-            dir['onDefault'] = ['command:extension.fileOpen', '$name'],
-            dir['onBack'] = ['command:extension.fileOpen', '..'],
-            dir['onDelete'] = [ 'command:extension.fileDelete', '$name']
+                dir.rows = newRows;
 
-            __this.preview(dir);            
+                dir['onOptions'] = ['command:extension.fileOptions', '$name'],
+                dir['onDefault'] = ['command:extension.fileOpen', '$name'],
+                dir['onBack'] = ['command:extension.fileOpen', '..'],
+                dir['onDelete'] = [ 'command:extension.fileDelete', '$name']
+
+                __this.preview(dir);
+            } else {
+                // XXX - can't browse this directory
+            }            
         })
         
     }
