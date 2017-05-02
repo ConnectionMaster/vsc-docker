@@ -7,6 +7,14 @@ import * as cp from 'child_process';
 
 export class Docker {
 
+    /**
+     * Constructor
+     * 
+     * @param rootPath 
+     * @param commandHandler 
+     * @param outputHandler 
+     * @param closeHandler 
+     */
     constructor(rootPath: string, commandHandler, outputHandler, closeHandler) {
         this.m_RootPath = rootPath;
         this.m_CommandHandler = commandHandler;
@@ -14,20 +22,29 @@ export class Docker {
         this.m_CloseHandler = closeHandler;
     }
 
-    private m_Containers = {};
-    private m_RootPath: string = "";
-    private m_CommandHandler = null;
-    private m_OutputHandler = null;
-    private m_CloseHandler = null;
-
+    /**
+     * 
+     * @param id 
+     */
     public nameFromId(id: string) {
         return id.replace('/', '_');
     }
 
+    /**
+     * Check if container with given id is running
+     * 
+     * @param id 
+     */
     public isRunning(id: string): boolean {
         return this.m_Containers.hasOwnProperty(id);
     }
 
+    /**
+     * 
+     * @param id 
+     * @param xvsc 
+     * @param cb 
+     */
     public attach(id: string, xvsc: boolean, cb) {
         if (this.m_Containers.hasOwnProperty(id)) {
             cb(true);
@@ -65,6 +82,13 @@ export class Docker {
         cb(true);
     }
 
+    /**
+     * Read directory in running container
+     * 
+     * @param id 
+     * @param path 
+     * @param cb 
+     */
     public dir(id: string, path: string, cb) {
         this.exec(id, ['ls', '-al', path], function(s: string) {
             var lines: string[] = s.split('\n');
@@ -94,14 +118,35 @@ export class Docker {
         })        
     }
 
+    /**
+     * Copy files from/to container
+     * 
+     * @param src 
+     * @param dst 
+     * @param cb 
+     */
     public cp(src: string, dst: string, cb) {
         this.query(['cp', src, dst], false, cb)
     }
 
+    /**
+     * Execute command in running container
+     * 
+     * @param id 
+     * @param command 
+     * @param cb 
+     */
     public exec(id: string, command: any[], cb) {
         this.query(['exec', this.nameFromId(id)].concat(command), false, cb);
     }
 
+    /**
+     * Pass command to be executed in running container (via stdin)
+     * 
+     * @param id 
+     * @param command 
+     * @param cb 
+     */
     public execCmd(id: string, command: any, cb) {
 
         if (this.m_Containers[id].xvsc) {
@@ -111,84 +156,206 @@ export class Docker {
         }
     }
 
+    /**
+     * Get docker info
+     * 
+     * @param cb 
+     */
     public info(cb) {
         this.query(['info'], false, cb);
     }
 
+    /**
+     * Get list of containers
+     * 
+     * @param all 
+     * @param cb 
+     */
     public ps(all: boolean, cb) {
         this.query(['ps'].concat(all ? [ '-a'] : []), true, cb);
     }
 
+    /**
+     * Remove file/directory inside running container
+     * 
+     * @param id 
+     * @param path 
+     * @param cb 
+     */
     public rmdir(id: string, path: string, cb) {
         this.exec(id, ['rm', '-rf', path], function(s: string) {
             cb(s);
         })        
     }
 
+    /**
+     * Query all local images
+     * 
+     * @param cb 
+     */
     public images(cb) {
         this.query(['images'], true, cb);
     }
 
+    /**
+     * Get config
+     * 
+     * @param id 
+     * @param cb 
+     */
     public getConfig(id, cb) {
         this. query(['run', '--rm', id, 'config'], false, cb);
     }
 
+    /**
+     * Search images in Docker Hub
+     * 
+     * @param filter 
+     * @param cb 
+     */
     public search(filter: string, cb) {
         this.query(['search', filter], true, cb)
     }
 
+    /**
+     * Remove local images
+     * 
+     * @param images 
+     * @param cb 
+     */
     public rmi(images: string[], cb) {
         this.query(['rmi', '-f'].concat(images), true, cb)
     }
 
+    /**
+     * Pull image from Docker Hub
+     * 
+     * @param image 
+     * @param cb 
+     */
     public pull(image: string, cb) {
         this.query(['pull', image], false, cb)
     }
     
+    /**
+     * Push image to Docker Hub
+     * 
+     * @param image 
+     * @param cb 
+     */
     public push(image: string, cb) {
         this.query(['push', image], false, cb)
     }
     
+    /**
+     * Remove (kill if necessary) containers
+     * 
+     * @param containers 
+     * @param force 
+     * @param cb 
+     */
     public rm(containers: string[], force: boolean, cb) {
         this.query(['rm'].concat(force ? [ '-f' ] : []).concat(containers), true, cb)
     }
 
+    /**
+     * Display image history
+     * 
+     * @param name 
+     * @param cb 
+     */
     public history(name: string, cb) {
         this.query(['history', '--no-trunc', name], true, cb)
     }
 
+    /**
+     * Rename running container
+     * 
+     * @param id 
+     * @param newName 
+     * @param cb 
+     */
     public rename(id, newName, cb) {
         this.query(['rename', id, newName], false, cb)
     }
 
+    /**
+     * Pause running container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public pause(id, cb) {
         this.query(['pause', id], false, cb)
     }
 
+    /**
+     * Unpause running container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public unpause(id, cb) {
         this.query(['unpause', id], false, cb)
     }
 
+    /**
+     * Start container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public start(id, cb) {
         this.query(['start', id], false, cb)
     }
 
+    /**
+     * Restart container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public restart(id, cb) {
         this.query(['restart', id], false, cb)
     }
 
+    /**
+     * Diff container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public diff(id, cb) {
         this.query(['diff', id], false, cb)
     }
 
+    /**
+     * Display processes in container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public top(id, cb) {
         this.query(['top', id, 'ps'], false, cb)
     }
 
+    /**
+     * Display logs for container
+     * 
+     * @param id 
+     * @param cb 
+     */
     public logs(id, cb) {
         this.query(['logs', id], false, cb)
     }
 
+    /**
+     * Execute docker command
+     * 
+     * @param params 
+     * @param parse 
+     * @param cb 
+     */
     private query(params: string[], parse: boolean, cb) {
 
         this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
@@ -257,6 +424,14 @@ export class Docker {
 
     }
 
+    /**
+     * Collect data
+     * 
+     * @param stream 
+     * @param encoding 
+     * @param id 
+     * @param cmds 
+     */
 
     private  collectData(stream: Readable, encoding: string, id: string, cmds: boolean): string[] {
         const data: string[] = [];
@@ -299,4 +474,10 @@ export class Docker {
         });
         return data;
     }
+
+    private m_Containers = {};
+    private m_RootPath: string = "";
+    private m_CommandHandler = null;
+    private m_OutputHandler = null;
+    private m_CloseHandler = null;
 }
