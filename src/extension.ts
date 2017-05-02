@@ -30,8 +30,11 @@ var copyPaste = require('copy-paste');
 
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker Runner");
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+/**
+ * Activate extension
+ * 
+ * @param context 
+ */
 export function activate(context: vscode.ExtensionContext) {
 
     g_StoragePath = context.storagePath;
@@ -136,11 +139,15 @@ export function activate(context: vscode.ExtensionContext) {
     out.show();
 }
 
-// this method is called when your extension is deactivated
+/**
+ * Deactivate extension
+ */
 export function deactivate() {
 }
 
-
+/**
+ * Display main menu
+ */
 function displayMainMenu() {
     var items:string[] = [];
 
@@ -175,6 +182,11 @@ function displayMainMenu() {
     })
 }
 
+/**
+ * Display container menu
+ * 
+ * @param image 
+ */
 function displayContainerMenu(image: string) {
     var cc :any = g_Config[image];
 
@@ -207,6 +219,12 @@ enum ContainerState {
     Exited
 }
 
+/**
+ * Display container options
+ * 
+ * @param id 
+ * @param status 
+ */
 function displayContainerOptions(id: string, status: string) {
     var items:string[] = [];
 
@@ -346,6 +364,12 @@ function displayContainerOptions(id: string, status: string) {
     })
 }
 
+/**
+ * Delete container
+ * 
+ * @param id 
+ * @param status 
+ */
 function deleteContainer(id: string, status: string) {
     vscode.window.showWarningMessage('Do you want to delete "' + id + '"?', 'Delete').then ( result => {
         if (result == 'Delete') {
@@ -361,6 +385,12 @@ function deleteContainer(id: string, status: string) {
     })
 }
 
+/**
+ * Display image options
+ * 
+ * @param name 
+ * @param repository 
+ */
 function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
 
@@ -424,6 +454,12 @@ function displayImageOptions(name: string, repository: string) {
     })
 }
 
+/**
+ * Delete image
+ * 
+ * @param name 
+ * @param repository 
+ */
 function deleteImage(name: string, repository: string) {
     vscode.window.showWarningMessage('Do you want to delete "' + name + '"?', 'Delete').then ( result => {
         if (result == 'Delete') {
@@ -450,6 +486,9 @@ function registerCommand(context: vscode.ExtensionContext, name, func) {
     context.subscriptions.push(disposable);    
 }
 
+/**
+ * Display general Docker information
+ */
 function displayInfo() {
     docker.info(function (result: object) {
         if (result) {
@@ -460,6 +499,9 @@ function displayInfo() {
     })       
 }
 
+/**
+ * Query local images
+ */
 function queryImages() {
     docker.images(function (result: object) {
         if (result) {
@@ -478,6 +520,9 @@ function queryImages() {
     })       
 }
 
+/**
+ * Query local containers
+ */
 function queryContainers() {
     docker.ps(true, function (result: object) {
 
@@ -496,6 +541,9 @@ function queryContainers() {
     })
 }
 
+/**
+ * Search images in Docker Hub
+ */
 function searchImages() {
     vscode.window.showInputBox( { prompt: "Search string" } ).then( (filter) => {
         var items:string[] = [];
@@ -781,6 +829,9 @@ fs.mkdirParent = function(dirPath, mode, callback) {
   });
 };
 
+/**
+ * Load config.json file
+ */
 function loadConfig() {
     try {
         g_Config = JSON.parse(fs.readFileSync(g_StoragePath + '/config.json'));
@@ -790,6 +841,9 @@ function loadConfig() {
     }
 }
 
+/**
+ * Save config.json file
+ */
 function saveConfig() {
     fs.mkdirParent(g_StoragePath, undefined, function () {
         fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_Config, null, 2));
