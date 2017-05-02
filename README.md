@@ -22,6 +22,14 @@ You can directly search images in Docker Hub by using **Search Images** option f
 
 ![Search Results](images/search-results.png)
 
+If you choose **Pull & Pin to the menu** option image will appear in the main menu. Default command line parameters are stored in **config.js** file. You can edit this file by selecting **Edit Configuration** option. Edit following line to change any required options:
+
+      "run": "-i -t --rm --name $default-name -v $workspace:$src ubuntu sh"
+
+
+
+
+
 ## Browsing local images
 
 Currently available operations:
