@@ -601,6 +601,8 @@ function installImage(id: string, description: string, pin: boolean) {
                         g_Config[id].description = description;
                     }
 
+                    g_Config[id].config.run = "-i -t --rm --name $default-name -v $workspace:$src " + id + " sh"
+
                     g_Config[id].menu = {
                         items: [ "Shell", "Execute" ],
                         commands: [ ["ide:bash"], ["ide:execute"]] 
@@ -770,6 +772,10 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
         // just show the terminal if it was already created for this container
         if (view) g_Terminals[name].show();
     } else {
+
+        var cc :any = g_Config[id];
+        var params: string = cc.config.run;
+
         // create a new terminal and show it
         g_Terminals[name]  = vscode.window.createTerminal(name);
         if (view) g_Terminals[name].show();
@@ -799,7 +805,12 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
                     src = g_Config[id].config.src;
                 }
 
-                g_Terminals[name].sendText('docker run -i -t --rm --name ' + name + ' -v ' + vscode.workspace.rootPath + ':' + src + ' ' + id + ' sh', true);
+                params = params.replace('$default-name', name);
+                params = params.replace('$workspace', vscode.workspace.rootPath);
+                params = params.replace('$src', src);
+
+
+                g_Terminals[name].sendText('docker run ' + params, true);
 
                 setTimeout(function() {
                     docker.attach(id, g_Config[id].config.compatible, function(result) {
