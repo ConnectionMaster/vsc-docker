@@ -68,6 +68,10 @@ export abstract class FileBrowser
             } else if (selected == 'Open') {
                 if (isDirectory) {
                     this.open(name);
+                } else {
+                    vscode.workspace.openTextDocument(this.getFullPath() + '/' + name).then( (document) => {
+                        vscode.window.showTextDocument(document);
+                    })
                 }
             }
         })     
