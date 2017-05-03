@@ -85,13 +85,26 @@ export class FileBrowserDocker extends FileBrowser
     openFile(name: string) {
 
         var tmp: string = os.tmpdir() + '/' + name;
+        var __this = this;
         
         // XXX - first copy file from docker to temp
         this.m_Docker.cp(this.getFullPath() + '/' + name, tmp, function() {
             vscode.workspace.openTextDocument(tmp).then( (document) => {
                 vscode.window.showTextDocument(document);
 
-                // XXX - file must be copied back when document is saved
+                vscode.workspace.onDidSaveTextDocument(function(e: vscode.TextDocument) {
+                    if (e.fileName == document.fileName) {
+                        __this.m_Docker.cp(tmp, __this.getFullPath() + '/' + name, function() {
+                            console.log("DOCUMENT SAVED");
+                        });
+                    } 
+                })
+
+                vscode.workspace.onDidCloseTextDocument(function(e: vscode.TextDocument) {
+                    if (e.fileName == document.fileName) {
+                        fs.unlinkSync(e.fileName);
+                    }
+                })
             })        
         })
     }
