@@ -69,9 +69,7 @@ export abstract class FileBrowser
                 if (isDirectory) {
                     this.open(name);
                 } else {
-                    vscode.workspace.openTextDocument(this.getFullPath() + '/' + name).then( (document) => {
-                        vscode.window.showTextDocument(document);
-                    })
+                    this.openFile(name);
                 }
             }
         })     
@@ -85,6 +83,7 @@ export abstract class FileBrowser
     abstract getPanel(): number;
     abstract copy(from: string, to: string);
     abstract getFullPath();
+    abstract openFile(name: string);
 
     protected preview(dir: any)
     {

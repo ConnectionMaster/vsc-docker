@@ -2,6 +2,9 @@
 import { Docker } from './docker';
 import { FileBrowser } from './file-browser';
 import * as vscode from 'vscode';
+var fs = require('fs');
+var os = require('os');
+
 
 export class FileBrowserDocker extends FileBrowser
 {
@@ -77,6 +80,20 @@ export class FileBrowserDocker extends FileBrowser
     getFullPath()
     {
         return this.m_ContainerId + ':' +  this.m_CurrentDirectory;
+    }
+
+    openFile(name: string) {
+
+        var tmp: string = os.tmpdir() + '/' + name;
+        
+        // XXX - first copy file from docker to temp
+        this.m_Docker.cp(this.getFullPath() + '/' + name, tmp, function() {
+            vscode.workspace.openTextDocument(tmp).then( (document) => {
+                vscode.window.showTextDocument(document);
+
+                // XXX - file must be copied back when document is saved
+            })        
+        })
     }
 
     copy(from: string, to: string)

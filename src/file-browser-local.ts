@@ -1,6 +1,8 @@
 
 import { FileBrowser } from './file-browser';
 var fs = require('fs');
+import * as vscode from 'vscode';
+
 
 export class FileBrowserLocal extends FileBrowser
 {
@@ -91,6 +93,12 @@ export class FileBrowserLocal extends FileBrowser
     getFullPath()
     {
         return this.m_CurrentDirectory;
+    }
+
+    openFile(name: string) {
+        vscode.workspace.openTextDocument(this.getFullPath() + '/' + name).then( (document) => {
+            vscode.window.showTextDocument(document);
+        })        
     }
 
     copy(from: string, to: string)
