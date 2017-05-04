@@ -8,6 +8,10 @@ I am still experimenting a lot and I am planning to add much more features in th
 
 Press **Alt+Ctrl+D** to activate.
 
+Make sure your local drive is shared, as the extension will attempt to map current directory to the containers.
+
+![Shared Drives](images/shared-drives.png)
+
 ## What this extension can do for you now?
 
 - Search and pull Docker images from Docker Hub
