@@ -149,6 +149,12 @@ export function deactivate() {
  * Display main menu
  */
 function displayMainMenu() {
+
+    if (!docker.isInstalled()) {
+        vscode.window.showErrorMessage('Docker seems to be not available!');
+        return;
+    }
+
     var items:string[] = [];
 
     items.push('Local Images');

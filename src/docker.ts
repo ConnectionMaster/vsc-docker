@@ -30,6 +30,19 @@ export class Docker {
         return id.replace('/', '_');
     }
 
+/**
+ * Checking in Docker is installed
+ */
+    public isInstalled(): boolean {
+        try
+        {
+            var result = cp.execSync('docker --version');
+            return (result.indexOf('Docker version') >= 0);
+        } catch (e) {
+            return false;
+        }
+    }
+
     /**
      * Check if container with given id is running
      * 
