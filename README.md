@@ -61,6 +61,7 @@ Currently available operations:
 
 - copy files between container and local filesystem
 - delete files in container and local filesystem
+- edit files
 - more to come...
 
 ![Search Results](images/files.png)
