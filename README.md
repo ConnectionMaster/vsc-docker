@@ -30,10 +30,6 @@ If you choose **Pull & Pin to the menu** option image will appear in the main me
 
       "run": "-i -t --rm --name $default-name -v $workspace:$src ubuntu sh"
 
-
-
-
-
 ## Browsing local images
 
 Currently available operations:
@@ -68,3 +64,5 @@ Currently available operations:
 - more to come...
 
 ![Search Results](images/files.png)
+
+Detailed information is [here](file-browser.md).
