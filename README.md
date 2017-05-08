@@ -67,3 +67,15 @@ Currently available operations:
 ![Search Results](images/files.png)
 
 Detailed information is [here](file-browser.md).
+
+## Configuration File
+
+Main menu configuration can be changed manually by editing **config.js** file. Choose **Edit Configuration** option from main menu.
+
+More information is available [here](config-file.md).
+
+## Extending
+
+Extension provides an API which can be used by other extensions.
+
+More information is available [here](extensing.md).
