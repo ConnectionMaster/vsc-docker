@@ -4,6 +4,8 @@ Please note this is an early alpha version, so it may have bugs and missing feat
 However I think it can be already very useful.
 I am still experimenting a lot and I am planning to add much more features in the future. 
 
+Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311) 
+
 ## How to start?
 
 Press **Alt+Ctrl+D** to activate.
