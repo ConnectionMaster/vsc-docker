@@ -137,6 +137,15 @@ export function activate(context: vscode.ExtensionContext) {
 
     // show output channel
     out.show();
+
+    // return our public API
+    let api = {
+        hello() {
+            vscode.window.showInformationMessage('Hello from Docker Runner!');
+        }
+    }
+
+    return api;
 }
 
 /**
