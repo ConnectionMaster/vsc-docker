@@ -2,14 +2,6 @@
 
 Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311) 
 
-## How to start?
-
-Press **Alt+Ctrl+D** to activate.
-
-Make sure your local drive is shared, as the extension will attempt to map current directory to the containers.
-
-![Shared Drives](images/shared-drives.png)
-
 ## What this extension can do for you now?
 
 - Search and pull Docker images from Docker Hub
@@ -17,6 +9,15 @@ Make sure your local drive is shared, as the extension will attempt to map curre
 - Manage local containers
 - Easily copy files between local filesystem and container file system
 - Pin your favourite containers to the main menu
+- Run containers conveniently mapped to your local workspace
+
+## How to start?
+
+Press **Alt+Ctrl+D** to activate.
+
+Make sure your local drive is shared, as the extension will attempt to map current directory to the containers.
+
+![Shared Drives](images/shared-drives.png)
 
 ## Search and pull images from Docker Hub
 
