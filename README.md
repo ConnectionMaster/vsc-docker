@@ -1,6 +1,10 @@
 # Docker Runner - Docker Integration for VSC
 
-Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311) 
+Docker Runner source available in [GitHub repository here](https://github.com/zikalino/vsc-docker). Any contributions are welcome!
+
+You can find [detailed documentation here](https://github.com/zikalino/vsc-docker/wiki).
+
+Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311).
 
 ## What this extension can do for you now?
 
@@ -65,19 +69,19 @@ Currently available operations:
 
 ![Search Results](images/files.png)
 
-Detailed information is [here](file-browser.md).
+Detailed information is [here](https://github.com/zikalino/vsc-docker/wiki/Working-with-Local-Containers).
 
 ## Configuration File
 
 Main menu configuration can be changed manually by editing **config.js** file. Choose **Edit Configuration** option from main menu.
 
-More information is available [here](config-file.md).
+More information is available [here](https://github.com/zikalino/vsc-docker/wiki/Extending-Main-Menu).
 
 ## Extending
 
 Extension provides an API which can be used by other extensions.
 
-More information is available [here](extensing.md).
+More information is available [here](https://github.com/zikalino/vsc-docker/wiki/Docker-Runner-API).
 
 ## Note
 
