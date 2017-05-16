@@ -1,9 +1,5 @@
 # Docker Runner - Docker Integration for VSC
 
-Please note this is an early alpha version, so it may have bugs and missing features.
-However I think it can be already very useful.
-I am still experimenting a lot and I am planning to add much more features in the future. 
-
 Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311) 
 
 ## How to start?
@@ -81,3 +77,10 @@ More information is available [here](config-file.md).
 Extension provides an API which can be used by other extensions.
 
 More information is available [here](extensing.md).
+
+## Note
+
+Please note this is an early alpha version, so it may have bugs and missing features.
+However I think it can be already very useful.
+I am still experimenting a lot and I am planning to add much more features in the future. 
+
