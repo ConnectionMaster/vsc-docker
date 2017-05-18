@@ -521,7 +521,7 @@ function queryImages() {
     docker.images(function (result: object) {
         if (result) {
             // add complex definition to the headers
-            result['title'] = 'Docker Images';
+            result['title'] = 'Local Images';
 
             result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
             result['onDelete'] = ['command:extension.imageDelete', '$image id', '$repository'];
