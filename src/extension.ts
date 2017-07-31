@@ -1,4 +1,4 @@
-
+﻿
 import * as vscode from 'vscode';
 var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
@@ -9,6 +9,12 @@ import { HtmlView } from './html-lite';
 
 import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';
+
+import { DockerContainers } from "./dockerContainers";
+import { DockerHubManager } from "./DockerHub/DockerHubManager";
+import { DockerHubTreeDataProvider } from "./dockerHubTreeDataProvider";
+import { DockerImages } from "./dockerImages";
+
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
@@ -36,6 +42,11 @@ var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker
  * @param context 
  */
 export function activate(context: vscode.ExtensionContext) {
+
+    const dockerContainers = new DockerContainers(context);
+    vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
+    const dockerImages = new DockerImages(context);
+    vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
 
     g_StoragePath = context.storagePath;
     html.setExtensionPath(context.extensionPath);
