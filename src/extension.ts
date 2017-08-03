@@ -166,15 +166,21 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.startContainer", (container) => {
-        dockerContainers.startContainer(container.name);
+        docker.start(container.name, () => {
+            dockerContainers.refreshDockerTree();
+        })
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.stopContainer", (container) => {
-        dockerContainers.stopContainer(container.name);
+        docker.stop(container.name, () => {
+            dockerContainers.refreshDockerTree();
+        })
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.restartContainer", (container) => {
-        dockerContainers.restartContainer(container.name);
+        docker.restart(container.name, () => {
+            dockerContainers.refreshDockerTree();
+        })
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.showContainerStatistics", (container) => {

@@ -327,6 +327,16 @@ export class Docker {
     }
 
     /**
+     * Stop container
+     * 
+     * @param id 
+     * @param cb 
+     */
+    public stop(id, cb) {
+        this.query(['stop', id], false, cb)
+    }
+
+    /**
      * Restart container
      * 
      * @param id 
