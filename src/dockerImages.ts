@@ -88,9 +88,9 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
                                                     c['tag'],
                                                     this.context.asAbsolutePath(path.join("resources", "image.png")),
                                                     {
-                                                        command: "docker-explorer.getImage",
+                                                        command: "extension.imageOptions",
                                                         title: "",
-                                                        arguments: [c['repository'], c['tag']]
+                                                        arguments: [c['image id'], c['repository']]
                                                     }                            
                         ));
                     }

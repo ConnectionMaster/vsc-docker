@@ -52,9 +52,9 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
                                                             c['image'],
                                                             this.context.asAbsolutePath(path.join("resources", c['status'] === "Up" ? "container-on.png" : "container-off.png")),
                                                             {
-                                                                command: "docker-explorer.getContainer",
+                                                                command: "extension.containerOptions",
                                                                 title: "",
-                                                                arguments: c['names']
+                                                                arguments: [c['container id'], c['status']]
                                                             }                            
                         ));
                     }
