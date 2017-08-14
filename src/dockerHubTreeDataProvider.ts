@@ -3,7 +3,6 @@ import * as vscode from "vscode";
 import { AppInsightsClient } from "./appInsightsClient";
 import { DockerHubManager } from "./DockerHub/DockerHubManager";
 import { DockerTreeBase } from "./dockerTreeBase";
-import { Executor } from "./executor";
 import { DockerHubNode } from "./Model/DockerHubNode";
 
 export class DockerHubTreeDataProvider extends DockerTreeBase<DockerHubNode> implements vscode.TreeDataProvider<DockerHubNode> {
@@ -39,7 +38,8 @@ export class DockerHubTreeDataProvider extends DockerTreeBase<DockerHubNode> imp
             return DockerHubManager.Instance.login(user, pwd);
         })
         .then(() => {
-            Executor.exec(`docker login -u ${user} -p ${pwd}`);
+            // XXX - fix this
+            //Executor.exec(`docker login -u ${user} -p ${pwd}`);
             return this._onDidChangeTreeData.fire();
         })
         .catch((error) => {
@@ -60,7 +60,7 @@ export class DockerHubTreeDataProvider extends DockerTreeBase<DockerHubNode> imp
     }
 
     public pullFromHub(repo: string, tag: string) {
-        Executor.runInTerminal(`docker pull ${repo}:${tag}`);
+//        Executor.runInTerminal(`docker pull ${repo}:${tag}`);
         AppInsightsClient.sendEvent("pullFromHub");
     }
 

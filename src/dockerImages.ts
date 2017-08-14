@@ -2,7 +2,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "./appInsightsClient";
 import { DockerTreeBase } from "./dockerTreeBase";
-import { Executor } from "./executor";
 import { ACRHierachy } from "./Model/ACRHierachy";
 import { DockerImage } from "./Model/DockerImage";
 import { Utility } from "./utility";
@@ -77,22 +76,22 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
     public getChildren(element?: DockerImage): Thenable<DockerImage[]> {
         const images = [];
         try {
-            const imageStrings = Executor.execSync("docker images --filter \"dangling=false\" --format \"{{.ID}} {{.Repository}} {{.Tag}}\"")
-                .split(/[\r\n]+/g).filter((item) => item);
-            imageStrings.forEach((imageString) => {
-                const items = imageString.split(" ");
-                images.push(new DockerImage(
-                    items[0],
-                    items[1],
-                    items[2],
-                    this.context.asAbsolutePath(path.join("resources", "image.png")),
-                    {
-                        command: "docker-explorer.getImage",
-                        title: "",
-                        arguments: [items[1], items[2]],
-                    },
-                ));
-            });
+//            const imageStrings = Executor.execSync("docker images --filter \"dangling=false\" --format \"{{.ID}} {{.Repository}} {{.Tag}}\"")
+//                .split(/[\r\n]+/g).filter((item) => item);
+//            imageStrings.forEach((imageString) => {
+//                const items = imageString.split(" ");
+//                images.push(new DockerImage(
+//                    items[0],
+//                    items[1],
+//                    items[2],
+//                    this.context.asAbsolutePath(path.join("resources", "image.png")),
+//                    {
+//                        command: "docker-explorer.getImage",
+//                        title: "",
+//                        arguments: [items[1], items[2]],
+//                    },
+//                ));
+//            });
         } catch (error) {
             if (!DockerTreeBase.isErrorMessageShown) {
                 vscode.window.showErrorMessage(`[Failed to list Docker Images] ${error.stderr}`);
@@ -106,8 +105,8 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
     }
 
     public getImage(repository: string, tag: string): void {
-        Executor.runInTerminal(`docker images ${repository}:${tag}`);
-        AppInsightsClient.sendEvent("getImage");
+//        Executor.runInTerminal(`docker images ${repository}:${tag}`);
+//        AppInsightsClient.sendEvent("getImage");
     }
 
     private static getRandomName(): string {
@@ -120,12 +119,12 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
 
         var name: string = DockerImages.getRandomName();
 
-        Executor.runInTerminal(`docker run -it --name ${name} ${repository}:${tag}`, true, name);
-        AppInsightsClient.sendEvent("runFromImage");
+//        Executor.runInTerminal(`docker run -it --name ${name} ${repository}:${tag}`, true, name);
+//        AppInsightsClient.sendEvent("runFromImage");
     }
 
     public removeImage(repository: string, tag: string): void {
-        Executor.runInTerminal(`docker rmi ${repository}:${tag}`);
+//        Executor.runInTerminal(`docker rmi ${repository}:${tag}`);
         AppInsightsClient.sendEvent("removeImage");
     }
 
@@ -135,17 +134,16 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
             if (registryName === undefined) {
 
             } else {
-                const credential = Executor.execSync(`docker exec azure-cli az acr credential show -n ${registryName}`);
-                const credentialObj = JSON.parse(credential);
-                const password = credentialObj.passwords[0].value;
-                const loginResult = Executor.execSync(`docker login ${registryName}.azurecr.io -u ${registryName} -p ${password}`);
-                if (loginResult.indexOf("Login Succeeded") >= 0) {
-                    Executor.runInTerminal(`docker tag ${repository}:${tag} ${registryName}.azurecr.io/${repository}:${tag}`);
-                    Executor.runInTerminal(`docker push ${registryName}.azurecr.io/${repository}:${tag}`);
-                }
+//                const credential = Executor.execSync(`docker exec azure-cli az acr credential show -n ${registryName}`);
+//                const credentialObj = JSON.parse(credential);
+//                const password = credentialObj.passwords[0].value;
+//                const loginResult = Executor.execSync(`docker login ${registryName}.azurecr.io -u ${registryName} -p ${password}`);
+//                if (loginResult.indexOf("Login Succeeded") >= 0) {
+//                    Executor.runInTerminal(`docker tag ${repository}:${tag} ${registryName}.azurecr.io/${repository}:${tag}`);
+//                    Executor.runInTerminal(`docker push ${registryName}.azurecr.io/${repository}:${tag}`);
+//                }
             }
         });
         AppInsightsClient.sendEvent("pushImage");
     }
-
 }

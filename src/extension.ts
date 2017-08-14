@@ -16,8 +16,6 @@ import { DockerHubTreeDataProvider } from "./dockerHubTreeDataProvider";
 import { DockerImages } from "./dockerImages";
 
 import { AzureContainerRegistries } from "./azureContainerRegistries";
-import { SuggestedDockerImages } from "./suggestedDockerImages";
-
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
@@ -51,10 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
     const dockerImages = new DockerImages(context);
     vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
 
-    const azureContainerRegistries = new AzureContainerRegistries(context);
-    vscode.window.registerTreeDataProvider("azureRegistries", azureContainerRegistries);
-    const suggestedDockerImages = new SuggestedDockerImages(context);
-    vscode.window.registerTreeDataProvider("suggestedDockerImages", suggestedDockerImages);
+//    const azureContainerRegistries = new AzureContainerRegistries(context);
+//    vscode.window.registerTreeDataProvider("azureRegistries", azureContainerRegistries);
     const dockerHubTreeDataProvider = new DockerHubTreeDataProvider(context);
     vscode.window.registerTreeDataProvider("DockerHubTreeView", dockerHubTreeDataProvider);
 
@@ -241,7 +237,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pullLatestFromDockerHub", (repo) => {
-        suggestedDockerImages.pullFromHub(repo.user, repo.repository);
+        //suggestedDockerImages.pullFromHub(repo.user, repo.repository);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.openDockerHubPage", (repo) => {
@@ -266,32 +262,32 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pullImage", (tagItem) => {
-        azureContainerRegistries.pullImage(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
+        //azureContainerRegistries.pullImage(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
         //AppInsightsClient.sendEvent("pullImageFromACR");
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.deployToAzure", (tagItem) => {
-        azureContainerRegistries.deployToAzure(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
+        //azureContainerRegistries.deployToAzure(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
         //AppInsightsClient.sendEvent("deployToAzure");
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.loginAzureCli", () => {
-        azureContainerRegistries.login();
+        //azureContainerRegistries.login();
          //AppInsightsClient.sendEvent("loginAzureCli");
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.logoutAzureCli", () => {
-        azureContainerRegistries.logout();
+        //azureContainerRegistries.logout();
          //AppInsightsClient.sendEvent("logoutAzureCli");
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.refreshAzureRegistries", () => {
-        azureContainerRegistries.refreshDockerTree();
+        //azureContainerRegistries.refreshDockerTree();
         //AppInsightsClient.sendEvent("refreshAzureRegistry");
     }));
 
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((editor) => {
-        suggestedDockerImages._onDidChangeTreeData.fire();
+        //suggestedDockerImages._onDidChangeTreeData.fire();
     }));
     
 
