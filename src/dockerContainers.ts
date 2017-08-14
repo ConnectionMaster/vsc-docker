@@ -50,7 +50,7 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
                         containers.push(new DockerContainer(c['container id'],
                                                             c['names'],
                                                             c['image'],
-                                                            this.context.asAbsolutePath(path.join("resources", c['status'] === "Up" ? "container-on.png" : "container-off.png")),
+                                                            this.context.asAbsolutePath(path.join("resources", c['status'].startsWith("Up") ? "container-on.png" : "container-off.png")),
                                                             {
                                                                 command: "extension.containerOptions",
                                                                 title: "",
