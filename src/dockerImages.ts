@@ -6,6 +6,8 @@ import { ACRHierachy } from "./Model/ACRHierachy";
 import { DockerImage } from "./Model/DockerImage";
 import { Utility } from "./utility";
 
+import { Docker } from "./docker"
+
 
 const adjectives: string[] = [
     "aback","abaft","abandoned","abashed","aberrant","abhorrent","abiding","abject","ablaze","able","abnormal","aboard","aboriginal","abortive","abounding","abrasive","abrupt","absent","absorbed","absorbing","abstracted","absurd","abundant","abusive","acceptable","accessible","accidental","accurate","acid","acidic","acoustic","acrid","actually","ad hoc","adamant","adaptable","addicted","adhesive","adjoining","adorable","adventurous","afraid","aggressive","agonizing","agreeable","ahead","ajar","alcoholic","alert","alike","alive","alleged","alluring","aloof","amazing","ambiguous","ambitious","amuck","amused","amusing","ancient","angry","animated","annoyed","annoying","anxious","apathetic","aquatic","aromatic","arrogant","ashamed","aspiring","assorted","astonishing","attractive","auspicious","automatic","available","average","awake","aware","awesome","awful","axiomatic",
@@ -65,8 +67,9 @@ const nouns: string[] = [
 
 
 export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.TreeDataProvider<DockerImage> {
-    constructor(context: vscode.ExtensionContext) {
+    constructor(context: vscode.ExtensionContext, docker: Docker) {
         super(context);
+        this.docker = docker;
     }
 
     public getTreeItem(element: DockerImage): vscode.TreeItem {
@@ -74,34 +77,32 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
     }
 
     public getChildren(element?: DockerImage): Thenable<DockerImage[]> {
-        const images = [];
-        try {
-//            const imageStrings = Executor.execSync("docker images --filter \"dangling=false\" --format \"{{.ID}} {{.Repository}} {{.Tag}}\"")
-//                .split(/[\r\n]+/g).filter((item) => item);
-//            imageStrings.forEach((imageString) => {
-//                const items = imageString.split(" ");
-//                images.push(new DockerImage(
-//                    items[0],
-//                    items[1],
-//                    items[2],
-//                    this.context.asAbsolutePath(path.join("resources", "image.png")),
-//                    {
-//                        command: "docker-explorer.getImage",
-//                        title: "",
-//                        arguments: [items[1], items[2]],
-//                    },
-//                ));
-//            });
-        } catch (error) {
-            if (!DockerTreeBase.isErrorMessageShown) {
-                vscode.window.showErrorMessage(`[Failed to list Docker Images] ${error.stderr}`);
-                DockerTreeBase.isErrorMessageShown = true;
-            }
-        } finally {
-            this.setAutoRefresh();
-        }
+        return new Promise((resolve,reject) => {
+            this.docker.images((result) => {
+                if (result)
+                {
+                    const images = [];
+                    for (var c of result.rows) {
+                        images.push(new DockerImage(c['image id'],
+                                                    c['repository'],
+                                                    c['tag'],
+                                                    this.context.asAbsolutePath(path.join("resources", "image.png")),
+                                                    {
+                                                        command: "docker-explorer.getImage",
+                                                        title: "",
+                                                        arguments: [c['repository'], c['tag']]
+                                                    }                            
+                        ));
+                    }
 
-        return Promise.resolve(images);
+                    this.setAutoRefresh();
+                    resolve(images);
+                }
+                else {
+                    reject(new Error("image query failed"));
+                }
+            })
+        });
     }
 
     public getImage(repository: string, tag: string): void {
@@ -146,4 +147,6 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
         });
         AppInsightsClient.sendEvent("pushImage");
     }
+
+    private docker: Docker = null;
 }

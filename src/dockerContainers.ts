@@ -41,11 +41,8 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
     }
 
     public getChildren(element?: DockerContainer): Thenable<DockerContainer[]> {
-
         return new Promise((resolve,reject) => {
- 
             this.docker.ps(true, (result) => {
-
                 if (result)
                 {
                     const containers = [];
