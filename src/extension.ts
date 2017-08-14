@@ -44,7 +44,7 @@ var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker
  */
 export function activate(context: vscode.ExtensionContext) {
 
-    const dockerContainers = new DockerContainers(context);
+    const dockerContainers = new DockerContainers(context, docker);
     vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
     const dockerImages = new DockerImages(context);
     vscode.window.registerTreeDataProvider("dockerImages", dockerImages);

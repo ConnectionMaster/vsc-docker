@@ -5,11 +5,14 @@ import { DockerTreeBase } from "./dockerTreeBase";
 import { DockerContainer } from "./Model/DockerContainer";
 import { Utility } from "./utility";
 
+import { Docker } from "./docker"
+
 export class DockerContainers extends DockerTreeBase<DockerContainer> implements vscode.TreeDataProvider<DockerContainer> {
     private containerStrings = [];
 
-    constructor(context: vscode.ExtensionContext) {
+    constructor(context: vscode.ExtensionContext, docker: Docker) {
         super(context);
+        this.docker = docker;
     }
 
     public searchContainer(): void {
@@ -38,35 +41,38 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
     }
 
     public getChildren(element?: DockerContainer): Thenable<DockerContainer[]> {
-        const containers = [];
-        try {
-//            this.containerStrings = Executor.execSync("docker ps -a --format \"{{.ID}} {{.Names}} {{.Image}} {{.Status}}\"")
-//                .split(/[\r\n]+/g).filter((item) => item);
-//            this.containerStrings.forEach((containerString) => {
-//                const items = containerString.split(" ");
-//                const image = items[3] === "Up" ? "container-on.png" : "container-off.png";
-//                containers.push(new DockerContainer(
-//                    items[0],
-//                    items[1],
-//                    items[2],
-//                    this.context.asAbsolutePath(path.join("resources", image)),
-//                    {
-//                        command: "docker-explorer.getContainer",
-//                        title: "",
-//                        arguments: [items[1]],
-//                    },
-//                ));
-//            });
-        } catch (error) {
-            if (!DockerTreeBase.isErrorMessageShown) {
-                vscode.window.showErrorMessage(`[Failed to list Docker Containers] ${error.stderr}`);
-                DockerTreeBase.isErrorMessageShown = true;
-            }
-        } finally {
-            this.setAutoRefresh();
-        }
 
-        return Promise.resolve(containers);
+        return new Promise((resolve,reject) => {
+ 
+            try {
+                this.docker.ps(true, (result) => {
+                    const containers = [];
+                    for (var c of result.rows) {
+                        containers.push(new DockerContainer(c['container id'],
+                                                            c['names'],
+                                                            c['image'],
+                                                            this.context.asAbsolutePath(path.join("resources", c['status'] === "Up" ? "container-on.png" : "container-off.png")),
+                                                            {
+                                                                command: "docker-explorer.getContainer",
+                                                                title: "",
+                                                                arguments: c['names']
+                                                            }                            
+                        ));
+                    }
+
+                    resolve(containers);
+                })
+            } catch (error) {
+                if (!DockerTreeBase.isErrorMessageShown) {
+                    vscode.window.showErrorMessage(`[Failed to list Docker Containers] ${error.stderr}`);
+                    DockerTreeBase.isErrorMessageShown = true;
+                }
+
+                reject(new Error("Failed to query containers"));
+            } finally {
+                this.setAutoRefresh();
+            }
+        });
     }
 
     public getContainer(containerName: string): void {
@@ -118,4 +124,6 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
 //        Executor.runInTerminal(`docker exec -it ${containerName} bash`, true, containerName);
 //        AppInsightsClient.sendEvent("executeInBashInContainer");
     }
+
+    private docker: Docker = null;
 }
