@@ -26,18 +26,6 @@
                 {
                     "id": "dockerImages",
                     "name": "Docker Images"
-                },
-                {
-                    "id": "azureRegistries",
-                    "name": "Azure Container Registry"
-                },
-                {
-                    "id": "DockerHubTreeView",
-                    "name": "Docker Hub"
-                },
-                {
-                    "id": "suggestedDockerImages",
-                    "name": "Suggested Docker Hub Images"
                 }
             ]
         },
