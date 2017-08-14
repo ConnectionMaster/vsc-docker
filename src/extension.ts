@@ -37,6 +37,10 @@ var copyPaste = require('copy-paste');
 
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker Runner");
 
+
+var dockerContainers: DockerContainers = null;
+var dockerImages: DockerImages = null;
+
 /**
  * Activate extension
  * 
@@ -44,9 +48,9 @@ var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker
  */
 export function activate(context: vscode.ExtensionContext) {
 
-    const dockerContainers = new DockerContainers(context, docker);
+    dockerContainers = new DockerContainers(context, docker);
     vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
-    const dockerImages = new DockerImages(context, docker);
+    dockerImages = new DockerImages(context, docker);
     vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
 
 //    const azureContainerRegistries = new AzureContainerRegistries(context);
@@ -695,6 +699,9 @@ function queryImages() {
             vscode.window.showErrorMessage('Operation failed!');                
         }
     })       
+
+    dockerImages.refreshDockerTree();    
+
 }
 
 /**
@@ -716,6 +723,8 @@ function queryContainers() {
             vscode.window.showErrorMessage('Operation failed!');                
         }
     })
+
+    dockerContainers.refreshDockerTree();    
 }
 
 /**

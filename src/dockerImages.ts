@@ -105,47 +105,10 @@ export class DockerImages extends DockerTreeBase<DockerImage> implements vscode.
         });
     }
 
-    public getImage(repository: string, tag: string): void {
-//        Executor.runInTerminal(`docker images ${repository}:${tag}`);
-//        AppInsightsClient.sendEvent("getImage");
-    }
-
     private static getRandomName(): string {
         var rand1: number = Math.floor(Math.random()*adjectives.length);
         var rand2: number = Math.floor(Math.random()*nouns.length);
         return adjectives[rand1] + "_" + nouns[rand2];
-    }
-
-    public runFromImage(repository: string, tag: string): void {
-
-        var name: string = DockerImages.getRandomName();
-
-//        Executor.runInTerminal(`docker run -it --name ${name} ${repository}:${tag}`, true, name);
-//        AppInsightsClient.sendEvent("runFromImage");
-    }
-
-    public removeImage(repository: string, tag: string): void {
-//        Executor.runInTerminal(`docker rmi ${repository}:${tag}`);
-        AppInsightsClient.sendEvent("removeImage");
-    }
-
-    public pushImage(repository: string, tag: string): void {
-        const registtyNames = ACRHierachy.root.children.map((item) => item.name);
-        vscode.window.showQuickPick(registtyNames, { placeHolder: "Choose Registry" }).then((registryName) => {
-            if (registryName === undefined) {
-
-            } else {
-//                const credential = Executor.execSync(`docker exec azure-cli az acr credential show -n ${registryName}`);
-//                const credentialObj = JSON.parse(credential);
-//                const password = credentialObj.passwords[0].value;
-//                const loginResult = Executor.execSync(`docker login ${registryName}.azurecr.io -u ${registryName} -p ${password}`);
-//                if (loginResult.indexOf("Login Succeeded") >= 0) {
-//                    Executor.runInTerminal(`docker tag ${repository}:${tag} ${registryName}.azurecr.io/${repository}:${tag}`);
-//                    Executor.runInTerminal(`docker push ${registryName}.azurecr.io/${repository}:${tag}`);
-//                }
-            }
-        });
-        AppInsightsClient.sendEvent("pushImage");
     }
 
     private docker: Docker = null;
