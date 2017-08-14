@@ -518,7 +518,7 @@ function displayContainerOptions(id: string, status: string) {
 
         } else if (selected == 'Top') {
             docker.top(id, function (result: object) {
-                html.createPreviewFromText('docker', result.toString(), "Diff");
+                html.createPreviewFromText('docker', result.toString(), "Top");
             })
 
         } else if (selected == 'Logs') {
