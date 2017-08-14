@@ -44,8 +44,10 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
 
         return new Promise((resolve,reject) => {
  
-            try {
-                this.docker.ps(true, (result) => {
+            this.docker.ps(true, (result) => {
+
+                if (result)
+                {
                     const containers = [];
                     for (var c of result.rows) {
                         containers.push(new DockerContainer(c['container id'],
@@ -60,18 +62,13 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
                         ));
                     }
 
+                    this.setAutoRefresh();
                     resolve(containers);
-                })
-            } catch (error) {
-                if (!DockerTreeBase.isErrorMessageShown) {
-                    vscode.window.showErrorMessage(`[Failed to list Docker Containers] ${error.stderr}`);
-                    DockerTreeBase.isErrorMessageShown = true;
                 }
-
-                reject(new Error("Failed to query containers"));
-            } finally {
-                this.setAutoRefresh();
-            }
+                else {
+                    reject(new Error("container query failed"));
+                }
+            })
         });
     }
 
