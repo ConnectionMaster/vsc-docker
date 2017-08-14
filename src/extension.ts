@@ -157,110 +157,6 @@ export function activate(context: vscode.ExtensionContext) {
         //AppInsightsClient.sendEvent("refreshDockerContainers");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.searchContainer", () => {
-        dockerContainers.searchContainer();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.getContainer", (containerName) => {
-        dockerContainers.getContainer(containerName);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.startContainer", (container) => {
-        docker.start(container.name, () => {
-            dockerContainers.refreshDockerTree();
-        })
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.stopContainer", (container) => {
-        docker.stop(container.name, () => {
-            dockerContainers.refreshDockerTree();
-        })
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.restartContainer", (container) => {
-        docker.restart(container.name, () => {
-            dockerContainers.refreshDockerTree();
-        })
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.showContainerStatistics", (container) => {
-        dockerContainers.showContainerStatistics(container.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.showContainerLogs", (container) => {
-        dockerContainers.showContainerLogs(container.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.removeContainer", (container) => {
-        dockerContainers.removeContainer(container.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.executeCommandInContainer", (container) => {
-        dockerContainers.executeCommandInContainer(container.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.executeInBashInContainer", (container) => {
-        dockerContainers.executeInBashInContainer(container.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.refreshDockerImages", () => {
-        dockerImages.refreshDockerTree();
-        //AppInsightsClient.sendEvent("refreshDockerImages");
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.getImage", (repository, tag) => {
-        dockerImages.getImage(repository, tag);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.runFromImage", (image) => {
-        dockerImages.runFromImage(image.repository, image.tag);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.removeImage", (image) => {
-        dockerImages.removeImage(image.repository, image.tag);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pushImage", (image) => {
-        dockerImages.pushImage(image.repository, image.tag);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.refreshDockerHub", () => {
-        dockerHubTreeDataProvider.refresh();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.loginDockerHub", () => {
-        dockerHubTreeDataProvider.login();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.logoutDockerHub", () => {
-        dockerHubTreeDataProvider.logout();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pullFromDockerHub", (element) => {
-        dockerHubTreeDataProvider.pullFromHub(element.parent, element.name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pullLatestFromDockerHub", (repo) => {
-        //suggestedDockerImages.pullFromHub(repo.user, repo.repository);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.openDockerHubPage", (repo) => {
-        //AppInsightsClient.sendEvent("openDockerHubPage");
-        let urlPrefix = "https://hub.docker.com/r/";
-
-        if (repo.parent == null) {
-            // when the context menu is invoked in "Suggested Docker Hub images" tree, repo.parent is null
-            if (repo.user == null) {
-                // when the context menu is invoked on an official image, repo.user is null
-                urlPrefix = "https://hub.docker.com/_/";
-            }
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`${urlPrefix + repo.label}`));
-        } else {
-            // when the context menu is invoked in "Docker Hub images" tree, repo.parent is {user}/{image}
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(`${urlPrefix + repo.parent}`));
-        }
-    }));
-
     context.subscriptions.push(vscode.window.onDidCloseTerminal((closedTerminal: vscode.Terminal) => {
         //Executor.onDidCloseTerminal(closedTerminal);
     }));
@@ -427,7 +323,8 @@ function displayContainerOptions(id: string, status: string) {
         if (state == ContainerState.Exited) {
             items.push('Remove');
         } else {
-            items.push('Kill & Remove');
+            items.push('Stop');
+            items.push('Stop & Remove');
         }
 
         // XXX - container can be restarted only when not paused -- and what else?
@@ -458,7 +355,16 @@ function displayContainerOptions(id: string, status: string) {
                 }
                 queryContainers();            
             })
-        } else if (selected == 'Kill & Remove') {
+        } else if (selected == 'Stop') {
+            docker.stop([ id ], function(result) {
+                if (result) {
+                    vscode.window.showInformationMessage('Container stopped');
+                } else {
+                    vscode.window.showErrorMessage('Operation failed');
+                }
+                queryContainers();            
+            })
+        } else if (selected == 'Stop & Remove') {
             docker.rm([ id ], true, function(result) {
                 if (result) {
                     vscode.window.showInformationMessage('Container removed');
