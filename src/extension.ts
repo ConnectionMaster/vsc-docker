@@ -703,6 +703,10 @@ function installImage(id: string, description: string, pin: boolean) {
                     saveConfig();
                 });
             } else {
+
+                // make sure image list is refreshed
+                queryImages();
+
                 vscode.window.showInformationMessage("Image pulled!");
             }            
         } else {
