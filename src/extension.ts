@@ -151,45 +151,17 @@ export function activate(context: vscode.ExtensionContext) {
         searchImages();
     });
 
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.refreshDockerContainers", () => {
+    registerCommand(context, 'extension.refreshContainers', (...p:any[]) => {
         dockerContainers.refreshDockerTree();
-        //AppInsightsClient.sendEvent("refreshDockerContainers");
-    }));
+    });
+
+    registerCommand(context, 'extension.refreshImages', (...p:any[]) => {
+        dockerImages.refreshDockerTree();
+    });
 
     context.subscriptions.push(vscode.window.onDidCloseTerminal((closedTerminal: vscode.Terminal) => {
         //Executor.onDidCloseTerminal(closedTerminal);
     }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.pullImage", (tagItem) => {
-        //azureContainerRegistries.pullImage(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
-        //AppInsightsClient.sendEvent("pullImageFromACR");
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.deployToAzure", (tagItem) => {
-        //azureContainerRegistries.deployToAzure(tagItem.node.name, tagItem.node.parent.name, tagItem.node.parent.parent.name);
-        //AppInsightsClient.sendEvent("deployToAzure");
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.loginAzureCli", () => {
-        //azureContainerRegistries.login();
-         //AppInsightsClient.sendEvent("loginAzureCli");
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.logoutAzureCli", () => {
-        //azureContainerRegistries.logout();
-         //AppInsightsClient.sendEvent("logoutAzureCli");
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand("docker-explorer.refreshAzureRegistries", () => {
-        //azureContainerRegistries.refreshDockerTree();
-        //AppInsightsClient.sendEvent("refreshAzureRegistry");
-    }));
-
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((editor) => {
-        //suggestedDockerImages._onDidChangeTreeData.fire();
-    }));
-    
 
     var item = vscode.window.createStatusBarItem();
 
@@ -488,6 +460,11 @@ function displayImageOptions(name: string, repository: string) {
     items.push('History');
     items.push('Remove');
 
+    items.push('Run');
+    items.push('Run (shell)');
+
+    // [TODO] add more options from configuration here
+
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'History') {
             docker.history(name, function (result: object) {
@@ -537,6 +514,10 @@ function displayImageOptions(name: string, repository: string) {
             vscode.window.showInformationMessage('Not implemented yet!');
         } else if (selected == 'Load') {
             vscode.window.showInformationMessage('Not implemented yet!');
+        } else if (selected == 'Run') {
+
+        } else if (selected == 'Run (shell)') {
+
         }
     })
 }

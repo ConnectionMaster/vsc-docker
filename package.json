@@ -64,6 +64,20 @@
             }
         ],
         
+        "menus": {
+            "view/title": [
+                {
+                    "command": "extension.refreshContainers",
+                    "when": "view == dockerContainers",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.refreshImages",
+                    "when": "view == dockerImages",
+                    "group": "navigation"
+                }
+            ]
+        },
         "keybindings": [
             {
                 "key": "alt+ctrl+d",
