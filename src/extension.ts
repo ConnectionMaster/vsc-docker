@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
         docker.rm(p[0], true, function(result) {
             vscode.window.showInformationMessage('RESULT: ' + JSON.stringify(result));
 
-            queryContainers();            
+            queryContainers(true);            
          })
 
     });
@@ -140,11 +140,11 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     registerCommand(context, 'extension.showLocalImages', (...p:any[]) => {
-        queryImages();
+        queryImages(false);
     });
 
     registerCommand(context, 'extension.showLocalContainers', (...p:any[]) => {
-        queryContainers();
+        queryContainers(false);
     });
 
     registerCommand(context, 'extension.searchImages', (...p:any[]) => {
@@ -219,9 +219,9 @@ function displayMainMenu() {
         } else if (selected == 'Search Images') {
             searchImages();
         } else if (selected == 'Local Containers') {
-            queryContainers();
+            queryContainers(false);
         } else if (selected == 'Local Images') {
-            queryImages();
+            queryImages(false);
         } else if (selected == 'Info') {
             displayInfo();
         } else {
@@ -325,7 +325,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();            
+                queryContainers(true);            
             })
         } else if (selected == 'Stop') {
             docker.stop([ id ], function(result) {
@@ -334,7 +334,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();            
+                queryContainers(true);            
             })
         } else if (selected == 'Stop & Remove') {
             docker.rm([ id ], true, function(result) {
@@ -343,7 +343,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();            
+                queryContainers(true);            
             })
         } else if (selected == 'Rename') {
             vscode.window.showInputBox({ prompt: 'New name'}).then( (newName) => {
@@ -353,7 +353,7 @@ function displayContainerOptions(id: string, status: string) {
                     } else {
                         vscode.window.showErrorMessage('Operation failed');
                     }
-                    queryContainers();            
+                    queryContainers(true);            
                 })
             })
 
@@ -364,7 +364,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();                            
+                queryContainers(true);                            
             })
         } else if (selected == 'Unpause') {
             docker.unpause(id, function(result) {
@@ -373,7 +373,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();                            
+                queryContainers(true);                            
             })
         } else if (selected == 'Start') {
             docker.start(id, function(result) {
@@ -382,7 +382,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();                            
+                queryContainers(true);                            
             })
         } else if (selected == 'Restart') {
             docker.restart(id, function(result) {
@@ -391,7 +391,7 @@ function displayContainerOptions(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();                            
+                queryContainers(true);                            
             })
         } else if (selected == 'Diff') {
             docker.diff(id, function (result: object) {
@@ -438,7 +438,7 @@ function deleteContainer(id: string, status: string) {
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
-                queryContainers();            
+                queryContainers(true);            
             })
         }
     })
@@ -473,7 +473,7 @@ function displayImageOptions(name: string, repository: string) {
                 result['title'] = 'History of ' + name;
 
                 // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', 'History', result, 1, null);
+                html.createPreviewFromObject('docker', 'History', result, 1, null, false);
             })
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
@@ -483,7 +483,7 @@ function displayImageOptions(name: string, repository: string) {
                     vscode.window.showErrorMessage('Removing image failed!');
                 }
 
-                queryImages();
+                queryImages(true);
 
                 if (g_Config.hasOwnProperty(repository)) {
                     delete g_Config[repository];
@@ -498,7 +498,7 @@ function displayImageOptions(name: string, repository: string) {
                     vscode.window.showErrorMessage('Pull failed');
                 }
 
-                queryImages();
+                queryImages(true);
             })
         } else if (selected == 'Push') {
             docker.push(repository, function(result) {
@@ -508,7 +508,7 @@ function displayImageOptions(name: string, repository: string) {
                     vscode.window.showErrorMessage('Push failed');
                 }
 
-                queryImages();
+                queryImages(true);
             })
         } else if (selected == 'Save') {
             vscode.window.showInformationMessage('Not implemented yet!');
@@ -538,7 +538,7 @@ function deleteImage(name: string, repository: string) {
                     vscode.window.showErrorMessage('Removing image failed!');
                 }
 
-                queryImages();
+                queryImages(true);
 
                 if (g_Config.hasOwnProperty(repository)) {
                     delete g_Config[repository];
@@ -570,7 +570,7 @@ function displayInfo() {
 /**
  * Query local images
  */
-function queryImages() {
+function queryImages(refreshOnly: boolean) {
     docker.images(function (result: object) {
         if (result) {
             // add complex definition to the headers
@@ -581,7 +581,7 @@ function queryImages() {
 
             result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
 
-            html.createPreviewFromObject('images','Images', result, 1, null);
+            html.createPreviewFromObject('images','Images', result, 1, null, refreshOnly);
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
         }
@@ -594,7 +594,7 @@ function queryImages() {
 /**
  * Query local containers
  */
-function queryContainers() {
+function queryContainers(refreshOnly: boolean) {
     docker.ps(true, function (result: object) {
 
         if (result) {
@@ -605,7 +605,7 @@ function queryContainers() {
 
             result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 
-            html.createPreviewFromObject('containers', 'Containers', result, 1, '');
+            html.createPreviewFromObject('containers', 'Containers', result, 1, '', refreshOnly);
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
         }
@@ -629,7 +629,7 @@ function searchImages() {
                 result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
                 // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', 'Search', result, 1, null);
+                html.createPreviewFromObject('docker', 'Search', result, 1, null, false);
             } else {
                 vscode.window.showErrorMessage('Search failed!');                
             }
@@ -688,7 +688,7 @@ function installImage(id: string, description: string, pin: boolean) {
             } else {
 
                 // make sure image list is refreshed
-                queryImages();
+                queryImages(true);
 
                 vscode.window.showInformationMessage("Image pulled!");
             }            
@@ -751,10 +751,10 @@ function cmdHandler(json: any, container: string) {
                     opn(params[0]);    
                     break;
                 case 'html':
-                    html.preview('extension', params[0], 'Info', 1);
+                    html.preview('extension', params[0], 'Info', 1, false);
                     break;
                 case 'form':
-                    html.createPreviewFromObject("extension", "Extension", params[0], 1, container);
+                    html.createPreviewFromObject("extension", "Extension", params[0], 1, container, false);
                     break;
                 case 'status':
                     var name: string = params[0].name;

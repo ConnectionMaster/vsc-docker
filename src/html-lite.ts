@@ -47,7 +47,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
      * @param title 
      * @param panel 
      */
-    public preview(uri: string, html: string, title: string, panel: number) {
+    public preview(uri: string, html: string, title: string, panel: number, refreshOnly: boolean) {
         this.m_InternalPages[uri] = html; 
 
         var x = vscode.workspace.textDocuments;
@@ -59,6 +59,10 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
                 return; 
             }
         }
+
+        // document not visible, so don't display it, user requested just refresh
+        if (refreshOnly)
+            return;
 
         // only call preview if document really changed
         vscode.commands.executeCommand('vscode.previewHtml', uri, panel, title);
@@ -88,7 +92,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.documentParagraph(text);
         this.documentEnd();
 
-        this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel);
+        this.preview('xxx://internal/' + type, this.m_CurrentDocument, title, panel, false);
     }
 
     /**
@@ -99,7 +103,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
      * @param panel 
      * @param container 
      */
-    public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string) {
+    public createPreviewFromObject(type: string, tabTitle: string, o: object, panel: number, container: string, refreshOnly: boolean) {
 
         this.documentStart(undefined, type, false);
 
@@ -113,7 +117,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         this.documentEnd();
 
-        this.preview('xxx://internal/' + type, this.m_CurrentDocument, tabTitle, panel);
+        this.preview('xxx://internal/' + type, this.m_CurrentDocument, tabTitle, panel, refreshOnly);
     }
 
     /**
