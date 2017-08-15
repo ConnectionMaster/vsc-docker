@@ -642,7 +642,9 @@ function installImageOptions(id: string, description: string) {
     var items:string[] = [];
 
     items.push('Pull');
-    items.push('Pull & Pin to the Menu');
+
+    // [TODO] this option is disabled for timebeing
+    //items.push('Pull & Pin to the Menu');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Pull') {

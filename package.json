@@ -13,7 +13,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.openMainMenu"
+        "onCommand:extension.openMainMenu",
+        "onView:dockerContainers",
+        "onView:dockerImages"
     ],
     "main": "./out/src/extension",
     "contributes": {
