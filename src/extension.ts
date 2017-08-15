@@ -535,7 +535,6 @@ function displayImageOptions(name: string, repository: string) {
     items.push('Remove');
 
     items.push('Run');
-    items.push('Run (shell)');
 
     // [TODO] add more options from configuration here
 
@@ -589,9 +588,7 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Load') {
             vscode.window.showInformationMessage('Not implemented yet!');
         } else if (selected == 'Run') {
-
-        } else if (selected == 'Run (shell)') {
-
+            startContainerFromTerminal(repository, true, null);
         }
     })
 }
@@ -926,8 +923,10 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
         if (view) g_Terminals[name].show();
     } else {
 
-        var cc :any = g_Config[id];
-        var params: string = cc.config.run;
+        //var cc :any = g_Config[id];
+        //var params: string = cc.config.run;
+
+        var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " bash";
 
         // create a new terminal and show it
         g_Terminals[name]  = vscode.window.createTerminal(name);
@@ -948,15 +947,15 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
 
             if (exists) {
                 g_Terminals[name].sendText('docker attach ' + name, true);
-                docker.attach(id, g_Config[id].config.compatible, function(result) {
+                docker.attach(id, /*g_Config[id].config.compatible*/ false, function(result) {
                     cb();
                 });
             } else {
                 var src = '/src';
 
-                if (g_Config[id].config.src) {
-                    src = g_Config[id].config.src;
-                }
+                //if (g_Config[id].config.src) {
+                //    src = g_Config[id].config.src;
+                //}
 
                 params = params.replace('$default-name', name);
                 params = params.replace('$workspace', vscode.workspace.rootPath);
@@ -966,7 +965,7 @@ function startContainerFromTerminal(id: string, view: boolean, cb) {
                 g_Terminals[name].sendText('docker run ' + params, true);
 
                 setTimeout(function() {
-                    docker.attach(id, g_Config[id].config.compatible, function(result) {
+                    docker.attach(id, /*g_Config[id].config.compatible*/ false, function(result) {
                         cb();
                     });
                 }, 3000)
