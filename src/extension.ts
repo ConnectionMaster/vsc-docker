@@ -16,6 +16,7 @@ import { DockerHubTreeDataProvider } from "./dockerHubTreeDataProvider";
 import { DockerImages } from "./dockerImages";
 
 import { AzureContainerRegistries } from "./azureContainerRegistries";
+import { AppInsightsClient } from "./appInsightsClient";
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
@@ -200,34 +201,68 @@ function displayMainMenu() {
 
     var items:string[] = [];
 
-    items.push('Local Images');
-    items.push('Local Containers');
-    items.push('Search Images');
+    items.push('Local Images (detailed)');
+    items.push('Local Containers (detailed)');
+    items.push('Find Images in DockerHub');
     items.push('Edit Configuration');
     items.push('Info');
     items.push('________________');
+    items.push('Login to Azure Container Registry');
+    items.push('Login to DockerHub');
+    items.push('Use Remote Docker Machine');
 
-    for (var item in g_Config) {
-        items.push((g_Terminals.hasOwnProperty(docker.nameFromId(item)) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
-    }
+    //for (var item in g_Config) {
+    //    items.push((g_Terminals.hasOwnProperty(docker.nameFromId(item)) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
+    //}
 
    vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Edit Configuration') {
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });
-        } else if (selected == 'Search Images') {
+        } else if (selected == 'Find Images in DockerHub') {
             searchImages();
-        } else if (selected == 'Local Containers') {
+        } else if (selected == 'Local Containers (detailed)') {
             queryContainers(false);
-        } else if (selected == 'Local Images') {
+        } else if (selected == 'Local Images (detailed)') {
             queryImages(false);
         } else if (selected == 'Info') {
             displayInfo();
-        } else {
-            var image: string = selected.split('[')[1].split(']')[0];
-            displayContainerMenu(image);
+        } else if (selected == 'Login to Azure Container Registry') {
+            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+                if (value == 'Request') {
+                    AppInsightsClient.sendEvent('AcrRequest');
+                } else if (value == 'Abandon') {
+                    AppInsightsClient.sendEvent('AcrAbandon');
+                } else {
+                    AppInsightsClient.sendEvent('AcrUndecided');
+                }
+            });                
+        } else if (selected == 'Login to DockerHub') {
+            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+                if (value == 'Request') {
+                    AppInsightsClient.sendEvent('DockerHubRequest');
+                } else if (value == 'Abandon') {
+                    AppInsightsClient.sendEvent('DockerHubAbandon');
+                } else {
+                    AppInsightsClient.sendEvent('DockerHubUndecided');
+                }
+            });                
+        } else if (selected == 'Use Remote Docker Machine') {
+            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+                if (value == 'Request') {
+                    AppInsightsClient.sendEvent('RemoteDockerMachineRequest');
+                } else if (value == 'Abandon') {
+                    AppInsightsClient.sendEvent('RemoteDockerMachineAbandon');
+                } else {
+                    AppInsightsClient.sendEvent('RemoteDockerMachineUndecided');
+                }
+            });                
         }
+//        } else {
+//            var image: string = selected.split('[')[1].split(']')[0];
+//            displayContainerMenu(image);
+//        }
     })
 }
 
