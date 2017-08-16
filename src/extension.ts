@@ -542,6 +542,7 @@ function displayImageOptions(name: string, repository: string) {
         if (selected == 'History') {
             docker.history(name, function (result: object) {
 
+            AppInsightsClient.sendEvent('ImageHistory');
                 // add complex definition to the headers
                 result['title'] = 'History of ' + name;
 
@@ -551,8 +552,10 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Remove') {
             docker.rmi([ name ], function(result) {
                 if (result) {
+                    AppInsightsClient.sendEvent('ImageRemoveSuccess');
                     vscode.window.showInformationMessage('Image removed!');                    
                 } else {
+                    AppInsightsClient.sendEvent('ImageRemoveFailure');
                     vscode.window.showErrorMessage('Removing image failed!');
                 }
 
@@ -566,8 +569,10 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Pull') {
             docker.pull(repository, function(result) {
                 if (result) {
+                    AppInsightsClient.sendEvent('ImagePullSuccess');
                     vscode.window.showInformationMessage('Pull completed!');
                 } else {
+                    AppInsightsClient.sendEvent('ImagePullFailure');
                     vscode.window.showErrorMessage('Pull failed');
                 }
 
@@ -576,8 +581,10 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Push') {
             docker.push(repository, function(result) {
                 if (result) {
+                    AppInsightsClient.sendEvent('ImagePushSuccess');
                     vscode.window.showInformationMessage('Push completed!');
                 } else {
+                    AppInsightsClient.sendEvent('ImagePushFailure');
                     vscode.window.showErrorMessage('Push failed');
                 }
 
@@ -588,7 +595,9 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Load') {
             vscode.window.showInformationMessage('Not implemented yet!');
         } else if (selected == 'Run') {
+            AppInsightsClient.sendEvent('RunFromImage');
             startContainerFromTerminal(repository, true, function () {
+                AppInsightsClient.sendEvent('RunFromImageAttached');
                 queryContainers(true);                
             });
         }
