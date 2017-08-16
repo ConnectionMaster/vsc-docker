@@ -588,7 +588,9 @@ function displayImageOptions(name: string, repository: string) {
         } else if (selected == 'Load') {
             vscode.window.showInformationMessage('Not implemented yet!');
         } else if (selected == 'Run') {
-            startContainerFromTerminal(repository, true, null);
+            startContainerFromTerminal(repository, true, function () {
+                queryContainers(true);                
+            });
         }
     })
 }
