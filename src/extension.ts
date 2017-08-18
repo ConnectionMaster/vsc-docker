@@ -527,14 +527,13 @@ function deleteContainer(id: string, status: string) {
 function displayImageOptions(name: string, repository: string) {
     var items:string[] = [];
 
+    items.push('Run');
     items.push('Pull');
     items.push('Push');
     items.push('Load');
     items.push('Save');
     items.push('History');
     items.push('Remove');
-
-    items.push('Run');
 
     // [TODO] add more options from configuration here
 
