@@ -1,6 +1,5 @@
 "use strict";
 import * as vscode from "vscode";
-import { Utility } from "./utility";
 import appInsights = require("applicationinsights");
 
 export class AppInsightsClient {

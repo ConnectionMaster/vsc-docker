@@ -2,9 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "./appInsightsClient";
 import { DockerTreeBase } from "./dockerTreeBase";
-import { ACRHierachy } from "./Model/ACRHierachy";
 import { DockerImage } from "./Model/DockerImage";
-import { Utility } from "./utility";
 
 import { Docker } from "./docker"
 

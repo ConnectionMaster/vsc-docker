@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { Utility } from "./utility";
 
 export class DockerTreeBase<T> {
     protected static isErrorMessageShown = false;
@@ -16,7 +15,7 @@ export class DockerTreeBase<T> {
     }
 
     protected setAutoRefresh(): void {
-        const interval = Utility.getConfiguration().get<number>("autoRefreshInterval");
+        const interval = 60000; // needs to go to config
         if (interval > 0) {
             clearTimeout(this._debounceTimer);
             this._debounceTimer = setTimeout(() => {

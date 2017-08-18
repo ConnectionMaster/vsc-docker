@@ -11,11 +11,8 @@ import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';
 
 import { DockerContainers } from "./dockerContainers";
-import { DockerHubManager } from "./DockerHub/DockerHubManager";
-import { DockerHubTreeDataProvider } from "./dockerHubTreeDataProvider";
 import { DockerImages } from "./dockerImages";
 
-import { AzureContainerRegistries } from "./azureContainerRegistries";
 import { AppInsightsClient } from "./appInsightsClient";
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
@@ -55,12 +52,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
     dockerImages = new DockerImages(context, docker);
     vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
-
-//    const azureContainerRegistries = new AzureContainerRegistries(context);
-//    vscode.window.registerTreeDataProvider("azureRegistries", azureContainerRegistries);
-    const dockerHubTreeDataProvider = new DockerHubTreeDataProvider(context);
-    vscode.window.registerTreeDataProvider("DockerHubTreeView", dockerHubTreeDataProvider);
-
 
     g_StoragePath = context.storagePath;
     html.setExtensionPath(context.extensionPath);
