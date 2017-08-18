@@ -358,6 +358,7 @@ function displayContainerOptions(id: string, status: string) {
     }
 
     if (state == ContainerState.Running) {
+        items.push('Terminal');
         items.push('Pause');
     } else if (state == ContainerState.Paused) {
         items.push('Unpause');
@@ -493,6 +494,8 @@ function displayContainerOptions(id: string, status: string) {
 
             g_FileBrowserDocker.setOppositeBrowser(g_FileBrowserLocal);
             g_FileBrowserLocal.setOppositeBrowser(g_FileBrowserDocker);
+        } else if (selected == 'Terminal') {
+            showTerminal(id);
         }
     })
 }
@@ -986,6 +989,20 @@ function getRandomName(): string {
     var rand2: number = Math.floor(Math.random()*nouns.length);
     return adjectives[rand1] + "_" + nouns[rand2];
 }
+
+function showTerminal(id: string) {
+    if (g_Terminals.hasOwnProperty(id)) {
+        // just show the terminal if it was already created for this container
+        if (id) g_Terminals[id].show();
+    } else {
+
+        // create a new terminal and show it
+        g_Terminals[id]  = vscode.window.createTerminal(id);
+        g_Terminals[id].show();
+        g_Terminals[id].sendText('docker attach ' + id, true);
+    }
+}
+
 
 function startContainerFromTerminal(id: string, view: boolean, cb) {
     var name = getRandomName();
