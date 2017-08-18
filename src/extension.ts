@@ -53,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
     dockerImages = new DockerImages(context, docker);
     vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
 
-    g_StoragePath = context.storagePath;
+    g_StoragePath = context.extensionPath;
     html.setExtensionPath(context.extensionPath);
 
     loadConfig();
@@ -222,6 +222,7 @@ function displayMainMenu() {
 
    vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Edit Configuration') {
+            saveConfig();
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
                 vscode.window.showTextDocument(document);
             });

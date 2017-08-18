@@ -2,7 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { AppInsightsClient } from "./appInsightsClient";
 import { DockerTreeBase } from "./tree-base";
-import { DockerContainer } from "./Model/DockerContainer";
+import { DockerContainer } from "./DockerContainer";
 
 import { Docker } from "./docker"
 
