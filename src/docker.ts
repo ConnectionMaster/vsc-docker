@@ -13,11 +13,10 @@ export class Docker extends CliRunner {
      * Constructor
      * 
      * @param rootPath 
-     * @param commandHandler 
      * @param outputHandler 
      * @param closeHandler 
      */
-    constructor(rootPath: string, commandHandler, outputHandler, closeHandler) {
+    constructor(rootPath: string, outputHandler, closeHandler) {
         super(outputHandler);
     }
 

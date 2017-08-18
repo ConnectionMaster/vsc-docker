@@ -18,7 +18,7 @@ import { DockerImages } from "./dockerImages";
 import { AzureContainerRegistries } from "./azureContainerRegistries";
 import { AppInsightsClient } from "./appInsightsClient";
 
-var docker: Docker = new Docker(vscode.workspace.rootPath, cmdHandler, logHandler, closeHandler);
+var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
 
 var fs = require('fs');
@@ -135,11 +135,6 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.localFileDelete', (...p:any[]) => {
         AppInsightsClient.sendEvent('BrowseLocalFileDelete');
         g_FileBrowserLocal.delete(p[0]);
-    });
-
-
-    registerCommand(context, 'extension.handler', (...p:any[]) => {
-        cmdHandler(p[0], p[1]);
     });
 
     registerCommand(context, 'extension.htmlEvent', (...p:any[]) => {
@@ -283,36 +278,6 @@ function displayMainMenu() {
 //            displayContainerMenu(image);
 //        }
     })
-}
-
-/**
- * Display container menu
- * 
- * @param image 
- */
-function displayContainerMenu(image: string) {
-    var cc :any = g_Config[image];
-
-    if (typeof cc == 'object') {
-        if (cc.config.compatible) {
-
-            if (g_Terminals.hasOwnProperty(docker.nameFromId(image))) {
-                cmdHandler([ 'docker:menu' ], image);
-            } else {
-                startContainerFromTerminal(image, true, function() {
-                    cmdHandler([ 'docker:menu' ], image);
-                });
-            }
-        } else {
-            if (g_Terminals.hasOwnProperty(docker.nameFromId(image))) {
-                cmdHandler([ 'ide:menu', cc.menu ], image);
-            } else {
-                startContainerFromTerminal(image, true, function() {
-                    cmdHandler([ 'ide:menu' ], image);
-                });
-            }
-        }
-    }
 }
 
 enum ContainerState {
@@ -791,140 +756,6 @@ function closeHandler(id: string) {
     if (g_Terminals.hasOwnProperty(id)) {
         g_Terminals[id].dispose();
         delete g_Terminals[id];
-    }
-}
-
-function cmdHandler(json: any, container: string) {
-    try {
-        // XXX - stupid thing! made this to make sure this function won't damage original JSON
-        // XXX - have to figure out how to do this properly in JS
-        var params = (typeof json == 'string') ? JSON.parse(json) : JSON.parse(JSON.stringify(json));
-        var cmd = params[0];
-        var cmdPrefix: string = cmd.split(':')[0];
-        var cmdPostfix: string = cmd.split(':')[1];
-
-        if (cmdPrefix == 'ide') {
-            params.splice(0, 1);
-            switch (cmdPostfix) {
-                case 'info':
-                    vscode.window.showInformationMessage(params[0]);
-                    break;
-                case 'error':
-                    vscode.window.showErrorMessage(params[0]);
-                    break;
-                case 'input':
-                    vscode.window.showInputBox({ prompt: params[0].label, value: params[0].default}).then( (text) => {
-                        var command: any[] = params[0].command;
-                        command.push(text);
-                        cmdHandler(command, container) 
-                    })
-                    break;
-                case 'menu':
-                    vscode.window.showQuickPick(params[0].items).then( (selected) => {
-                        if (selected)
-                        {
-                            var index: number = params[0].items.indexOf(selected);
-                            cmdHandler(params[0].commands[index], container) 
-                        }
-                    })
-                    break;
-                case 'clipboard':
-                    copyPaste.copy(params[0]);
-                    break;
-                case 'openurl':
-                    opn(params[0]);    
-                    break;
-                case 'html':
-                    html.preview('extension', params[0], 'Info', 1, false);
-                    break;
-                case 'form':
-                    html.createPreviewFromObject("extension", "Extension", params[0], 1, container, false);
-                    break;
-                case 'status':
-                    var name: string = params[0].name;
-                    var command: string = params[0].command;
-
-                    if (!g_StatusBarItems.hasOwnProperty('name')) {
-                        g_StatusBarItems['name'] = vscode.window.createStatusBarItem();
-                        g_StatusBarItems['name'].show();
-                    }
-
-                    if (params[0].hasOwnProperty('text')) {
-                        g_StatusBarItems['name'].text = params[0].text;
-                    }
-
-                    if (params[0].hasOwnProperty('command')) {
-                        g_StatusBarItems['name'].command = params[0].command;
-                    }
-                    break;
-                case 'bash':
-                    startContainerFromTerminal(container, true, function() {});
-                    break;
-                case 'execute':
-                    if (params.length < 1) {
-                        vscode.window.showInputBox( { prompt: "Enter command", value: ''} ).then( (cmd) => {
-                            out.appendLine('\u27a4\u27a4 ' + container + " \u27a4\u27a4 " + cmd + " \u27a4\u27a4");
-                            out.show();
-                            docker.exec(container, cmd.split(' '), function(result) {
-                                if (result) {
-                                    vscode.window.showInformationMessage('Execution Successful!', 'Store').then( (result) => {
-                                        if (result == 'Store') {
-                                            vscode.window.showInputBox( { prompt: "Menu item name", value: ''} ).then( (name) => {
-                                                g_Config[container].menu.items.push(name);
-                                                g_Config[container].menu.commands.push(['ide:execute'].concat(cmd.split(' ')));
-
-                                                saveConfig();
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    vscode.window.showErrorMessage('Execution Failed!');
-                                }
-                                out.appendLine('\u2b24');
-                            });
-                        });
-                    } else {
-                        out.appendLine('\u27a4\u27a4 ' + container + " \u27a4\u27a4 " + params.join(' ') + " \u27a4\u27a4");
-                        out.show();
-                        docker.exec(container, params, function (result) {
-                            if (result) {
-                                vscode.window.showInformationMessage('Execution Successful!');
-                            } else {
-                                vscode.window.showErrorMessage('Execution Failed!');
-                            }
-                            out.appendLine('\u2b24');
-                        });
-                    }
-                    break;
-                case 'install':
-                    // install required container and launch welcome screen
-                    docker.pull(params[0], function(result) {
-                        if (result) {
-                            startContainerFromTerminal(params[0], true, function (result) {
-                                // image is now started
-
-                                // send command to the container
-                                docker.execCmd(params[0], ['docker:welcome'], function(result) {});
-                            });
-
-                        } else {
-
-                        }
-                    })
-                    break;
-                case 'log':
-                    out.appendLine(params[0]);
-                    out.show();
-                    break;
-            }
-        } else if (cmdPrefix == 'docker') {
-            docker.execCmd(container, params, function(result) {});
-        }
-
-        vscode.commands.executeCommand(cmd, params);
-    } catch (e) {
-        console.log("Parsing JSON failed:");
-        console.log(json);
     }
 }
 
