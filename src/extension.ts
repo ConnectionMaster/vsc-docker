@@ -166,6 +166,12 @@ export function activate(context: vscode.ExtensionContext) {
         //Executor.onDidCloseTerminal(closedTerminal);
     }));
 
+    context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(function(e: vscode.TextDocument) {
+        if (e.fileName.endsWith("config.json")) {
+            loadConfig();
+        }
+    }));
+
     var item = vscode.window.createStatusBarItem();
 
     item.text = "\u27a4 Docker Runner";

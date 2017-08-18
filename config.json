@@ -1,1 +1,14 @@
-{}
+{
+  "commands": [
+    {
+      "image": "azuresdk/azure-cli-python",
+      "command": "ls -al",
+      "name": "Current Directory"
+    },
+    {
+      "image": "*",
+      "command": "ps",
+      "name": "Processes"
+    }
+  ]
+}
