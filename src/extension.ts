@@ -684,8 +684,8 @@ function queryContainers(refreshOnly: boolean) {
         if (result) {
             // add complex definition to the headers
             result['title'] = 'Containers';
-            result['onSelect'] = ['command:extension.containerOptions', '$container id', '$status'];
-            result['onDelete'] = ['command:extension.containerDelete', '$container id', '$status'];
+            result['onSelect'] = ['command:extension.containerOptions', '$names', '$status'];
+            result['onDelete'] = ['command:extension.containerDelete', '$names', '$status'];
 
             result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
 

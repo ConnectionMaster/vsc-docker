@@ -33,7 +33,7 @@ export class DockerContainers extends DockerTreeBase<DockerContainer> implements
                                                             {
                                                                 command: "extension.containerOptions",
                                                                 title: "",
-                                                                arguments: [c['container id'], c['status']]
+                                                                arguments: [c['names'], c['status']]
                                                             }                            
                         ));
                     }
