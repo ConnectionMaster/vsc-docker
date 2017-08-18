@@ -10,8 +10,8 @@ import { HtmlView } from './html-lite';
 import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';
 
-import { DockerContainers } from "./dockerContainers";
-import { DockerImages } from "./dockerImages";
+import { DockerContainers } from "./tree-docker-containers";
+import { DockerImages } from "./tree-docker-images";
 
 import { AppInsightsClient } from "./appInsightsClient";
 
