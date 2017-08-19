@@ -1,5 +1,92 @@
 
 
+export function vt100ToLines(vt: string) : string[] {
+
+    // replace all line endings with single \n
+    vt = vt.replace(/(\r\n|\n|\r)/gm,"\n");
+    
+    var chunks: string[] = vt.split('\x1b');
+    var output: string[] = [];
+    for (var chunk of chunks) {
+        var first: string = chunk.charAt(0);
+        var skip = 0;
+        
+        switch (first) {
+            case '=': // Esc=
+            case '>': // Esc>
+            case '<': // Esc<
+            case 'N': // EscN 
+            case 'O': // EscO 
+            case 'D': // EscD
+            case 'M':   // EscM
+            case 'E':   // EscE
+            case '7':   // Esc7
+            case '8':   // Esc8
+            case 'H':   // EscH
+            case 'c':   // Escc
+                                
+                skip += 1;
+                break;
+            case '#': // Esc#3 Esc#4 Esc#5 Esc#6 Esc#8
+            case '(': // Esc(A Esc(B Esc(0 Esc(1 Esc(2
+            case ')': // Esc)A Esc)B Esc)0 Esc)1 Esc)2
+                skip += 2;
+                break;
+            case '[':
+                var second: string = chunk.charAt(1);
+
+                switch (second) {
+                    case '?':
+                        var fourth: string = chunk.charAt(3);
+
+                        switch (fourth) {
+                            case 'h': // Esc[?1h Esc[?3h Esc[?4h Esc[?5h Esc[?6h Esc[?7h Esc[?8h Esc[?9h
+                            case 'l': // Esc[?1l Esc[?2l Esc[?3l Esc[?4l Esc[?5l Esc[?6l Esc[?7l Esc[?8l Esc[?9l
+                                skip += 4;
+                                break;
+                            case ';': // Esc[?1;Value0c      Response: terminal type code n              DA
+
+                                // XXX - calculate skip
+
+                                break;
+                        }
+
+                    case 'K':   // Esc[K
+                    case 'J':   // Esc[J
+                    case 'c':   // Esc[c
+                    case 'H':   // Esc[H
+                    case 'f':   // Esc[f
+                    case 'g':   // Esc[g
+                    case 'i':   // Esc[i
+                    case 'm':   // Esc[m
+                        skip += 2;
+                        break;
+                    case ';':
+                        var third: string = chunk.charAt(2);
+
+                        switch (third) {
+                            case 'H': // Esc[;H
+                            case 'f': // Esc[;f
+                                skip += 3;
+                                break;
+                            default:
+                                // XXX - ERROR
+                        }
+                }
+
+                // XXXX implement
+                break;
+        }
+
+        output.push(chunk.slice(skip));
+    }
+
+    return output.join('').split('\n');
+}
+
+
+
+
 
 /*
     Esc[20h         Set new line mode                   LMN 

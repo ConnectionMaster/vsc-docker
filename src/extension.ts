@@ -15,6 +15,8 @@ import { DockerImages } from "./tree-docker-images";
 
 import { AppInsightsClient } from "./appInsightsClient";
 
+import { vt100ToLines } from "./vt100-decode";
+
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
 
@@ -447,7 +449,7 @@ function displayContainerOptions(id: string, status: string, image: string) {
         } else if (selected == 'Logs') {
             docker.logs(id, function (result: object) {
                 AppInsightsClient.sendEvent('ContainerLogsCompleted');
-                html.createPreviewFromText('docker', result.toString(), "Logs");
+                html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
             })
 
         } else if (selected == 'Browse') {
