@@ -88,6 +88,9 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         text = text.replace(/(\r\n|\n|\r)/gm,"<br/>");
 
+//        text = text.split('\x1b').join("---");
+
+
         this.documentStart(title, type, true);
         this.documentParagraph(text);
         this.documentEnd();
