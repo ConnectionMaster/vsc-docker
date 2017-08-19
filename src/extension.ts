@@ -611,14 +611,29 @@ function displayImageOptions(name: string, repository: string) {
  * @param repository 
  */
 function displayContainerLogOptions(entry: string, container: string, image: string) {
+
+    var split: string[] = entry.split('# ');
     var items:string[] = [];
 
-    items.push('Store');
+    if (split.length == 2) {
+        items.push('Store');
+    }
+
     items.push('Copy');
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Store') {
+            vscode.window.showInputBox({ prompt: 'Comand Name'}).then( (name) => {
+                g_Config['commands'].push(    
+                    {
+                        "image": image,
+                        "command": split[1],
+                        "name": name
+                    }
+              );
+            })
         } else if (selected == 'Copy') {
+            // XXX - copy to clipboard
         }
     });
 }
