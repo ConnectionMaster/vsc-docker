@@ -2,13 +2,13 @@
   "commands": [
     {
       "image": "azuresdk/azure-cli-python",
-      "command": "ls -al",
-      "name": "Current Directory"
+      "command": "az login",
+      "name": "Azure Login"
     },
     {
-      "image": "*",
-      "command": "ps",
-      "name": "Processes"
+      "image": "azuresdk/azure-cli-python",
+      "command": "az logout",
+      "name": "Azure Logout"
     }
   ]
 }

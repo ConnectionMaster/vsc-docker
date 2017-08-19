@@ -22,7 +22,7 @@ var fs = require('fs');
 var path = require('path');
 
 
-var g_Config = {};
+var g_Config: object = {};
 var g_availableImages = {};
 var g_StatusBarItems = {};
 var g_StoragePath = '';
@@ -82,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     registerCommand(context, 'extension.containerOptions', (...p:any[]) => {
         AppInsightsClient.sendEvent('DisplayContainerOptions');
-        displayContainerOptions(p[0], p[1]);
+        displayContainerOptions(p[0], p[1], p[2]);
     });
 
     registerCommand(context, 'extension.containerDelete', (...p:any[]) => {
@@ -222,10 +222,6 @@ function displayMainMenu() {
     items.push('Login to DockerHub');
     items.push('Use Remote Docker Machine');
 
-    //for (var item in g_Config) {
-    //    items.push((g_Terminals.hasOwnProperty(docker.nameFromId(item)) ? '\u26ab' : '\u26aa') + g_Config[item].description + ' [' +  item + ']')
-    //}
-
    vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Edit Configuration') {
             saveConfig();
@@ -271,10 +267,6 @@ function displayMainMenu() {
                 }
             });                
         }
-//        } else {
-//            var image: string = selected.split('[')[1].split(']')[0];
-//            displayContainerMenu(image);
-//        }
     })
 }
 
@@ -291,7 +283,7 @@ enum ContainerState {
  * @param id 
  * @param status 
  */
-function displayContainerOptions(id: string, status: string) {
+function displayContainerOptions(id: string, status: string, image: string) {
     var items:string[] = [];
 
     var state: ContainerState = ContainerState.Running;
@@ -334,6 +326,19 @@ function displayContainerOptions(id: string, status: string) {
     items.push('Top');
     items.push('Logs');
     items.push('Browse');
+
+    var divider: boolean = false;
+    
+    for (var item of g_Config['commands'])
+    {
+        if ((item['image'] == '*') || (item['image'] == image)) {
+            if (!divider) {
+                items.push('________________');
+                divider = true;                
+            }
+            items.push(item['name']);
+        }
+    }
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'Remove') {
@@ -459,6 +464,12 @@ function displayContainerOptions(id: string, status: string) {
             g_FileBrowserLocal.setOppositeBrowser(g_FileBrowserDocker);
         } else if (selected == 'Terminal') {
             showTerminal(id);
+        } else {
+            for (var item of g_Config['commands']) {
+                if (item['name'] == selected) {
+                    // XXX - execute item['command']
+                }
+            }
         }
     })
 }
@@ -647,7 +658,7 @@ function queryContainers(refreshOnly: boolean) {
         if (result) {
             // add complex definition to the headers
             result['title'] = 'Containers';
-            result['onSelect'] = ['command:extension.containerOptions', '$names', '$status'];
+            result['onSelect'] = ['command:extension.containerOptions', '$names', '$status', '$image'];
             result['onDelete'] = ['command:extension.containerDelete', '$names', '$status'];
 
             result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
