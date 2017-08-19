@@ -96,6 +96,11 @@ export function activate(context: vscode.ExtensionContext) {
         displayImageOptions(p[0], p[1]);
     });
 
+    registerCommand(context, 'extension.logEntryOptions', (...p:any[]) => {
+        AppInsightsClient.sendEvent('ContainerLogOptions');
+        displayContainerLogOptions(p[0], p[1], p[2]);
+    });
+
     registerCommand(context, 'extension.imageDelete', (...p:any[]) => {
         deleteImage(p[0], p[1]);
     });
@@ -449,7 +454,24 @@ function displayContainerOptions(id: string, status: string, image: string) {
         } else if (selected == 'Logs') {
             docker.logs(id, function (result: object) {
                 AppInsightsClient.sendEvent('ContainerLogsCompleted');
-                html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
+
+                var lines = vt100ToLines(result.toString());
+                var r: object = {};
+
+                r['title'] = "Logs of container " + id;
+                r['headers'] = ['Command'];
+
+                r['rows'] = [];
+
+                r['onSelect'] = ['command:extension.logEntryOptions', '$Command', id, image];
+                
+                for (var txt of lines) {
+                    r['rows'].push({ 'Command': txt })
+                }
+
+                html.createPreviewFromObject('docker', 'Logs', r, 1, null, false);
+                
+                //html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
             })
 
         } else if (selected == 'Browse') {
@@ -580,6 +602,25 @@ function displayImageOptions(name: string, repository: string) {
             });
         }
     })
+}
+
+/**
+ * Display image options
+ * 
+ * @param name 
+ * @param repository 
+ */
+function displayContainerLogOptions(entry: string, container: string, image: string) {
+    var items:string[] = [];
+
+    items.push('Store');
+    items.push('Copy');
+
+    vscode.window.showQuickPick(items).then( selected => {
+        if (selected == 'Store') {
+        } else if (selected == 'Copy') {
+        }
+    });
 }
 
 /**
