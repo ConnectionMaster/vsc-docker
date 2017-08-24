@@ -72,18 +72,56 @@ export function vt100ToLines(vt: string) : string[] {
                             default:
                                 // XXX - ERROR
                         }
+                        break;
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        skip = parseNumber(chunk, 1) + 1;
+                        break;
                 }
 
                 // XXXX implement
                 break;
         }
 
-        output.push(chunk.slice(skip));
+        var cleaned = chunk.slice(skip); 
+
+        output.push(cleaned);
     }
 
     return output.join('').split('\n');
 }
 
+function parseNumber(chunk: string, index: number): number {
+
+    var newIndex = index;
+    var nextChar: string = chunk[index];
+
+    do
+    {
+        do {
+            newIndex++;
+            nextChar = chunk[newIndex];
+        } while (nextChar >= '0' && nextChar <= '9');
+
+        if (nextChar == ';') {
+            newIndex++;
+            nextChar = chunk[newIndex];
+        }
+    } while (nextChar >= '0' && nextChar <= '9');
+
+    // at the moment skip anything else...
+    newIndex++;
+    
+    return newIndex - index;
+}
 
 
 
