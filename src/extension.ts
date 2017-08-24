@@ -490,8 +490,8 @@ function displayContainerOptions(id: string, status: string, image: string) {
             showTerminal(id);
         } else {
             for (var item of g_Config['commands']) {
-                if (item['name'] == selected) {
-                    // XXX - execute item['command']
+                if (item['name'] == selected && item['image'] == image) {
+                    docker.exec(id, item['command'].split(' '), function(result) {});
                 }
             }
         }

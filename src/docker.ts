@@ -152,7 +152,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public exec(id: string, command: any[], cb) {
-        this.execute(['exec', this.nameFromId(id)].concat(command), false, cb);
+        this.execute(['exec', id].concat(command), false, cb);
     }
 
     /**
