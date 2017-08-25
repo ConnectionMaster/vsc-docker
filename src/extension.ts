@@ -35,7 +35,7 @@ var g_FileBrowserDocker: FileBrowserDocker = null;
 var g_FileBrowserLocal: FileBrowserLocal = null;
 var copyPaste = require('copy-paste');
 
-var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker Runner");
+var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker");
 
 
 var dockerContainers: DockerContainers = null;
@@ -181,7 +181,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     var item = vscode.window.createStatusBarItem();
 
-    item.text = "\u27a4 Docker Runner";
+    item.text = "Docker \u27a4";
     item.command = "extension.openMainMenu";
     item.show();
 

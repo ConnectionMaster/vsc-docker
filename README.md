@@ -6,22 +6,19 @@ You can find [detailed documentation here](https://github.com/zikalino/vsc-docke
 
 Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311).
 
-## What this extension can do for you now?
-
-- Search and pull Docker images from Docker Hub
-- Easily manage local images
-- Manage local containers
-- Easily copy files between local filesystem and container file system
-- Pin your favourite containers to the main menu
-- Run containers conveniently mapped to your local workspace
-
 ## How to start?
 
-Press **Alt+Ctrl+D** to activate.
+After extension is installed you will see two new categories in **EXPLORER** view.
 
-Make sure your local drive is shared, as the extension will attempt to map current directory to the containers.
+![Search Results](images/explorer-view.png)
 
-![Shared Drives](images/shared-drives.png)
+Click on selected container or image to display options. You can perform all the basic operations from here:
+
+For images:
+
+
+
+There's also a new **Docker** button available in the status bar, which you can click to display main **Docker Runner** menu.
 
 ## Search and pull images from Docker Hub
 
@@ -33,43 +30,13 @@ If you choose **Pull & Pin to the menu** option image will appear in the main me
 
       "run": "-i -t --rm --name $default-name -v $workspace:$src ubuntu sh"
 
-## Browsing local images
+## Adding Custom Menu Items
 
-Currently available operations:
+You can add most frequently used commands to the container menu.
 
-- pull
-- push
-- remove
-- history
-
-![Search Results](images/images.png)
-
-## Browsing local containers
-
-Currently available operations:
-
-- start / restart / stop / pause
-- rename
-- remove
-- diff
-- logs
-- browse filesystem
+Click on selected container and choose **Logs** from the context menu. You will see history for selected container. You can right click any command and add it to the menu.
 
 
-![Search Results](images/containers.png)
-
-## Browsing container filesystem
-
-Currently available operations:
-
-- copy files between container and local filesystem
-- delete files in container and local filesystem
-- edit files
-- more to come...
-
-![Search Results](images/files.png)
-
-Detailed information is [here](https://github.com/zikalino/vsc-docker/wiki/Working-with-Local-Containers).
 
 ## Configuration File
 
@@ -88,4 +55,8 @@ More information is available [here](https://github.com/zikalino/vsc-docker/wiki
 Please note this is an early alpha version, so it may have bugs and missing features.
 However I think it can be already very useful.
 I am still experimenting a lot and I am planning to add much more features in the future. 
+
+Make sure your local drive is shared, as the extension will attempt to map current directory to the containers.
+
+![Shared Drives](images/shared-drives.png)
 
