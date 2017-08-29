@@ -141,7 +141,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public cp(src: string, dst: string, cb) {
-        this.execute(['cp', src, dst], false, cb)
+        this.execute(['cp', src, dst], false, false, cb)
     }
 
     /**
@@ -152,7 +152,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public exec(id: string, command: any[], cb) {
-        this.execute(['exec', id].concat(command), false, cb);
+        this.execute(['exec', id].concat(command), false, false, cb);
     }
 
     /**
@@ -177,7 +177,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public info(cb) {
-        this.execute(['info'], false, cb);
+        this.execute(['info'], false, false, cb);
     }
 
     /**
@@ -187,7 +187,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public ps(all: boolean, cb) {
-        this.execute(['ps'].concat(all ? [ '-a'] : []), true, cb);
+        this.execute(['ps'].concat(all ? [ '-a'] : []), true, true, cb);
     }
 
     /**
@@ -209,7 +209,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public images(cb) {
-        this.execute(['images'], true, cb);
+        this.execute(['images'], true, true, cb);
     }
 
     /**
@@ -219,7 +219,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public getConfig(id, cb) {
-        this. execute(['run', '--rm', id, 'config'], false, cb);
+        this. execute(['run', '--rm', id, 'config'], false, false, cb);
     }
 
     /**
@@ -229,7 +229,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public search(filter: string, cb) {
-        this.execute(['search', filter], true, cb)
+        this.execute(['search', filter], true, false, cb)
     }
 
     /**
@@ -239,7 +239,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public rmi(images: string[], cb) {
-        this.execute(['rmi', '-f'].concat(images), true, cb)
+        this.execute(['rmi', '-f'].concat(images), true, false, cb)
     }
 
     /**
@@ -249,7 +249,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public pull(image: string, cb) {
-        this.execute(['pull', image], false, cb)
+        this.execute(['pull', image], false, false, cb)
     }
     
     /**
@@ -259,7 +259,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public push(image: string, cb) {
-        this.execute(['push', image], false, cb)
+        this.execute(['push', image], false, false, cb)
     }
     
     /**
@@ -270,7 +270,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public rm(containers: string[], force: boolean, cb) {
-        this.execute(['rm'].concat(force ? [ '-f' ] : []).concat(containers), true, cb)
+        this.execute(['rm'].concat(force ? [ '-f' ] : []).concat(containers), true, false, cb)
     }
 
     /**
@@ -280,7 +280,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public history(name: string, cb) {
-        this.execute(['history', '--no-trunc', name], true, cb)
+        this.execute(['history', '--no-trunc', name], true, false, cb)
     }
 
     /**
@@ -291,7 +291,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public rename(id, newName, cb) {
-        this.execute(['rename', id, newName], false, cb)
+        this.execute(['rename', id, newName], false, false, cb)
     }
 
     /**
@@ -301,7 +301,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public pause(id, cb) {
-        this.execute(['pause', id], false, cb)
+        this.execute(['pause', id], false, false, cb)
     }
 
     /**
@@ -311,7 +311,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public unpause(id, cb) {
-        this.execute(['unpause', id], false, cb)
+        this.execute(['unpause', id], false, false, cb)
     }
 
     /**
@@ -321,7 +321,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public start(id, cb) {
-        this.execute(['start', id], false, cb)
+        this.execute(['start', id], false, false, cb)
     }
 
     /**
@@ -331,7 +331,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public stop(id, cb) {
-        this.execute(['stop', id], false, cb)
+        this.execute(['stop', id], false, false, cb)
     }
 
     /**
@@ -341,7 +341,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public restart(id, cb) {
-        this.execute(['restart', id], false, cb)
+        this.execute(['restart', id], false, false, cb)
     }
 
     /**
@@ -351,7 +351,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public diff(id, cb) {
-        this.execute(['diff', id], false, cb)
+        this.execute(['diff', id], false, false, cb)
     }
 
     /**
@@ -361,7 +361,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public top(id, cb) {
-        this.execute(['top', id, 'ps'], false, cb)
+        this.execute(['top', id, 'ps'], false, false, cb)
     }
 
     /**
@@ -371,7 +371,7 @@ export class Docker extends CliRunner {
      * @param cb 
      */
     public logs(id, cb) {
-        this.execute(['logs', id], false, cb)
+        this.execute(['logs', id], false, false, cb)
     }
 
     private m_Containers = {};

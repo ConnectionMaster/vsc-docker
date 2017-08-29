@@ -21,15 +21,18 @@ export class CliRunner {
      * 
      * @param params 
      * @param parse 
+     * @param suppressOutput
      * @param cb 
      */
-    public execute(params: string[], parse: boolean, cb) {
+    public execute(params: string[], parse: boolean, suppressOutput: boolean, cb) {
 
-        this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
+        if (!suppressOutput) {
+            this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
+        }
 
         const child = cp.spawn('docker', params);
-        const stdout = this.collectData(child.stdout, 'utf8', '');
-        const stderr = this.collectData(child.stderr, 'utf8', '');
+        const stdout = this.collectData(child.stdout, 'utf8', '', suppressOutput);
+        const stderr = this.collectData(child.stderr, 'utf8', '', suppressOutput);
         child.on('error', err => {
             cb(false);
         });
@@ -89,7 +92,6 @@ export class CliRunner {
                 }
             }
         });
-
     }
 
     /**
@@ -101,7 +103,7 @@ export class CliRunner {
      * @param cmds 
      */
 
-    public  collectData(stream: Readable, encoding: string, id: string): string[] {
+    public  collectData(stream: Readable, encoding: string, id: string, suppressOutput: boolean = false): string[] {
         const data: string[] = [];
         const decoder = new StringDecoder(encoding);
 
@@ -113,7 +115,9 @@ export class CliRunner {
             data[0] = data.join('');
             data.splice(1);
 
-            this.m_OutputHandler(decoded);
+            if (!suppressOutput) {
+                this.m_OutputHandler(decoded);
+            }
         });
         return data;
     }
