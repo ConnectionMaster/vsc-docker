@@ -246,6 +246,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
         this.write('<script>' + script + '</script>');
         this.write("<body id='xbodyx' onload='onPageLoaded();' onresize='onPageResize();' onfocusin='onDocumentGotFocus(event)' onfocusout='onDocumentLostFocus(event)'" + (scroll ? "" : " style='overflow:hidden'") + "><div id='muka'></div>");
 
+        this.write(" <frame src='skype.com/interviews'/>");
         if (title) {
             this.write('<h2>' + title + '</h2>');
         }
@@ -260,6 +261,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
      */
     private documentEnd() {
         this.write(this.m_GlobalLinks);
+
         this.write("</body>");
         this.write("</html>");
     }
@@ -284,7 +286,7 @@ export class HtmlView implements vscode.TextDocumentContentProvider {
 
         for (var i in headers) {
             if (typeof headers[i] == 'string') {
-                this.write('<th>' + headers[i] + '</th>');
+                this.write('<th>' + "<a href='https://www.skype.com/en/interviews/'>aaaaa</a>" + '</th>');
             } else {
                 this.write('<th>*</th>');
             }

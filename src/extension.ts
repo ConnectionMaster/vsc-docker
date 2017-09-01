@@ -17,6 +17,8 @@ import { AppInsightsClient } from "./appInsightsClient";
 
 import { vt100ToLines } from "./vt100-decode";
 
+import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
+
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
 
@@ -49,6 +51,17 @@ var dockerImages: DockerImages = null;
 export function activate(context: vscode.ExtensionContext) {
 
     AppInsightsClient.sendEvent('ExtensionActivated');
+
+    let previewUri = vscode.Uri.parse('adaptivecard-preview://authority/adaptivecard-preview');
+
+    let provider = new AdaptiveCardDocumentContentProvider(context);
+    let registration = vscode.workspace.registerTextDocumentContentProvider('adaptivecard-preview', provider);
+
+    // XXX - display card
+    // XXX
+    //provider.update(previewUri);
+    //vscode.commands.executeCommand('vscode.previewHtml', previewUri, 2, `MUKAMUKA`);
+    // XXX
 
     dockerContainers = new DockerContainers(context, docker);
     vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
