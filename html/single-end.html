@@ -1,0 +1,58 @@
+  </head>
+  <body>
+
+    <div style="margin: 10px; cursor: pointer;">
+      <div class="wc-message-wrapper list">
+        <div class="wc-message wc-message-from-bot">
+          <div class="wc-message-content">
+            <svg class="wc-message-callout">
+              <path xmlns="http://www.w3.org/2000/svg" class="point-left" d="m 0 6 l 6 6 v -12 Z" />
+              <path xmlns="http://www.w3.org/2000/svg" class="point-right" d="m 6 6 l -6 6 v -12 Z" />
+            </svg>
+            <div id="BotChatGoesHere"></div>
+          </div>
+        </div>
+     </div>
+  </div>
+
+    <script>
+      
+      const params = BotChat.queryParams(location.search);
+
+      const user = {
+        id: params['userid'] || 'userid',
+        name: params['username'] || 'username'
+      };
+
+      const bot = {
+        id: params['botid'] || 'botid',
+        name: params['botname'] || 'botname'
+      };
+
+      window['botchatDebug'] = params['debug'] && params['debug'] === 'true';
+
+      var handlerHref = "";
+
+      function ca(action, param) {
+        if (handlerHref == '') {
+          handlerHref = document.getElementById("event_handler_a").getAttribute('href');
+        }
+  
+        var href = handlerHref; 
+        href = href.replace('xresponsex', encodeURIComponent(JSON.stringify(param)));
+        document.getElementById("event_handler_a").setAttribute('href', href);
+        document.getElementById("event_handler_a").click();
+      }
+
+      BotChat.AppSingleMsg({
+        // XXX - ActivityViewProps here
+        muka: "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+        onCardAction: ca,
+        activity: ACTIVITY
+        
+      }, document.getElementById('BotChatGoesHere'));
+    </script>
+
+    <a href='command:extension.htmlCardEvent?xresponsex' id='event_handler_a' ></a>
+  </body>
+</html>
