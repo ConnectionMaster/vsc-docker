@@ -59,6 +59,26 @@ export class AdaptiveCard
         this.m_AdaptiveCard["attachments"][0].content.body.push(item);
     }
 
+    public addFact(title: string, value: string) {
+        if (this.m_CurrentFactSet == null) {
+            this.m_CurrentFactSet =
+            {
+                "type": "FactSet",
+                "facts": []
+            }
+
+            this.addItem(this.m_CurrentFactSet);
+        }
+
+
+        this.m_CurrentFactSet.facts.push(
+            {
+                "title": title,
+                "value": value
+            }
+        );
+    }
+
     public addActions(a: any) {
 
         var b: string = typeof a;
@@ -86,4 +106,5 @@ export class AdaptiveCard
     }
 
     private m_AdaptiveCard: object = null;
+    private m_CurrentFactSet = null;
 }

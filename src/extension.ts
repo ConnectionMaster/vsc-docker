@@ -298,6 +298,7 @@ function displayContainerOptions(r: object) {
     }
 
     var card: AdaptiveCard = new AdaptiveCard();
+
     card.addActions(items);    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
@@ -487,6 +488,13 @@ function displayImageOptions(r: object) {
     // [TODO] add more options from configuration here
 
     var card: AdaptiveCard = new AdaptiveCard();
+
+    card.addTitleWithIcon(r["repository"], "");
+    card.addFact("Tag", r["tag"]);
+    card.addFact("Image Id", r["id"]);
+    card.addFact("Created", r["created"]);
+    card.addFact("Size", r["size"]);
+    
     card.addActions(items);    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
