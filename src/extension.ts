@@ -125,12 +125,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }));
 
-    var item = vscode.window.createStatusBarItem();
-
-    item.text = "Docker \u27a4";
-    item.command = "extension.openMainMenu";
-    item.show();
-
     // show output channel
     out.show();
 
@@ -170,13 +164,15 @@ function displayMainMenu() {
     items.push('Find Images in DockerHub');
     items.push('Edit Configuration');
     items.push('Info');
-    items.push('________________');
     items.push('Login to Azure Container Registry');
     items.push('Login to DockerHub');
     items.push('Use Remote Docker Machine');
 
 
     var card: AdaptiveCard = new AdaptiveCard();
+
+    card.addTitleWithIcon("Docker Runner", "file:///" + g_StoragePath + "//vsc-docker-icon.png");//"https://zim.gallerycdn.vsassets.io/extensions/zim/vsc-docker/0.16.0/1504017964617/Microsoft.VisualStudio.Services.Icons.Default");// );
+
     card.addActions(items);    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {

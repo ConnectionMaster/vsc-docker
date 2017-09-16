@@ -19,6 +19,42 @@ export class AdaptiveCard
         };
     }
 
+    public addTitleWithIcon(title: string, icon: string) {
+        var item = 
+        {
+            "type": "ColumnSet",
+            "separation": "strong",
+            "columns": [
+                {
+                    "type": "Column",
+                    "size": 1,
+                    "items": [
+                        {
+                            "type": "Image",
+                            "url": icon
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "size": 3,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "size": "extraLarge",
+                            "color": "dark",
+                            "weight": "bolder",
+                            "text": title,
+                            "horizontalAlignment": "left"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        this.addItem(item);
+    }
+
     public addItem(item: any) {
         this.m_AdaptiveCard["attachments"][0].content.body.push(item);
     }

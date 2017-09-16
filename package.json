@@ -17,21 +17,9 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "views": {
-            "explorer": [
-                {
-                    "id": "dockerContainers",
-                    "name": "Docker Containers"
-                },
-                {
-                    "id": "dockerImages",
-                    "name": "Docker Images"
-                }
-            ]
-        },
         "commands": [
             {
-                "command": "extension.openMainMenuoprn",
+                "command": "extension.openMainMenu",
                 "title": "DockerRunner: Menu"
             },
             {
@@ -51,6 +39,18 @@
             {
                 "key": "alt+ctrl+d",
                 "command": "extension.openMainMenu"
+            },
+            {
+                "key": "alt+ctrl+c",
+                "command": "extension.showLocalContainers"
+            },
+            {
+                "key": "alt+ctrl+i",
+                "command": "extension.showLocalImages"
+            },
+            {
+                "key": "alt+ctrl+s",
+                "command": "extension.searchImages"
             }
         ]
     },
