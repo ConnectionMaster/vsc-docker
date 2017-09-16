@@ -299,6 +299,13 @@ function displayContainerOptions(r: object) {
 
     var card: AdaptiveCard = new AdaptiveCard();
 
+    card.addTitleWithIcon(r["names"], "");
+    card.addFact("Container Id", r["id"]);
+    card.addFact("Image", r["image"]);
+    card.addFact("Created", r["created"]);
+    card.addFact("Status", r["status"]);
+    card.addFact("Ports", r["ports"]);
+    
     card.addActions(items);    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
@@ -774,6 +781,7 @@ function queryContainers(refreshOnly: boolean) {
                             {
                                 "action": "image-options",
                                 "id": i["container id"],
+                                "names": i["names"],
                                 "image": i["image"],
                                 "tag": i["tag"],
                                 "created": i["created"],
