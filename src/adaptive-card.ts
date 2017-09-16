@@ -23,15 +23,25 @@ export class AdaptiveCard
         this.m_AdaptiveCard["attachments"][0].content.body.push(item);
     }
 
-    public addAction() {
-        this.m_AdaptiveCard["attachments"][0].content.actions.push(
-        {
-            "type": "Action.Submit",
-            "data":
+    public addActions(a: any) {
+
+        var b: string = typeof a;
+
+        if (typeof a === "string") {
+            this.m_AdaptiveCard["attachments"][0].content.actions.push(
             {
-                "action": "xxx"
+                "type": "Action.Submit",
+                "title": a,
+                "data":
+                {
+                    "action": a
+                }
+            });
+        } else if (typeof a === "object") {
+            for (var item of a) {
+                this.addActions(item);
             }
-        });            
+        }            
     }
 
     public getCard(): object

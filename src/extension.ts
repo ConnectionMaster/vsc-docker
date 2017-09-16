@@ -227,7 +227,12 @@ function displayMainMenu() {
     items.push('Login to DockerHub');
     items.push('Use Remote Docker Machine');
 
-   vscode.window.showQuickPick(items).then( selected => {
+
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addActions(items);    
+    
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        let selected: string = r.action;
         if (selected == 'Edit Configuration') {
             saveConfig();
             vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
@@ -345,7 +350,11 @@ function displayContainerOptions(id: string, status: string, image: string) {
         }
     }
 
-    vscode.window.showQuickPick(items).then( selected => {
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addActions(items);    
+    
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        let selected: string = r.action;
         if (selected == 'Remove') {
             docker.rm([ id ], false, function(result) {
                 if (result) {
@@ -536,7 +545,11 @@ function displayImageOptions(r: object) {
 
     // [TODO] add more options from configuration here
 
-    vscode.window.showQuickPick(items).then( selected => {
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addActions(items);    
+    
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        let selected: string = r.action;
         if (selected == 'History') {
             docker.history(r["id"], function (result: object) {
 
@@ -619,7 +632,11 @@ function displayContainerLogOptions(entry: string, container: string, image: str
 
     items.push('Copy');
 
-    vscode.window.showQuickPick(items).then( selected => {
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addActions(items);    
+    
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        let selected: string = r.action;
         if (selected == 'Store') {
             vscode.window.showInputBox({ prompt: 'Comand Name'}).then( (name) => {
                 g_Config['commands'].push(    
@@ -815,8 +832,12 @@ function installImageOptions(id: string, description: string) {
     // [TODO] this option is disabled for timebeing
     //items.push('Pull & Pin to the Menu');
 
-    vscode.window.showQuickPick(items).then( selected => {
-        if (selected == 'Pull') {
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addActions(items);    
+    
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        let selected: string = r.action;
+       if (selected == 'Pull') {
             installImage(id, description, false);
         } else if (selected == 'Pull & Pin to the Menu') {
             installImage(id, description, true);
