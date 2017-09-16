@@ -13,9 +13,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.openMainMenu",
-        "onView:dockerContainers",
-        "onView:dockerImages"
+        "onCommand:extension.openMainMenu"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -33,7 +31,7 @@
         },
         "commands": [
             {
-                "command": "extension.openMainMenu",
+                "command": "extension.openMainMenuoprn",
                 "title": "DockerRunner: Menu"
             },
             {
@@ -47,39 +45,8 @@
             {
                 "command": "extension.searchImages",
                 "title": "DockerRunner: Search Images"
-            },
-            {
-                "command": "extension.refreshContainers",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
-            },
-            {
-                "command": "extension.refreshImages",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
             }
         ],
-        
-        "menus": {
-            "view/title": [
-                {
-                    "command": "extension.refreshContainers",
-                    "when": "view == dockerContainers",
-                    "group": "navigation"
-                },
-                {
-                    "command": "extension.refreshImages",
-                    "when": "view == dockerImages",
-                    "group": "navigation"
-                }
-            ]
-        },
         "keybindings": [
             {
                 "key": "alt+ctrl+d",

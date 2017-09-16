@@ -13,6 +13,8 @@ import { FileBrowserLocal } from './file-browser-local';
 
 import { AppInsightsClient } from "./appInsightsClient";
 
+import { AdaptiveCard } from "./adaptive-card";
+
 import { vt100ToLines } from "./vt100-decode";
 
 import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
@@ -685,58 +687,17 @@ function displayInfo() {
 function queryImages(refreshOnly: boolean) {
     docker.images(function (result: object) {
         if (result) {
-            var action = 
-            {
-                "type": "message",
-                "attachments": [
-                    {
-                        "contentType": "application/vnd.microsoft.card.adaptive",
-                        "content": {
-            
-                            "type": "AdaptiveCard",
-                            "body": [],
-                            "actions": [{
-                                "type": "Action.ShowCard",
-                                //"data":
-                                //{
-                                //    "action": "image",
-                                //    "param": i["image id"]
-                                //}
-                                "card":
-                                {
-                                    "type": "AdaptiveCard",
-                                    "body": [ {
-                                        "type": "TextBlock",
-                                        "text":"What do you think?"
-                                    }],
-                                    "actions": [
-                                        {
-                                            "type": "Action.Submit",
-                                            "title": "Delete",
-                                            "separation": "strong",
-                                            "data":
-                                            {
-                                                "action": "image-delete",
-                                                "param": "MUKAAAA"
-                                            }
-                                        }
-                                                
-                                    ]
-                                }
-                            }]
-                        }
-                    }
-                ]
-            };
 
-            action.attachments[0].content.body.push(
-            {
-                "type": "TextBlock",
-                "size": "large",
-                //"color": "accent",
-                "textweight": "bolder",
-                "text": "Local Images"
-            });        
+            var card: AdaptiveCard = new AdaptiveCard();
+
+            card.addItem(
+                {
+                    "type": "TextBlock",
+                    "size": "large",
+                    //"color": "accent",
+                    "textweight": "bolder",
+                    "text": "Local Images"
+                });        
         
             // add items
 
@@ -789,13 +750,10 @@ function queryImages(refreshOnly: boolean) {
                     ]
                 }
 
-                action.attachments[0].content.body.push(row);
+                card.addItem(row);
             }
 
-    
-            console.log(JSON.stringify(action));
-
-            ac.createAdaptiveCardPreview("DockerRunner", "Docker", action, 2, function (r) {
+            ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 displayImageOptions(r);
             })
         } else {
