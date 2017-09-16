@@ -11,9 +11,6 @@ import { HtmlView as NewHtmlView } from './html-view';
 import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';
 
-import { DockerContainers } from "./tree-docker-containers";
-import { DockerImages } from "./tree-docker-images";
-
 import { AppInsightsClient } from "./appInsightsClient";
 
 import { vt100ToLines } from "./vt100-decode";
@@ -43,9 +40,6 @@ var copyPaste = require('copy-paste');
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker");
 
 
-var dockerContainers: DockerContainers = null;
-var dockerImages: DockerImages = null;
-
 /**
  * Activate extension
  * 
@@ -65,11 +59,6 @@ export function activate(context: vscode.ExtensionContext) {
     //provider.update(previewUri);
     //vscode.commands.executeCommand('vscode.previewHtml', previewUri, 2, `MUKAMUKA`);
     // XXX
-
-    dockerContainers = new DockerContainers(context, docker);
-    vscode.window.registerTreeDataProvider("dockerContainers", dockerContainers);
-    dockerImages = new DockerImages(context, docker);
-    vscode.window.registerTreeDataProvider("dockerImages", dockerImages);
 
     g_StoragePath = context.extensionPath;
     html.setExtensionPath(context.extensionPath);
@@ -174,16 +163,6 @@ export function activate(context: vscode.ExtensionContext) {
     registerCommand(context, 'extension.searchImages', (...p:any[]) => {
         AppInsightsClient.sendEvent('SearchImages');
         searchImages();
-    });
-
-    registerCommand(context, 'extension.refreshContainers', (...p:any[]) => {
-        AppInsightsClient.sendEvent('RefreshContainers');
-        dockerContainers.refreshDockerTree();
-    });
-
-    registerCommand(context, 'extension.refreshImages', (...p:any[]) => {
-        AppInsightsClient.sendEvent('RefreshImages');
-        dockerImages.refreshDockerTree();
     });
 
     context.subscriptions.push(vscode.window.onDidCloseTerminal((closedTerminal: vscode.Terminal) => {
@@ -823,9 +802,6 @@ function queryImages(refreshOnly: boolean) {
             vscode.window.showErrorMessage('Operation failed!');                
         }
     })       
-
-    dockerImages.refreshDockerTree();    
-
 }
 
 /**
@@ -847,8 +823,6 @@ function queryContainers(refreshOnly: boolean) {
             vscode.window.showErrorMessage('Operation failed!');                
         }
     })
-
-    dockerContainers.refreshDockerTree();    
 }
 
 /**
