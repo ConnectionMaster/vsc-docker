@@ -5,11 +5,7 @@ import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
 
 import { Docker } from './docker';
-import { HtmlView } from './html-lite';
 import { HtmlView as NewHtmlView } from './html-view';
-
-import { FileBrowserDocker } from './file-browser-docker';
-import { FileBrowserLocal } from './file-browser-local';
 
 import { AppInsightsClient } from "./appInsightsClient";
 
@@ -20,7 +16,6 @@ import { vt100ToLines } from "./vt100-decode";
 import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
-var html: HtmlView = HtmlView.getInstance();
 
 var ac: NewHtmlView = NewHtmlView.getInstance();
 
@@ -35,8 +30,6 @@ var g_StoragePath = '';
 
 var g_Terminals = {};
 
-var g_FileBrowserDocker: FileBrowserDocker = null;
-var g_FileBrowserLocal: FileBrowserLocal = null;
 var copyPaste = require('copy-paste');
 
 var out: vscode.OutputChannel = vscode.window.createOutputChannel("\u27a4 Docker");
@@ -63,7 +56,6 @@ export function activate(context: vscode.ExtensionContext) {
     // XXX
 
     g_StoragePath = context.extensionPath;
-    html.setExtensionPath(context.extensionPath);
 
     ac.setExtensionPath(context.extensionPath);
 
@@ -102,45 +94,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     registerCommand(context, 'extension.imageDelete', (...p:any[]) => {
         deleteImage(p[0], p[1]);
-    });
-
-    registerCommand(context, 'extension.fileOpen', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseFileOpen');
-        g_FileBrowserDocker.open(p[0]);
-    });
-
-    registerCommand(context, 'extension.fileOptions', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseFileOptions');
-        g_FileBrowserDocker.options(p[0]);
-    });
-
-    registerCommand(context, 'extension.fileDelete', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseFileDelete');
-        g_FileBrowserDocker.delete(p[0]);
-    });
-
-    registerCommand(context, 'extension.localFileOpen', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseLocalFileOpen');
-        g_FileBrowserLocal.open(p[0]);
-    });
-
-    registerCommand(context, 'extension.localFileOptions', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseLocalFileOptions');
-        g_FileBrowserLocal.options(p[0]);
-    });
-
-    registerCommand(context, 'extension.localFileDelete', (...p:any[]) => {
-        AppInsightsClient.sendEvent('BrowseLocalFileDelete');
-        g_FileBrowserLocal.delete(p[0]);
-    });
-
-    registerCommand(context, 'extension.htmlEvent', (...p:any[]) => {
-        // parameters:
-        //  1) document
-        //  2) element id
-        //  3) event type
-        //  4) event param
-        html.handleEvent(p[0], p[1], p[2], p[3]);
     });
 
     registerCommand(context, 'extension.acEvent', (...p:any[]) => {
@@ -447,13 +400,15 @@ function displayContainerOptions(r: object) {
         } else if (selected == 'Diff') {
             docker.diff(id, function (result: object) {
                 AppInsightsClient.sendEvent('ContainerDiffCompleted');
-                html.createPreviewFromText('docker', result.toString(), "Diff");
+                // XXX-MISSING
+                //html.createPreviewFromText('docker', result.toString(), "Diff");
             })
 
         } else if (selected == 'Top') {
             docker.top(id, function (result: object) {
                 AppInsightsClient.sendEvent('ContainerTopCompleted');
-                html.createPreviewFromText('docker', result.toString(), "Top");
+                // XXX-MISSING
+                //html.createPreviewFromText('docker', result.toString(), "Top");
             })
 
         } else if (selected == 'Logs') {
@@ -474,23 +429,15 @@ function displayContainerOptions(r: object) {
                     r['rows'].push({ 'Command': txt })
                 }
 
-                html.createPreviewFromObject('docker', 'Logs', r, 1, null, false);
+                // XXX-MISSING
+                //html.createPreviewFromObject('docker', 'Logs', r, 1, null, false);
                 
                 //html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
             })
 
         } else if (selected == 'Browse') {
             AppInsightsClient.sendEvent('ContainerBrowseStarted');
-            g_FileBrowserDocker = new FileBrowserDocker(docker, id, '/');
-            g_FileBrowserDocker.open('');
-
-            var localPath: string = vscode.workspace.rootPath.split('\\').join('/');
-            
-            g_FileBrowserLocal = new FileBrowserLocal(localPath);
-            g_FileBrowserLocal.open('');
-
-            g_FileBrowserDocker.setOppositeBrowser(g_FileBrowserLocal);
-            g_FileBrowserLocal.setOppositeBrowser(g_FileBrowserDocker);
+            // XXX-MISSING
         } else if (selected == 'Terminal') {
             showTerminal(id);
         } else {
@@ -555,8 +502,8 @@ function displayImageOptions(r: object) {
                 // add complex definition to the headers
                 result['title'] = 'History of ' + r["repository"] + ":" + r["tag"];
 
-                // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', 'History', result, 1, null, false);
+                // XXX-MISSING
+                //html.createPreviewFromObject('docker', 'History', result, 1, null, false);
             })
         } else if (selected == 'Remove') {
             docker.rmi(r["id"], function(result) {
@@ -689,7 +636,8 @@ function registerCommand(context: vscode.ExtensionContext, name, func) {
 function displayInfo() {
     docker.info(function (result: object) {
         if (result) {
-            html.createPreviewFromText('info', result.toString(), 'Info');
+            // XXX-MISSING
+            //html.createPreviewFromText('info', result.toString(), 'Info');
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
         }
@@ -875,8 +823,8 @@ function searchImages() {
                 result['title'] = 'Search Docker Hub';
                 result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
-                // XXX - just for testing purposes here
-                html.createPreviewFromObject('docker', 'Search', result, 1, null, false);
+                // XXX-MISSING
+                //html.createPreviewFromObject('docker', 'Search', result, 1, null, false);
             } else {
                 vscode.window.showErrorMessage('Search failed!');                
             }
