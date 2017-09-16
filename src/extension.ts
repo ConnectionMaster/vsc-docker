@@ -91,11 +91,6 @@ export function activate(context: vscode.ExtensionContext) {
         installImageOptions(p[0], p[1]);
     });
 
-    registerCommand(context, 'extension.containerOptions', (...p:any[]) => {
-        AppInsightsClient.sendEvent('DisplayContainerOptions');
-        displayContainerOptions(p[0], p[1], p[2]);
-    });
-
     registerCommand(context, 'extension.containerDelete', (...p:any[]) => {
         deleteContainer(p[0], p[1]);
     });
@@ -293,9 +288,12 @@ enum ContainerState {
  * @param id 
  * @param status 
  */
-function displayContainerOptions(id: string, status: string, image: string) {
+function displayContainerOptions(r: object) {
     var items:string[] = [];
-
+    var status: string = r["status"];
+    var image: string = r["image"];
+    var id: string = r["id"];
+    
     var state: ContainerState = ContainerState.Running;
 
     if (status.indexOf('Created') >= 0) {
@@ -786,14 +784,77 @@ function queryContainers(refreshOnly: boolean) {
     docker.ps(true, function (result: object) {
 
         if (result) {
-            // add complex definition to the headers
-            result['title'] = 'Containers';
-            result['onSelect'] = ['command:extension.containerOptions', '$names', '$status', '$image'];
-            result['onDelete'] = ['command:extension.containerDelete', '$names', '$status'];
+            var card: AdaptiveCard = new AdaptiveCard();
+            
+            card.addItem(
+                {
+                    "type": "TextBlock",
+                    "size": "large",
+                    //"color": "accent",
+                    "textweight": "bolder",
+                    "text": "Containers"
+                });        
+                    
+            // add items
 
-            result['actions'] = [ {name: 'Refresh', link: ['command:extension.showLocalContainers' ] } ];
+            for (var i of result["rows"]) {
+                var row = 
+                {
+                    "type": "ColumnSet",
+                    "separation": "strong",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "size": 2,
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "size": "medium",
+                                    "color": "accent",
+                                    "textweight": "bolder",
+                                    "text": i["names"]
+                                }
+                            ],
+                            "selectAction":
+                            {
+                            "type": "Action.Submit",
+                            "data":
+                            {
+                                "action": "image-options",
+                                "id": i["container id"],
+                                "image": i["image"],
+                                "tag": i["tag"],
+                                "created": i["created"],
+                                "command": i["command"],
+                                "ports": i["ports"],
+                                "status": i["status"]
+                            }
+                        }
 
-            html.createPreviewFromObject('containers', 'Containers', result, 1, '', refreshOnly);
+                        },
+                        {
+                            "type": "Column",
+                            "size": 1,
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "size": "medium",
+                                    "horizontalAlignment": "left",
+                                    "text": i["image"],
+                                    "isSubtle": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                card.addItem(row);
+            }
+            
+            ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+                displayContainerOptions(r);
+            });
+
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
         }
