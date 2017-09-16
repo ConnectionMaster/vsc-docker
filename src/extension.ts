@@ -6,6 +6,7 @@ import { Readable } from "stream";
 
 import { Docker } from './docker';
 import { HtmlView } from './html-lite';
+import { HtmlView as NewHtmlView } from './html-view';
 
 import { FileBrowserDocker } from './file-browser-docker';
 import { FileBrowserLocal } from './file-browser-local';
@@ -21,6 +22,8 @@ import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
 var html: HtmlView = HtmlView.getInstance();
+
+var ac: NewHtmlView = NewHtmlView.getInstance();
 
 var fs = require('fs');
 var path = require('path');
@@ -71,6 +74,8 @@ export function activate(context: vscode.ExtensionContext) {
     g_StoragePath = context.extensionPath;
     html.setExtensionPath(context.extensionPath);
 
+    ac.setExtensionPath(context.extensionPath);
+
     loadConfig();
 
     console.log('Congratulations, your extension "vsc-docker" is now active!');
@@ -102,11 +107,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     registerCommand(context, 'extension.containerDelete', (...p:any[]) => {
         deleteContainer(p[0], p[1]);
-    });
-
-    registerCommand(context, 'extension.imageOptions', (...p:any[]) => {
-        AppInsightsClient.sendEvent('DisplayImageOptions');
-        displayImageOptions(p[0], p[1]);
     });
 
     registerCommand(context, 'extension.logEntryOptions', (...p:any[]) => {
@@ -155,6 +155,10 @@ export function activate(context: vscode.ExtensionContext) {
         //  3) event type
         //  4) event param
         html.handleEvent(p[0], p[1], p[2], p[3]);
+    });
+
+    registerCommand(context, 'extension.acEvent', (...p:any[]) => {
+        ac.handleEvent(p[0]);
     });
 
     registerCommand(context, 'extension.showLocalImages', (...p:any[]) => {
@@ -538,7 +542,7 @@ function deleteContainer(id: string, status: string) {
  * @param name 
  * @param repository 
  */
-function displayImageOptions(name: string, repository: string) {
+function displayImageOptions(r: object) {
     var items:string[] = [];
 
     items.push('Run');
@@ -553,17 +557,17 @@ function displayImageOptions(name: string, repository: string) {
 
     vscode.window.showQuickPick(items).then( selected => {
         if (selected == 'History') {
-            docker.history(name, function (result: object) {
+            docker.history(r["id"], function (result: object) {
 
             AppInsightsClient.sendEvent('ImageHistory');
                 // add complex definition to the headers
-                result['title'] = 'History of ' + name;
+                result['title'] = 'History of ' + r["repository"] + ":" + r["tag"];
 
                 // XXX - just for testing purposes here
                 html.createPreviewFromObject('docker', 'History', result, 1, null, false);
             })
         } else if (selected == 'Remove') {
-            docker.rmi([ name ], function(result) {
+            docker.rmi(r["id"], function(result) {
                 if (result) {
                     AppInsightsClient.sendEvent('ImageRemoveSuccess');
                     vscode.window.showInformationMessage('Image removed!');                    
@@ -574,13 +578,13 @@ function displayImageOptions(name: string, repository: string) {
 
                 queryImages(true);
 
-                if (g_Config.hasOwnProperty(repository)) {
-                    delete g_Config[repository];
+                if (g_Config.hasOwnProperty(r["repository"])) {
+                    delete g_Config[r["repository"]];
                     saveConfig();
                 }
             })
         } else if (selected == 'Pull') {
-            docker.pull(repository, function(result) {
+            docker.pull(r["repository"], function(result) {
                 if (result) {
                     AppInsightsClient.sendEvent('ImagePullSuccess');
                     vscode.window.showInformationMessage('Pull completed!');
@@ -592,7 +596,7 @@ function displayImageOptions(name: string, repository: string) {
                 queryImages(true);
             })
         } else if (selected == 'Push') {
-            docker.push(repository, function(result) {
+            docker.push(r["repository"], function(result) {
                 if (result) {
                     AppInsightsClient.sendEvent('ImagePushSuccess');
                     vscode.window.showInformationMessage('Push completed!');
@@ -609,7 +613,7 @@ function displayImageOptions(name: string, repository: string) {
             vscode.window.showInformationMessage('Not implemented yet!');
         } else if (selected == 'Run') {
             AppInsightsClient.sendEvent('RunFromImage');
-            startContainerFromTerminal(repository, true, function () {
+            startContainerFromTerminal(r["repository"], true, function () {
                 AppInsightsClient.sendEvent('RunFromImageAttached');
                 queryContainers(true);                
             });
@@ -702,15 +706,119 @@ function displayInfo() {
 function queryImages(refreshOnly: boolean) {
     docker.images(function (result: object) {
         if (result) {
-            // add complex definition to the headers
-            result['title'] = 'Local Images';
+            var action = 
+            {
+                "type": "message",
+                "attachments": [
+                    {
+                        "contentType": "application/vnd.microsoft.card.adaptive",
+                        "content": {
+            
+                            "type": "AdaptiveCard",
+                            "body": [],
+                            "actions": [{
+                                "type": "Action.ShowCard",
+                                //"data":
+                                //{
+                                //    "action": "image",
+                                //    "param": i["image id"]
+                                //}
+                                "card":
+                                {
+                                    "type": "AdaptiveCard",
+                                    "body": [ {
+                                        "type": "TextBlock",
+                                        "text":"What do you think?"
+                                    }],
+                                    "actions": [
+                                        {
+                                            "type": "Action.Submit",
+                                            "title": "Delete",
+                                            "separation": "strong",
+                                            "data":
+                                            {
+                                                "action": "image-delete",
+                                                "param": "MUKAAAA"
+                                            }
+                                        }
+                                                
+                                    ]
+                                }
+                            }]
+                        }
+                    }
+                ]
+            };
 
-            result['onSelect'] = ['command:extension.imageOptions', '$image id', '$repository'];
-            result['onDelete'] = ['command:extension.imageDelete', '$image id', '$repository'];
+            action.attachments[0].content.body.push(
+            {
+                "type": "TextBlock",
+                "size": "large",
+                //"color": "accent",
+                "textweight": "bolder",
+                "text": "Local Images"
+            });        
+        
+            // add items
 
-            result['actions'] = [ {name: 'Refresh', link: [ 'command:extension.showLocalImages' ] } ];
+            for (var i of result["rows"]) {
+                var row = 
+                {
+                    "type": "ColumnSet",
+                    "separation": "strong",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "size": 2,
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "size": "medium",
+                                    "color": "accent",
+                                    "textweight": "bolder",
+                                    "text": i["repository"]
+                                }
+                            ],
+                            "selectAction":
+                            {
+                            "type": "Action.Submit",
+                            "data":
+                            {
+                                "action": "image-options",
+                                "id": i["image id"],
+                                "repository": i["repository"],
+                                "tag": i["tag"],
+                                "created": i["created"],
+                                "size": i["size"]
+                            }
+                        }
 
-            html.createPreviewFromObject('images','Images', result, 1, null, refreshOnly);
+                        },
+                        {
+                            "type": "Column",
+                            "size": 1,
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "size": "medium",
+                                    "horizontalAlignment": "left",
+                                    "text": i["tag"],
+                                    "isSubtle": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                action.attachments[0].content.body.push(row);
+            }
+
+    
+            console.log(JSON.stringify(action));
+
+            ac.createAdaptiveCardPreview("DockerRunner", "Docker", action, 2, function (r) {
+                displayImageOptions(r);
+            })
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
         }
