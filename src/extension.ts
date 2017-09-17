@@ -758,7 +758,7 @@ function queryContainers(refreshOnly: boolean) {
 
             for (var i of result["rows"]) {
 
-                var icon: string =  i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused.png") : "container-off.png";
+                var icon: string =  i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png";
                 var row = 
                 {
                     "type": "ColumnSet",
