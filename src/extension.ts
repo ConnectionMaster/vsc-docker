@@ -757,11 +757,26 @@ function queryContainers(refreshOnly: boolean) {
             // add items
 
             for (var i of result["rows"]) {
+
+                var icon: string =  i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused.png") : "container-off.png";
                 var row = 
                 {
                     "type": "ColumnSet",
                     "separation": "strong",
                     "columns": [
+                        {
+                            "type": "Column",
+                            "size": 1,
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "file:///" + g_StoragePath + "//resources//" + icon,
+                                    "size": "small"
+                                }
+                            ]
+                        
+
+                        },
                         {
                             "type": "Column",
                             "size": 2,
