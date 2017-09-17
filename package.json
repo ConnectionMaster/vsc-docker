@@ -13,7 +13,10 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.openMainMenu"
+        "onCommand:extension.openMainMenu",
+        "onCommand:extension.showLocalImages",
+        "onCommand:extension.showLocalContainers",
+        "onCommand:extension.searchImages"
     ],
     "main": "./out/src/extension",
     "contributes": {
