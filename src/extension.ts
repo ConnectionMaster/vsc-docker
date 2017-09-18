@@ -915,13 +915,17 @@ function searchImages() {
                 }
                     
                 ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-                    // add complex definition to the headers
-                //result['title'] = 'Search Docker Hub';
-                //result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
-                // XXX-MISSING
-                //html.createPreviewFromObject('docker', 'Search', result, 1, null, false);
-            });
+                    card = new AdaptiveCard();
+                    card.addTitleWithIcon("Pull Image", "");
+                    card.addFact("Name", r["name"]);
+                    card.addFact("Description", r["description"]);
+                    card.addActions("Pull", { name: r["name"], description: r["description"]});
+
+                    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+                        installImage(r["name"], r["description"], false);
+                    });
+                });
             } else {
                 vscode.window.showErrorMessage('Search failed!');                
             }
