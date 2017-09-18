@@ -489,8 +489,8 @@ function displayImageOptions(r: object) {
     items.push('Run');
     items.push('Pull');
     items.push('Push');
-    items.push('Load');
-    items.push('Save');
+//    items.push('Load');
+//    items.push('Save');
     items.push('History');
     items.push('Remove');
 
