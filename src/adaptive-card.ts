@@ -79,23 +79,27 @@ export class AdaptiveCard
         );
     }
 
-    public addActions(a: any) {
+    public addActions(a: any, params: any) {
 
         var b: string = typeof a;
 
         if (typeof a === "string") {
-            this.m_AdaptiveCard["attachments"][0].content.actions.push(
-            {
+            let action =            {
                 "type": "Action.Submit",
                 "title": a,
                 "data":
                 {
                     "action": a
                 }
-            });
+            };
+
+            for (var p in params) {
+                action.data[p] = params[p];
+            }
+            this.m_AdaptiveCard["attachments"][0].content.actions.push(action);
         } else if (typeof a === "object") {
             for (var item of a) {
-                this.addActions(item);
+                this.addActions(item, params);
             }
         }            
     }

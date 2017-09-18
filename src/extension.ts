@@ -173,7 +173,7 @@ function displayMainMenu() {
 
     card.addTitleWithIcon("Docker Runner", "file:///" + g_StoragePath + "//vsc-docker-icon.png");//"https://zim.gallerycdn.vsassets.io/extensions/zim/vsc-docker/0.16.0/1504017964617/Microsoft.VisualStudio.Services.Icons.Default");// );
 
-    card.addActions(items);    
+    card.addActions(items, {});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -299,14 +299,16 @@ function displayContainerOptions(r: object) {
 
     var card: AdaptiveCard = new AdaptiveCard();
 
-    card.addTitleWithIcon(r["names"], "");
+    var icon: string =   "file:///" + g_StoragePath + "//resources//" + (status.startsWith("Up") ? (status.indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png");
+    
+    card.addTitleWithIcon(r["names"], icon);
     card.addFact("Container Id", r["id"]);
     card.addFact("Image", r["image"]);
     card.addFact("Created", r["created"]);
     card.addFact("Status", r["status"]);
     card.addFact("Ports", r["ports"]);
     
-    card.addActions(items);    
+    card.addActions(items, {});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -502,7 +504,13 @@ function displayImageOptions(r: object) {
     card.addFact("Created", r["created"]);
     card.addFact("Size", r["size"]);
     
-    card.addActions(items);    
+    card.addActions(items, {
+        "repository": r["repository"],
+        "tag": r["tag"],
+        "id": r["id"],
+        "created": r["created"],
+        "size": r["size"]
+    });    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -589,7 +597,7 @@ function displayContainerLogOptions(entry: string, container: string, image: str
     items.push('Copy');
 
     var card: AdaptiveCard = new AdaptiveCard();
-    card.addActions(items);    
+    card.addActions(items, {});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -758,7 +766,7 @@ function queryContainers(refreshOnly: boolean) {
 
             for (var i of result["rows"]) {
 
-                var icon: string =  i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png";
+                var icon: string =   "file:///" + g_StoragePath + "//resources//" + (i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png");
                 var row = 
                 {
                     "type": "ColumnSet",
@@ -770,7 +778,7 @@ function queryContainers(refreshOnly: boolean) {
                             "items": [
                                 {
                                     "type": "Image",
-                                    "url": "file:///" + g_StoragePath + "//resources//" + icon,
+                                    "url": icon,
                                     "size": "small"
                                 }
                             ]
@@ -869,7 +877,7 @@ function installImageOptions(id: string, description: string) {
     //items.push('Pull & Pin to the Menu');
 
     var card: AdaptiveCard = new AdaptiveCard();
-    card.addActions(items);    
+    card.addActions(items, {});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
