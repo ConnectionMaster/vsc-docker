@@ -308,7 +308,7 @@ function displayContainerOptions(r: object) {
     card.addFact("Status", r["status"]);
     card.addFact("Ports", r["ports"]);
     
-    card.addActions(items, {});    
+    card.addActions(items, { names: r["names"], id: r["id"]});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -346,18 +346,24 @@ function displayContainerOptions(r: object) {
                 queryContainers(true);            
             })
         } else if (selected == 'Rename') {
-            vscode.window.showInputBox({ prompt: 'New name'}).then( (newName) => {
-                docker.rename(id, newName, function(result) {
-                    if (result) {
-                        AppInsightsClient.sendEvent('ContainerRenameSuccess');
-                        vscode.window.showInformationMessage('Container renamed');
-                    } else {
-                        AppInsightsClient.sendEvent('ContainerRenameFailed');
-                        vscode.window.showErrorMessage('Operation failed');
-                    }
-                    queryContainers(true);            
+            let card: AdaptiveCard = new AdaptiveCard();
+            
+                card.addTitleWithIcon("Rename Container", "");
+                card.addFact("Name", r["names"]);
+                card.addInputText("newName");
+                card.addActions("Rename", { id: r["id"]})
+            
+                ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+                    docker.rename(r["id"], r["newName"], function(result) {
+                        if (result) {
+                            AppInsightsClient.sendEvent('ContainerRenameSuccess');
+                        } else {
+                            AppInsightsClient.sendEvent('ContainerRenameFailed');
+                            // XXX - operation failed message
+                        }
+                        queryContainers(true);            
+                    })
                 })
-            })
 
         } else if (selected == 'Pause') {
             docker.pause(id, function(result) {
