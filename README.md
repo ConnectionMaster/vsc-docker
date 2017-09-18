@@ -2,8 +2,6 @@
 
 Docker Runner source available in [GitHub repository here](https://github.com/zikalino/vsc-docker). Any contributions are welcome!
 
-You can find [detailed documentation here](https://github.com/zikalino/vsc-docker/wiki).
-
 Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311).
 
 Version **0.17.0** uses Active Cards as user interface. Explorer view has been depreciated, also custom HTML view was depreciated.
@@ -12,7 +10,7 @@ Version **0.17.0** uses Active Cards as user interface. Explorer view has been d
 
 To Activate extension use:
 
-**ALt+Ctrl+D** to ope main menu.
+**ALt+Ctrl+D** to open main menu.
 
 ![Main Menu](images/explorer-view.png)
 
