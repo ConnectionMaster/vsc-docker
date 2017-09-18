@@ -49,12 +49,6 @@ export function activate(context: vscode.ExtensionContext) {
     let provider = new AdaptiveCardDocumentContentProvider(context);
     let registration = vscode.workspace.registerTextDocumentContentProvider('adaptivecard-preview', provider);
 
-    // XXX - display card
-    // XXX
-    //provider.update(previewUri);
-    //vscode.commands.executeCommand('vscode.previewHtml', previewUri, 2, `MUKAMUKA`);
-    // XXX
-
     g_StoragePath = context.extensionPath;
 
     ac.setExtensionPath(context.extensionPath);
@@ -76,11 +70,6 @@ export function activate(context: vscode.ExtensionContext) {
             queryContainers(true);            
          })
 
-    });
-
-    registerCommand(context, 'extension.installImageOptions', (...p:any[]) => {
-        AppInsightsClient.sendEvent('DisplayInstallImageOptions');
-        installImageOptions(p[0], p[1]);
     });
 
     registerCommand(context, 'extension.containerDelete', (...p:any[]) => {
@@ -678,17 +667,9 @@ function queryImages(refreshOnly: boolean) {
 
             var card: AdaptiveCard = new AdaptiveCard();
 
-            card.addItem(
-                {
-                    "type": "TextBlock",
-                    "size": "large",
-                    //"color": "accent",
-                    "textweight": "bolder",
-                    "text": "Local Images"
-                });        
-        
-            // add items
+            card.addTitleWithIcon("Local Images", "");
 
+            // add items
             for (var i of result["rows"]) {
                 var row = 
                 {
@@ -759,17 +740,9 @@ function queryContainers(refreshOnly: boolean) {
         if (result) {
             var card: AdaptiveCard = new AdaptiveCard();
             
-            card.addItem(
-                {
-                    "type": "TextBlock",
-                    "size": "large",
-                    //"color": "accent",
-                    "textweight": "bolder",
-                    "text": "Containers"
-                });        
+            card.addTitleWithIcon("Containers", "");
                     
             // add items
-
             for (var i of result["rows"]) {
 
                 var icon: string =   "file:///" + g_StoragePath + "//resources//" + (i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png");
@@ -938,29 +911,6 @@ function searchImages() {
         })
     } )
 }
-
-function installImageOptions(id: string, description: string) {
-
-    var items:string[] = [];
-
-    items.push('Pull');
-
-    // [TODO] this option is disabled for timebeing
-    //items.push('Pull & Pin to the Menu');
-
-    var card: AdaptiveCard = new AdaptiveCard();
-    card.addActions(items, {});    
-    
-    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-        let selected: string = r.action;
-       if (selected == 'Pull') {
-            installImage(id, description, false);
-        } else if (selected == 'Pull & Pin to the Menu') {
-            installImage(id, description, true);
-        }
-    });
-}
- 
 
 function installImage(id: string, description: string, pin: boolean) {
 
