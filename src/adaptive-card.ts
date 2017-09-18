@@ -79,6 +79,15 @@ export class AdaptiveCard
         );
     }
 
+    public addInputText(id: string) {
+        this.addItem(
+            {
+                "type": "Input.Text",
+                "id": id
+            }
+        );
+    }
+
     public addActions(a: any, params: any) {
 
         var b: string = typeof a;

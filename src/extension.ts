@@ -159,8 +159,8 @@ function displayMainMenu() {
 
     var items:string[] = [];
 
-    items.push('Local Images (detailed)');
-    items.push('Local Containers (detailed)');
+    items.push('Local Images');
+    items.push('Local Containers');
     items.push('Find Images in DockerHub');
     items.push('Edit Configuration');
     items.push('Info');
@@ -184,9 +184,9 @@ function displayMainMenu() {
             });
         } else if (selected == 'Find Images in DockerHub') {
             searchImages();
-        } else if (selected == 'Local Containers (detailed)') {
+        } else if (selected == 'Local Containers') {
             queryContainers(false);
-        } else if (selected == 'Local Images (detailed)') {
+        } else if (selected == 'Local Images') {
             queryImages(false);
         } else if (selected == 'Info') {
             displayInfo();
@@ -848,18 +848,80 @@ function queryContainers(refreshOnly: boolean) {
  * Search images in Docker Hub
  */
 function searchImages() {
-    vscode.window.showInputBox( { prompt: "Search string" } ).then( (filter) => {
-        var items:string[] = [];
+    var card: AdaptiveCard = new AdaptiveCard();
 
-        docker.search(filter, function (result: object) {
+    card.addTitleWithIcon("Find Images in DockerHub", "");
+    card.addInputText("phrase");
+    card.addActions("Search", {})
+
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+            var items:string[] = [];
+
+        docker.search(r["phrase"], function (result: object) {
 
             if (result) {
-                // add complex definition to the headers
-                result['title'] = 'Search Docker Hub';
-                result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
+                card = new AdaptiveCard();
+                card.addTitleWithIcon("Search Results", "");
+
+
+                for (var i of result["rows"]) {
+                    
+                    var row = 
+                    {
+                        "type": "ColumnSet",
+                        "separation": "strong",
+                        "columns": [
+                            {
+                                "type": "Column",
+                                "size": 1,
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "size": "medium",
+                                        "color": "accent",
+                                        "textweight": "bolder",
+                                        "text": i["name"]
+                                    }
+                                ],
+                                "selectAction":
+                                {
+                                    "type": "Action.Submit",
+                                    "data":
+                                    {
+                                        "action": "image-search-select",
+                                        "name": i["name"],
+                                        "description": i["description"]
+                                    }
+                                }    
+                            },
+                            {
+                                "type": "Column",
+                                "size": 1,
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "size": "medium",
+                                        "horizontalAlignment": "left",
+                                        "text": i["description"],
+                                        "isSubtle": true,
+                                        "wrap": true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+    
+                    card.addItem(row);
+                }
+                    
+                ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+                    // add complex definition to the headers
+                //result['title'] = 'Search Docker Hub';
+                //result['onSelect'] = ['command:extension.installImageOptions', '$name', '$description'];
 
                 // XXX-MISSING
                 //html.createPreviewFromObject('docker', 'Search', result, 1, null, false);
+            });
             } else {
                 vscode.window.showErrorMessage('Search failed!');                
             }
