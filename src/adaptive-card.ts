@@ -27,7 +27,7 @@ export class AdaptiveCard
             "columns": [
                 {
                     "type": "Column",
-                    "size": 1,
+                    "size": icon != "" ? 1 : 0,
                     "items": [
                         {
                             "type": "Image",
