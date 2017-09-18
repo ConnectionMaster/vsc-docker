@@ -282,7 +282,7 @@ function displayContainerOptions(r: object) {
     items.push('Diff');
     items.push('Top');
     items.push('Logs');
-    items.push('Browse');
+//    items.push('Browse');
 
     var divider: boolean = false;
     
