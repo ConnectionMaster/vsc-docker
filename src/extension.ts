@@ -1249,10 +1249,8 @@ function saveConfig() {
  *
  */
 
-function startContainerBot(id: string, view: boolean, cb) {
-    var name = "azure-cli-bot";
-
-    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " node /bot/server-local.js";
+function startContainerBot(name: string, view: boolean, cb) {
+    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + name + " node /bot/server-local.js";
 
     // create a new terminal and show it
     if (null == terminal) {
