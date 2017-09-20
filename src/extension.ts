@@ -1,4 +1,4 @@
-
+﻿
 import * as vscode from 'vscode';
 var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
@@ -77,6 +77,14 @@ export function activate(context: vscode.ExtensionContext) {
         handleAction( { action: "display-docker-search"});        
     });
 
+    let disposable = vscode.commands.registerCommand('extension.testStuff', () => {
+        
+        startContainerBot("dockiot/azure-bot-dev", true, function(result) {            
+            terminal.sendText("azure --help");
+        });
+
+    });
+        
     context.subscriptions.push(vscode.window.onDidCloseTerminal((closedTerminal: vscode.Terminal) => {
         //Executor.onDidCloseTerminal(closedTerminal);
     }));
@@ -1041,8 +1049,33 @@ function installImage(id: string, description: string, pin: boolean) {
     })
 }
 
+// XXX - fix this
+var collect: string = "";
+
 function logHandler(data: string) {
     out.append(data);
+
+    // XXXX - this is only for special containers -- need to know which container it came from!!!!
+    collect += data;
+    
+      var parts: string[] = collect.split('\n');
+    
+      for (var part of parts) {
+        try {
+          var activity: any = JSON.parse(part);
+    
+          ac.createAdaptiveCardPreview("azure-cli", "Azure CLI", activity.data, 1, function(r) {
+            //vscode.window.showInformationMessage(JSON.stringify(r));
+            terminal.sendText(JSON.stringify(r), true);
+            
+          });
+          
+          collect = "";
+          return;
+            
+        } catch (e) {}
+      }
+    
 }
 
 function closeHandler(id: string) {
@@ -1226,3 +1259,60 @@ function saveConfig() {
         fs.writeFileSync(g_StoragePath + '/config.json', JSON.stringify(g_Config, null, 2));
     })
 }
+
+
+/*
+ * This is a function to start bots from container
+ *
+ */
+
+function startContainerBot(id: string, view: boolean, cb) {
+    var name = "azure-cli-bot";
+
+    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " node /bot/server-local.js";
+
+    // create a new terminal and show it
+    if (null == terminal) {
+        terminal  = vscode.window.createTerminal(name);
+    }
+    //terminal.show();
+
+    // check if we already have this process isRunning
+
+    docker.ps(false, function(result) {
+        var exists: boolean = false;
+
+        if (result) {
+            for (var i = 0; i < result.rows.length; i++) {
+                if (result.rows[i].names == name) {
+                    exists = true;
+                }
+            }
+        }
+
+        if (exists) {
+            terminal.sendText('docker attach ' + name, true);
+            setTimeout(function() {
+            docker.attachBot(name, function(result) {
+                cb();
+            });
+        }, 3000)
+    } else {
+            var src = '/src';
+
+            params = params.replace('$default-name', name);
+            params = params.replace('$workspace', vscode.workspace.rootPath);
+            params = params.replace('$src', src);
+
+            terminal.sendText('docker run ' + params, true);
+
+            setTimeout(function() {
+                docker.attachBot(name, function(result) {
+                    cb();
+                });
+            }, 3000)
+        }
+    });
+}
+
+var terminal = null;

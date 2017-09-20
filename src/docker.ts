@@ -94,6 +94,48 @@ export class Docker extends CliRunner {
     }
 
     /**
+     * 
+     * @param id 
+     * @param cb 
+     */
+    public attachBot(id: string, cb) {
+        if (this.m_Containers.hasOwnProperty(id)) {
+            cb(true);
+            return;
+        }
+
+        var src = '/src';
+        // check if we are mapping something here
+
+
+        // XXX - must get current local directory
+        const child = cp.spawn('docker', ['attach', '--no-stdin', id]);
+        this.m_Containers[id] = child;
+        child['xvsc'] = true;
+
+        const stdout = this.collectData(child.stdout, 'utf8', id);
+        const stderr = this.collectData(child.stderr, 'utf8', id);
+        child.on('error', err => {
+            console.log('CONTAINER ERROR');
+        });
+
+        child.on('close', code => {
+            console.log('CONTAINER EXITED ' + code);
+
+            // remove this container from container list
+            delete this.m_Containers[id]; 
+
+            // XXX - send notification, so terminal can be closed, etc...
+            //this.m_CloseHandler(id);
+            if (code) {
+            } else {
+            }
+        });
+
+        cb(true);
+    }
+
+    /**
      * Read directory in running container
      * 
      * @param id 
