@@ -367,7 +367,6 @@ function containerRemove(r: any) {
     docker.rm([ r.id ], false, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerRemoveSuccess');
-            vscode.window.showInformationMessage('Container removed');
         } else {
             AppInsightsClient.sendEvent('ContainerRemoveFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -380,7 +379,6 @@ function containerStop(r: any) {
     docker.stop([ r.id ], function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerStopSuccess');
-            vscode.window.showInformationMessage('Container stopped');
         } else {
             AppInsightsClient.sendEvent('ContainerStopFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -393,7 +391,6 @@ function containerStopAndRemove(r: any) {
     docker.rm([ r.id ], true, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerStopRemoveSuccess');
-            vscode.window.showInformationMessage('Container removed');
         } else {
             AppInsightsClient.sendEvent('ContainerStopRemoveFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -428,7 +425,6 @@ function containerPause(r: any) {
     docker.pause(r.id, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerPauseSuccess');
-            vscode.window.showInformationMessage('Container paused');
         } else {
             AppInsightsClient.sendEvent('ContainerPauseFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -441,7 +437,6 @@ function containerUnpause(r: any) {
     docker.unpause(r.id, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerUnpauseSuccess');
-            vscode.window.showInformationMessage('Container unpaused');
         } else {
             AppInsightsClient.sendEvent('ContainerUnpauseFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -454,7 +449,6 @@ function containerStart(r: any) {
     docker.start(r.id, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerStartSuccess');
-            vscode.window.showInformationMessage('Container started');
         } else {
             AppInsightsClient.sendEvent('ContainerStartFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -467,7 +461,6 @@ function containerRestart(r: any) {
     docker.restart(r.id, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerRestartSuccess');
-            vscode.window.showInformationMessage('Container restarted');
         } else {
             AppInsightsClient.sendEvent('ContainerRestartFailed');
             vscode.window.showErrorMessage('Operation failed');
@@ -550,7 +543,6 @@ function deleteContainer(id: string, status: string) {
         if (result == 'Delete') {
             docker.rm([ id ], true, function(result) {
                 if (result) {
-                    vscode.window.showInformationMessage('Container removed');
                 } else {
                     vscode.window.showErrorMessage('Operation failed');
                 }
@@ -616,7 +608,6 @@ function imageRemove(r: any) {
     docker.rmi(r["id"], function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ImageRemoveSuccess');
-            vscode.window.showInformationMessage('Image removed!');                    
         } else {
             AppInsightsClient.sendEvent('ImageRemoveFailure');
             vscode.window.showErrorMessage('Removing image failed!');
@@ -635,7 +626,6 @@ function imagePull(r: any) {
     docker.pull(r["repository"], function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ImagePullSuccess');
-            vscode.window.showInformationMessage('Pull completed!');
         } else {
             AppInsightsClient.sendEvent('ImagePullFailure');
             vscode.window.showErrorMessage('Pull failed');
@@ -649,7 +639,6 @@ function imagePush(r: any) {
     docker.push(r["repository"], function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ImagePushSuccess');
-            vscode.window.showInformationMessage('Push completed!');
         } else {
             AppInsightsClient.sendEvent('ImagePushFailure');
             vscode.window.showErrorMessage('Push failed');
@@ -719,7 +708,6 @@ function deleteImage(name: string, repository: string) {
         if (result == 'Delete') {
             docker.rmi([ name ], function(result) {
                 if (result) {
-                    vscode.window.showInformationMessage('Image removed!');                    
                 } else {
                     vscode.window.showErrorMessage('Removing image failed!');
                 }
@@ -1020,8 +1008,6 @@ function installImage(id: string, description: string, pin: boolean) {
                         g_Config[id].config = config;
                         g_Config[id].config.compatible = true;
                     } else {
-                        vscode.window.showInformationMessage("Installed generic image!");
-
                         g_Config[id] = {};
                         g_Config[id].config = {};
                         g_Config[id].config.compatible = false;
@@ -1041,8 +1027,6 @@ function installImage(id: string, description: string, pin: boolean) {
 
                 // make sure image list is refreshed
                 queryImages(true);
-
-                vscode.window.showInformationMessage("Image pulled!");
             }            
         } else {
             vscode.window.showErrorMessage('Failed to pull image!');
@@ -1066,9 +1050,7 @@ function logHandler(data: string) {
           var activity: any = JSON.parse(part);
     
           ac.createAdaptiveCardPreview("azure-cli", "Azure CLI", activity.data, 1, function(r) {
-            //vscode.window.showInformationMessage(JSON.stringify(r));
-            terminal.sendText(JSON.stringify(r), true);
-            
+            terminal.sendText(JSON.stringify(r), true);            
           });
           
           collect = "";
