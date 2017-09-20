@@ -75,8 +75,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposable = vscode.commands.registerCommand('extension.testStuff', () => {
         
-        startContainerBot("dockiot/azure-bot-dev", true, function(result) {            
-            terminal.sendText("azure --help");
+        startContainerBot("dockiot/ansible", "ansible", true, function(result) {            
+            terminal.sendText("hi!");
         });
 
     });
@@ -96,8 +96,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     // return our public API
     let api = {
-        runBotContainer(image: string, options: any = {}) {
-            startContainerBot(image, true, function(result) {
+        runBotContainer(image: string, name: string, options: any = {}) {
+            startContainerBot(image, name, true, function(result) {
                 terminal.sendText("hi!");                
             });
         }
@@ -1249,8 +1249,8 @@ function saveConfig() {
  *
  */
 
-function startContainerBot(name: string, view: boolean, cb) {
-    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + name + " node /bot/server-local.js";
+function startContainerBot(id: string, name: string, view: boolean, cb) {
+    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " node /bot/server-local.js";
 
     // create a new terminal and show it
     if (null == terminal) {
