@@ -141,6 +141,57 @@ function handleAction(a: any) {
     case "display-image-details":
         displayImageOptions(a);
         break;
+    case 'image-run':
+        imageRun(a);
+        break;
+    case 'image-pull':
+        imagePull(a);
+        break;
+    case 'image-push':
+        imagePush(a);
+        break;
+    case 'image-history':
+        imageHistory(a);
+        break;
+    case 'image-remove':
+        imageRemove(a);
+        break;
+    case 'container-start':
+        containerStart(a);
+        break;
+    case 'container-remove':
+        containerRemove(a);
+        break;
+    case 'container-stop':
+        containerStop(a);
+        break;
+    case 'container-stop-and-remove':
+        containerStopAndRemove(a);
+        break;
+    case 'container-restart':
+        containerRestart(a);
+        break;
+    case 'container-terminal':
+        containerTerminal(a);
+        break;
+    case 'container-pause':
+        containerPause(a);
+        break;
+    case 'container-unpause':
+        containerUnpause(a);
+        break;
+    case 'container-rename':
+        containerRename(a);
+        break;
+    case 'container-diff':
+        containerDiff(a);
+        break;
+    case 'container-top':
+        containerTop(a);
+        break;
+    case 'container-logs':
+        containerLogs(a);
+        break;    
     }
 }
 
@@ -299,156 +350,185 @@ function displayContainerOptions(r: object) {
     }
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-        let selected: string = r.action;
-        if (selected == 'Remove') {
-            docker.rm([ id ], false, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerRemoveSuccess');
-                    vscode.window.showInformationMessage('Container removed');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerRemoveFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);            
-            })
-        } else if (selected == 'Stop') {
-            docker.stop([ id ], function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerStopSuccess');
-                    vscode.window.showInformationMessage('Container stopped');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerStopFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);            
-            })
-        } else if (selected == 'Stop & Remove') {
-            docker.rm([ id ], true, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerStopRemoveSuccess');
-                    vscode.window.showInformationMessage('Container removed');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerStopRemoveFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);            
-            })
-        } else if (selected == 'Rename') {
-            let card: AdaptiveCard = new AdaptiveCard();
-            
-                card.addTitleWithIcon("Rename Container", "");
-                card.addFact("Name", r["names"]);
-                card.addInputText("newName");
-                card.addActions("Rename", { id: r["id"]})
-            
-                ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-                    docker.rename(r["id"], r["newName"], function(result) {
-                        if (result) {
-                            AppInsightsClient.sendEvent('ContainerRenameSuccess');
-                        } else {
-                            AppInsightsClient.sendEvent('ContainerRenameFailed');
-                            // XXX - operation failed message
-                        }
-                        queryContainers(true);            
-                    })
-                })
-
-        } else if (selected == 'Pause') {
-            docker.pause(id, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerPauseSuccess');
-                    vscode.window.showInformationMessage('Container paused');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerPauseFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);                            
-            })
-        } else if (selected == 'Unpause') {
-            docker.unpause(id, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerUnpauseSuccess');
-                    vscode.window.showInformationMessage('Container unpaused');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerUnpauseFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);                            
-            })
-        } else if (selected == 'Start') {
-            docker.start(id, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerStartSuccess');
-                    vscode.window.showInformationMessage('Container started');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerStartFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);                            
-            })
-        } else if (selected == 'Restart') {
-            docker.restart(id, function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ContainerRestartSuccess');
-                    vscode.window.showInformationMessage('Container restarted');
-                } else {
-                    AppInsightsClient.sendEvent('ContainerRestartFailed');
-                    vscode.window.showErrorMessage('Operation failed');
-                }
-                queryContainers(true);                            
-            })
-        } else if (selected == 'Diff') {
-            docker.diff(id, function (result: object) {
-                AppInsightsClient.sendEvent('ContainerDiffCompleted');
-                // XXX-MISSING
-                //html.createPreviewFromText('docker', result.toString(), "Diff");
-            })
-
-        } else if (selected == 'Top') {
-            docker.top(id, function (result: object) {
-                AppInsightsClient.sendEvent('ContainerTopCompleted');
-                // XXX-MISSING
-                //html.createPreviewFromText('docker', result.toString(), "Top");
-            })
-
-        } else if (selected == 'Logs') {
-            docker.logs(id, function (result: object) {
-                AppInsightsClient.sendEvent('ContainerLogsCompleted');
-
-                var lines = vt100ToLines(result.toString());
-                var r: object = {};
-
-                r['title'] = "Logs of container " + id;
-                r['headers'] = ['Command'];
-
-                r['rows'] = [];
-
-                r['onSelect'] = ['command:extension.logEntryOptions', '$Command', id, image];
-                
-                for (var txt of lines) {
-                    r['rows'].push({ 'Command': txt })
-                }
-
-                // XXX-MISSING
-                //html.createPreviewFromObject('docker', 'Logs', r, 1, null, false);
-                
-                //html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
-            })
-
-        } else if (selected == 'Browse') {
-            AppInsightsClient.sendEvent('ContainerBrowseStarted');
-            // XXX-MISSING
-        } else if (selected == 'Terminal') {
-            showTerminal(id);
-        } else {
-            for (var item of g_Config['commands']) {
-                if (item['name'] == selected && item['image'] == image) {
-                    docker.exec(id, item['command'].split(' '), function(result) {});
-                }
-            }
-        }
+        handleAction(r);
     })
 }
+
+function containerRemove(r: any) {
+    docker.rm([ r.id ], false, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerRemoveSuccess');
+            vscode.window.showInformationMessage('Container removed');
+        } else {
+            AppInsightsClient.sendEvent('ContainerRemoveFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);            
+    })
+}
+
+function containerStop(r: any) {
+    docker.stop([ r.id ], function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerStopSuccess');
+            vscode.window.showInformationMessage('Container stopped');
+        } else {
+            AppInsightsClient.sendEvent('ContainerStopFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);            
+    })
+}
+
+function containerStopAndRemove(r: any) {
+    docker.rm([ r.id ], true, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerStopRemoveSuccess');
+            vscode.window.showInformationMessage('Container removed');
+        } else {
+            AppInsightsClient.sendEvent('ContainerStopRemoveFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);            
+    })
+}
+
+function containerRename(r: any) {
+    let card: AdaptiveCard = new AdaptiveCard();
+    
+        card.addTitleWithIcon("Rename Container", "");
+        card.addFact("Name", r["names"]);
+        card.addInputText("newName");
+        card.addActions("Rename", { id: r["id"]})
+    
+        ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+            docker.rename(r["id"], r["newName"], function(result) {
+                if (result) {
+                    AppInsightsClient.sendEvent('ContainerRenameSuccess');
+                } else {
+                    AppInsightsClient.sendEvent('ContainerRenameFailed');
+                    // XXX - operation failed message
+                }
+                queryContainers(true);            
+            })
+        })
+
+}
+
+function containerPause(r: any) {
+    docker.pause(r.id, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerPauseSuccess');
+            vscode.window.showInformationMessage('Container paused');
+        } else {
+            AppInsightsClient.sendEvent('ContainerPauseFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);                            
+    })
+}
+
+function containerUnpause(r: any) {
+    docker.unpause(r.id, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerUnpauseSuccess');
+            vscode.window.showInformationMessage('Container unpaused');
+        } else {
+            AppInsightsClient.sendEvent('ContainerUnpauseFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);                            
+    })
+}
+
+function containerStart(r: any) {
+    docker.start(r.id, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerStartSuccess');
+            vscode.window.showInformationMessage('Container started');
+        } else {
+            AppInsightsClient.sendEvent('ContainerStartFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);                            
+    })
+}
+
+function containerRestart(r: any) {
+    docker.restart(r.id, function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ContainerRestartSuccess');
+            vscode.window.showInformationMessage('Container restarted');
+        } else {
+            AppInsightsClient.sendEvent('ContainerRestartFailed');
+            vscode.window.showErrorMessage('Operation failed');
+        }
+        queryContainers(true);                            
+    })
+}
+
+function containerDiff(r: any) {
+    docker.diff(r.id, function (result: object) {
+        AppInsightsClient.sendEvent('ContainerDiffCompleted');
+        // XXX-MISSING
+        //html.createPreviewFromText('docker', result.toString(), "Diff");
+    })
+
+}
+
+function containerTop(r: any) {
+    docker.top(r.id, function (result: object) {
+        AppInsightsClient.sendEvent('ContainerTopCompleted');
+        // XXX-MISSING
+        //html.createPreviewFromText('docker', result.toString(), "Top");
+    })
+
+}
+
+function containerLogs(r: any) {
+    docker.logs(r.id, function (result: object) {
+        AppInsightsClient.sendEvent('ContainerLogsCompleted');
+
+        var lines = vt100ToLines(result.toString());
+//        var r: object = {};
+
+//        r['title'] = "Logs of container " + r['id'];
+//        r['headers'] = ['Command'];
+
+//        r['rows'] = [];
+
+//        r['onSelect'] = ['command:extension.logEntryOptions', '$Command', id, image];
+        
+//        for (var txt of lines) {
+//            r['rows'].push({ 'Command': txt })
+//        }
+
+        // XXX-MISSING
+        //html.createPreviewFromObject('docker', 'Logs', r, 1, null, false);
+        
+        //html.createPreviewFromText('docker', vt100ToLines(result.toString()).join('\n'), "Logs");
+    })
+
+}
+
+function containerBrowse(r: any) {
+    AppInsightsClient.sendEvent('ContainerBrowseStarted');
+    // XXX-MISSING
+}
+
+function containerTerminal(r: any) {
+    showTerminal(r.id);
+}
+
+function containerCommand(r: any) {
+    // XXX - fix this
+//    for (var item of g_Config['commands']) {
+//        if (item['name'] == selected && item['image'] == image) {
+//            docker.exec(id, item['command'].split(' '), function(result) {});
+//        }
+//    }
+}
+
 
 /**
  * Delete container
@@ -507,70 +587,79 @@ function displayImageOptions(r: object) {
     card.addAction('Remove', 'image-remove', p);
 
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-        let selected: string = r.action;
-        if (selected == 'History') {
-            docker.history(r["id"], function (result: object) {
+        handleAction(r);
+    })
+}
 
-            AppInsightsClient.sendEvent('ImageHistory');
-                // add complex definition to the headers
-                result['title'] = 'History of ' + r["repository"] + ":" + r["tag"];
+function imageHistory(r: any) {
+    docker.history(r["id"], function (result: object) {
 
-                // XXX-MISSING
-                //html.createPreviewFromObject('docker', 'History', result, 1, null, false);
-            })
-        } else if (selected == 'Remove') {
-            docker.rmi(r["id"], function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ImageRemoveSuccess');
-                    vscode.window.showInformationMessage('Image removed!');                    
-                } else {
-                    AppInsightsClient.sendEvent('ImageRemoveFailure');
-                    vscode.window.showErrorMessage('Removing image failed!');
-                }
+    AppInsightsClient.sendEvent('ImageHistory');
+        // add complex definition to the headers
+        result['title'] = 'History of ' + r["repository"] + ":" + r["tag"];
 
-                queryImages(true);
+        // XXX-MISSING
+        //html.createPreviewFromObject('docker', 'History', result, 1, null, false);
+    })
+}
 
-                if (g_Config.hasOwnProperty(r["repository"])) {
-                    delete g_Config[r["repository"]];
-                    saveConfig();
-                }
-            })
-        } else if (selected == 'Pull') {
-            docker.pull(r["repository"], function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ImagePullSuccess');
-                    vscode.window.showInformationMessage('Pull completed!');
-                } else {
-                    AppInsightsClient.sendEvent('ImagePullFailure');
-                    vscode.window.showErrorMessage('Pull failed');
-                }
+function imageRemove(r: any) {
+    docker.rmi(r["id"], function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ImageRemoveSuccess');
+            vscode.window.showInformationMessage('Image removed!');                    
+        } else {
+            AppInsightsClient.sendEvent('ImageRemoveFailure');
+            vscode.window.showErrorMessage('Removing image failed!');
+        }
 
-                queryImages(true);
-            })
-        } else if (selected == 'Push') {
-            docker.push(r["repository"], function(result) {
-                if (result) {
-                    AppInsightsClient.sendEvent('ImagePushSuccess');
-                    vscode.window.showInformationMessage('Push completed!');
-                } else {
-                    AppInsightsClient.sendEvent('ImagePushFailure');
-                    vscode.window.showErrorMessage('Push failed');
-                }
+        queryImages(true);
 
-                queryImages(true);
-            })
-        } else if (selected == 'Save') {
-            vscode.window.showInformationMessage('Not implemented yet!');
-        } else if (selected == 'Load') {
-            vscode.window.showInformationMessage('Not implemented yet!');
-        } else if (selected == 'Run') {
-            AppInsightsClient.sendEvent('RunFromImage');
-            startContainerFromTerminal(r["repository"] + ":" + r["tag"], true, function () {
-                AppInsightsClient.sendEvent('RunFromImageAttached');
-                queryContainers(true);                
-            });
+        if (g_Config.hasOwnProperty(r["repository"])) {
+            delete g_Config[r["repository"]];
+            saveConfig();
         }
     })
+}
+
+function imagePull(r: any) {
+    docker.pull(r["repository"], function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ImagePullSuccess');
+            vscode.window.showInformationMessage('Pull completed!');
+        } else {
+            AppInsightsClient.sendEvent('ImagePullFailure');
+            vscode.window.showErrorMessage('Pull failed');
+        }
+
+        queryImages(true);
+    })
+}
+
+function imagePush(r: any) {
+    docker.push(r["repository"], function(result) {
+        if (result) {
+            AppInsightsClient.sendEvent('ImagePushSuccess');
+            vscode.window.showInformationMessage('Push completed!');
+        } else {
+            AppInsightsClient.sendEvent('ImagePushFailure');
+            vscode.window.showErrorMessage('Push failed');
+        }
+
+        queryImages(true);
+    })
+}
+
+function imageSave(r: any) {
+    vscode.window.showInformationMessage('Not implemented yet!');
+} function imageLoad(r: any) {
+    vscode.window.showInformationMessage('Not implemented yet!');
+} function imageRun(r: any) {
+    AppInsightsClient.sendEvent('RunFromImage');
+    startContainerFromTerminal(r["repository"] + ":" + r["tag"], true, function () {
+        AppInsightsClient.sendEvent('RunFromImageAttached');
+        queryContainers(true);                
+    });
 }
 
 /**
