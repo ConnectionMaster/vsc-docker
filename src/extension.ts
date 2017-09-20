@@ -1,19 +1,14 @@
 ﻿
 import * as vscode from 'vscode';
-var opn = require('opn');
 import { StringDecoder } from 'string_decoder';
 import { Readable } from "stream";
-
 import { Docker } from './docker';
 import { HtmlView as NewHtmlView } from './html-view';
-
 import { AppInsightsClient } from "./appInsightsClient";
-
 import { AdaptiveCard } from "./adaptive-card";
-
 import { vt100ToLines } from "./vt100-decode";
-
 import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
+var opn = require('opn');
 
 var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
 
@@ -100,8 +95,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     // return our public API
     let api = {
-        hello() {
-            vscode.window.showInformationMessage('Hello from Docker Runner!');
+        runBotContainer(image: string, options: any = {}) {
+            startContainerBot(image, true, function(result) {
+                terminal.sendText("hi!");                
+            });
         }
     }
 
