@@ -54,6 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     registerCommand(context, 'extension.openMainMenu', () => {
+        AppInsightsClient.sendEvent('ShowMainMenu');
         handleAction( { action: "display-main-menu"});
     });
 
@@ -115,6 +116,9 @@ export function deactivate() {
  * Handle actions
  */
 function handleAction(a: any) {
+
+    AppInsightsClient.sendEvent(a.action);
+
     switch (a.action) {
     case "display-main-menu":
         displayMainMenu();
