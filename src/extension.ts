@@ -123,9 +123,23 @@ function handleAction(a: any) {
     case "display-docker-search":
         searchImages();
         break;
+    case 'display-info':
+        displayInfo();
+        break;
+    case 'login-to-acr':
+        loginToAcr();
+        break;
+    case 'login-to-dockerhub':
+        loginToDockerHub();
+        break;
+    case 'use-remote-docker':
+        useRemoteDockerMachine();
+        break;
     case "display-container-details":
+        displayContainerOptions(a);
         break;
     case "display-image-details":
+        displayImageOptions(a);
         break;
     }
 }
@@ -143,71 +157,65 @@ function displayMainMenu() {
 
     AppInsightsClient.sendEvent('MainMenuDockerInstalled');
 
-    var items:string[] = [];
-
-    items.push('Local Images');
-    items.push('Local Containers');
-    items.push('Find Images in DockerHub');
-    items.push('Edit Configuration');
-    items.push('Info');
-    items.push('Login to Azure Container Registry');
-    items.push('Login to DockerHub');
-    items.push('Use Remote Docker Machine');
-
-
     var card: AdaptiveCard = new AdaptiveCard();
 
     card.addTitleWithIcon("Docker Runner", "file:///" + g_StoragePath + "//vsc-docker-icon.png");//"https://zim.gallerycdn.vsassets.io/extensions/zim/vsc-docker/0.16.0/1504017964617/Microsoft.VisualStudio.Services.Icons.Default");// );
 
-    card.addActions(items, {});    
+    card.addAction('Local Images', 'display-local-images', {});
+    card.addAction('Local Containers', 'display-local-containers', {});
+    card.addAction('Find Images in DockerHub', 'display-docker-search', {});
+    card.addAction('Edit Configuration', 'display-configuration', {});
+    card.addAction('Info', 'display-info', {});
+    card.addAction('Login to Azure Container Registry', 'login-to-acr', {});
+    card.addAction('Login to DockerHub', 'login-to-dockerhub', {});
+    card.addAction('Use Remote Docker Machine', 'use-remote-docker', {});
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-        let selected: string = r.action;
-        if (selected == 'Edit Configuration') {
-            saveConfig();
-            vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
-                vscode.window.showTextDocument(document);
-            });
-        } else if (selected == 'Find Images in DockerHub') {
-            searchImages();
-        } else if (selected == 'Local Containers') {
-            queryContainers(false);
-        } else if (selected == 'Local Images') {
-            queryImages(false);
-        } else if (selected == 'Info') {
-            displayInfo();
-        } else if (selected == 'Login to Azure Container Registry') {
-            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
-                if (value == 'Request') {
-                    AppInsightsClient.sendEvent('AcrRequest');
-                } else if (value == 'Abandon') {
-                    AppInsightsClient.sendEvent('AcrAbandon');
-                } else {
-                    AppInsightsClient.sendEvent('AcrUndecided');
-                }
-            });                
-        } else if (selected == 'Login to DockerHub') {
-            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
-                if (value == 'Request') {
-                    AppInsightsClient.sendEvent('DockerHubRequest');
-                } else if (value == 'Abandon') {
-                    AppInsightsClient.sendEvent('DockerHubAbandon');
-                } else {
-                    AppInsightsClient.sendEvent('DockerHubUndecided');
-                }
-            });                
-        } else if (selected == 'Use Remote Docker Machine') {
-            vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
-                if (value == 'Request') {
-                    AppInsightsClient.sendEvent('RemoteDockerMachineRequest');
-                } else if (value == 'Abandon') {
-                    AppInsightsClient.sendEvent('RemoteDockerMachineAbandon');
-                } else {
-                    AppInsightsClient.sendEvent('RemoteDockerMachineUndecided');
-                }
-            });                
-        }
+        handleAction(r);
     })
+}
+
+function loginToAcr() {
+    vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+        if (value == 'Request') {
+            AppInsightsClient.sendEvent('AcrRequest');
+        } else if (value == 'Abandon') {
+            AppInsightsClient.sendEvent('AcrAbandon');
+        } else {
+            AppInsightsClient.sendEvent('AcrUndecided');
+        }
+    });                
+}
+
+function loginToDockerHub() {
+    vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+        if (value == 'Request') {
+            AppInsightsClient.sendEvent('DockerHubRequest');
+        } else if (value == 'Abandon') {
+            AppInsightsClient.sendEvent('DockerHubAbandon');
+        } else {
+            AppInsightsClient.sendEvent('DockerHubUndecided');
+        }
+    });                
+}
+
+function useRemoteDockerMachine() {
+    vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
+        if (value == 'Request') {
+            AppInsightsClient.sendEvent('RemoteDockerMachineRequest');
+        } else if (value == 'Abandon') {
+            AppInsightsClient.sendEvent('RemoteDockerMachineAbandon');
+        } else {
+            AppInsightsClient.sendEvent('RemoteDockerMachineUndecided');
+        }
+    });                
+}
+
+function editConfiguration() {
+    saveConfig();
+    vscode.workspace.openTextDocument(g_StoragePath + '/config.json').then( (document) => {
+        vscode.window.showTextDocument(document);
+    });
 }
 
 enum ContainerState {
@@ -230,61 +238,8 @@ function displayContainerOptions(r: object) {
     var id: string = r["id"];
     
     var state: ContainerState = ContainerState.Running;
-
-    if (status.indexOf('Created') >= 0) {
-        state = ContainerState.Created;
-    } else if (status.indexOf('Exited') >= 0) {
-        state = ContainerState.Exited;
-    } else if (status.indexOf('Paused') >= 0) {
-        state = ContainerState.Paused;
-    }
-
-    if ((state == ContainerState.Created) || (state == ContainerState.Exited)) {
-        items.push('Start');
-    }
-
-    if (state != ContainerState.Paused) {
-        if (state == ContainerState.Exited) {
-            items.push('Remove');
-        } else {
-            items.push('Stop');
-            items.push('Stop & Remove');
-        }
-
-        // XXX - container can be restarted only when not paused -- and what else?
-        items.push('Restart');
-    }
-
-    if (state == ContainerState.Running) {
-        items.push('Terminal');
-        items.push('Pause');
-    } else if (state == ContainerState.Paused) {
-        items.push('Unpause');
-    }
-
-    items.push('Rename');
-
-
-    items.push('Diff');
-    items.push('Top');
-    items.push('Logs');
-//    items.push('Browse');
-
-    var divider: boolean = false;
-    
-    for (var item of g_Config['commands'])
-    {
-        if ((item['image'] == '*') || (item['image'] == image)) {
-            if (!divider) {
-                items.push('________________');
-                divider = true;                
-            }
-            items.push(item['name']);
-        }
-    }
-
     var card: AdaptiveCard = new AdaptiveCard();
-
+    
     var icon: string =   "file:///" + g_StoragePath + "//resources//" + (status.startsWith("Up") ? (status.indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png");
     
     card.addTitleWithIcon(r["names"], icon);
@@ -294,7 +249,54 @@ function displayContainerOptions(r: object) {
     card.addFact("Status", r["status"]);
     card.addFact("Ports", r["ports"]);
     
-    card.addActions(items, { names: r["names"], id: r["id"]});    
+    let p: any = { names: r["names"], id: r["id"]};    
+    
+    if (status.indexOf('Created') >= 0) {
+        state = ContainerState.Created;
+    } else if (status.indexOf('Exited') >= 0) {
+        state = ContainerState.Exited;
+    } else if (status.indexOf('Paused') >= 0) {
+        state = ContainerState.Paused;
+    }
+
+    if ((state == ContainerState.Created) || (state == ContainerState.Exited)) {
+        card.addAction('Start', 'container-start', p);
+    }
+
+    if (state != ContainerState.Paused) {
+        if (state == ContainerState.Exited) {
+            card.addAction('Remove', 'container-remove', p);
+        } else {
+            card.addAction('Stop', 'container-stop', p);
+            card.addAction('Stop & Remove', 'container-stop-and-remove', p);
+        }
+
+        // XXX - container can be restarted only when not paused -- and what else?
+        card.addAction('Restart', 'container-restart', p);
+    }
+
+    if (state == ContainerState.Running) {
+        card.addAction('Terminal', 'container-terminal', p);
+        card.addAction('Pause', 'container-pause', p);
+    } else if (state == ContainerState.Paused) {
+        card.addAction('Unpause', 'container-unpause', p);
+    }
+
+    card.addAction('Rename', 'container-rename', p);
+
+
+    card.addAction('Diff', 'container-diff', p);
+    card.addAction('Top', 'container-top', p);
+    card.addAction('Logs', 'container-logs', p);
+//    card.addAction('Browse');
+
+    for (var item of g_Config['commands'])
+    {
+        // XXX - custom-command on container
+        if ((item['image'] == '*') || (item['image'] == image)) {
+            card.addAction(item['name'], 'container-command-' + item['name'], p);
+        }
+    }
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -478,13 +480,13 @@ function deleteContainer(id: string, status: string) {
 function displayImageOptions(r: object) {
     var items:string[] = [];
 
-    items.push('Run');
-    items.push('Pull');
-    items.push('Push');
-//    items.push('Load');
-//    items.push('Save');
-    items.push('History');
-    items.push('Remove');
+    var p: any = {
+        "repository": r["repository"],
+        "tag": r["tag"],
+        "id": r["id"],
+        "created": r["created"],
+        "size": r["size"]
+    }
 
     // [TODO] add more options from configuration here
 
@@ -496,14 +498,14 @@ function displayImageOptions(r: object) {
     card.addFact("Created", r["created"]);
     card.addFact("Size", r["size"]);
     
-    card.addActions(items, {
-        "repository": r["repository"],
-        "tag": r["tag"],
-        "id": r["id"],
-        "created": r["created"],
-        "size": r["size"]
-    });    
-    
+    card.addAction('Run', 'image-run', p);
+    card.addAction('Pull', 'image-pull', p);
+    card.addAction('Push', 'image-push', p);
+//    card.addAction('Load');
+//    card.addAction('Save');
+    card.addAction('History', 'image-history', p);
+    card.addAction('Remove', 'image-remove', p);
+
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
         if (selected == 'History') {
@@ -582,14 +584,13 @@ function displayContainerLogOptions(entry: string, container: string, image: str
     var split: string[] = entry.split('# ');
     var items:string[] = [];
 
+    var card: AdaptiveCard = new AdaptiveCard();
     if (split.length == 2) {
-        items.push('Store');
+        card.addAction('Store', 'container-log-store', {});
     }
 
-    items.push('Copy');
+    card.addAction('Copy', 'container-log-copy', {});
 
-    var card: AdaptiveCard = new AdaptiveCard();
-    card.addActions(items, {});    
     
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         let selected: string = r.action;
@@ -690,7 +691,7 @@ function queryImages(refreshOnly: boolean) {
                             "type": "Action.Submit",
                             "data":
                             {
-                                "action": "image-options",
+                                "action": "display-image-details",
                                 "id": i["image id"],
                                 "repository": i["repository"],
                                 "tag": i["tag"],
@@ -720,7 +721,7 @@ function queryImages(refreshOnly: boolean) {
             }
 
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-                displayImageOptions(r);
+                handleAction(r);
             })
         } else {
             vscode.window.showErrorMessage('Operation failed!');                
@@ -778,7 +779,7 @@ function queryContainers(refreshOnly: boolean) {
                             "type": "Action.Submit",
                             "data":
                             {
-                                "action": "image-options",
+                                "action": "display-container-details",
                                 "id": i["container id"],
                                 "names": i["names"],
                                 "image": i["image"],
@@ -811,7 +812,7 @@ function queryContainers(refreshOnly: boolean) {
             }
             
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
-                displayContainerOptions(r);
+                handleAction(r);
             });
 
         } else {

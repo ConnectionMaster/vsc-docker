@@ -88,6 +88,22 @@ export class AdaptiveCard
         );
     }
 
+    public addAction(title: string, id: string, params: any) {
+        let action =            {
+            "type": "Action.Submit",
+            "title": title,
+            "data":
+            {
+                "action": id
+            }
+        };
+
+        for (var p in params) {
+            action.data[p] = params[p];
+        }
+        this.m_AdaptiveCard["attachments"][0].content.actions.push(action);
+    }
+
     public addActions(a: any, params: any) {
 
         var b: string = typeof a;
