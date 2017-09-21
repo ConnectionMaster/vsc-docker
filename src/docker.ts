@@ -416,5 +416,16 @@ export class Docker extends CliRunner {
         this.execute(['logs', id], false, false, cb)
     }
 
+    /**
+     * Display logs for container
+     * 
+     * @param username 
+     * @param password 
+     * @param cb 
+     */
+    public login(username: string, password: string, cb) {
+        this.execute(['login', '--password', password, '--username', username], false, false, cb);
+    }
+
     private m_Containers = {};
 }

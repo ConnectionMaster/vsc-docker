@@ -141,6 +141,9 @@ function handleAction(a: any) {
     case 'login-to-dockerhub':
         loginToDockerHub();
         break;
+    case 'login-to-dockerhub-submit':
+        loginToDockerHubSubmit(a);
+        break;
     case 'use-remote-docker':
         useRemoteDockerMachine();
         break;
@@ -251,15 +254,33 @@ function loginToAcr() {
 }
 
 function loginToDockerHub() {
-    vscode.window.showInformationMessage('Not implemented -- click Request if you want implementation to be prioritised',  "Request", "Abandon").then((value) => {
-        if (value == 'Request') {
-            AppInsightsClient.sendEvent('DockerHubRequest');
-        } else if (value == 'Abandon') {
-            AppInsightsClient.sendEvent('DockerHubAbandon');
+
+    var card: AdaptiveCard = new AdaptiveCard();
+
+    card.addTitleWithIcon("Login to DockerHub", "");
+    
+    card.addInputText("username", "User");
+    card.addInputText("password", "Password");
+    
+    card.addAction("Login", "login-to-dockerhub-submit", {})
+
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+        handleAction(r);
+    })
+}
+
+function loginToDockerHubSubmit(r) {
+    docker.login(r["username"], r["password"], function(result) {
+        var card: AdaptiveCard = new AdaptiveCard();
+        if (result) {
+            AppInsightsClient.sendEvent('LoginToDockerSuccess');
+            card.addInfoMessage("DockerHub Login Successful");
         } else {
-            AppInsightsClient.sendEvent('DockerHubUndecided');
+            AppInsightsClient.sendEvent('LoginToDockerFailed');
+            card.addInfoMessage("DockerHub Login Failed");
         }
-    });                
+        ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {});
+    })
 }
 
 function useRemoteDockerMachine() {

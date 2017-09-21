@@ -55,6 +55,19 @@ export class AdaptiveCard
         this.addItem(item);
     }
 
+    public addInfoMessage(info: string) {
+        this.addItem(
+            {
+                "type": "TextBlock",
+                "size": "large",
+                "color": "dark",
+                "weight": "bolder",
+                "text": info,
+                "horizontalAlignment": "left"
+            }
+        );
+    }
+
     public addItem(item: any) {
         this.m_AdaptiveCard["attachments"][0].content.body.push(item);
     }
@@ -79,7 +92,17 @@ export class AdaptiveCard
         );
     }
 
-    public addInputText(id: string) {
+    public addInputText(id: string, title: string = "") {
+
+        if (title != "") {
+            this.addItem(
+                {
+                    "type": "TextBlock"
+                }
+            );
+    
+        }
+
         this.addItem(
             {
                 "type": "Input.Text",
