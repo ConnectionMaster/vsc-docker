@@ -144,6 +144,9 @@ function handleAction(a: any) {
     case 'use-remote-docker':
         useRemoteDockerMachine();
         break;
+    case 'display-configuration':
+        editConfiguration();
+        break;
     case "display-container-details":
         displayContainerOptions(a);
         break;
@@ -1049,7 +1052,7 @@ function logHandler(data: string) {
         try {
           var activity: any = JSON.parse(part);
     
-          ac.createAdaptiveCardPreview("azure-cli", "Azure CLI", activity.data, 1, function(r) {
+          ac.createAdaptiveCardPreview("azure-cli", "Azure CLI", activity, 1, function(r) {
             terminal.sendText(JSON.stringify(r), true);            
           });
           
