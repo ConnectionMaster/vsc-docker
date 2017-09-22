@@ -116,7 +116,7 @@ export class CliRunner {
             data.splice(1);
 
             if (!suppressOutput) {
-                this.m_OutputHandler(decoded);
+                this.m_OutputHandler(id, decoded);
             }
         });
         return data;

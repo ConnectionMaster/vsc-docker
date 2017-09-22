@@ -1072,30 +1072,32 @@ function installImage(id: string, description: string, pin: boolean) {
 }
 
 // XXX - fix this
-var collect: string = "";
+var collect: {};
 
-function logHandler(data: string) {
+function logHandler(id: string, data: string) {
     out.append(data);
 
-    // XXXX - this is only for special containers -- need to know which container it came from!!!!
-    collect += data;
-    
-      var parts: string[] = collect.split('\n');
-    
-      for (var part of parts) {
-        try {
-          var activity: any = JSON.parse(part);
-    
-          ac.createAdaptiveCardPreview("azure-cli", "Azure CLI", activity.data, 1, function(r) {
-            terminal.sendText(JSON.stringify(r), true);            
-          });
-          
-          collect = "";
-          return;
+    // XXX - check if collect contains member
+
+    if (collect[id] != undefined) {
+        collect[id] += data;
+        
+        var parts: string[] = collect[id].split('\n');
+        
+        for (var part of parts) {
+            try {
+            var activity: any = JSON.parse(part);
+        
+            ac.createAdaptiveCardPreview(id, id, activity.data, 1, function(r) {
+                terminal.sendText(JSON.stringify(r), true);            
+            });
             
-        } catch (e) {}
-      }
-    
+            collect[id] = "";
+            return;
+                
+            } catch (e) {}
+        }
+    }
 }
 
 function closeHandler(id: string) {
@@ -1289,6 +1291,10 @@ function saveConfig() {
 function startContainerBot(id: string, name: string, view: boolean, cb) {
     var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " node /bot/server-local.js";
 
+    // create data collection buffer
+    collect[name] = "";
+
+    // XXX - this terminal should be in terminal pool, not a single variable
     // create a new terminal and show it
     if (null == terminal) {
         terminal  = vscode.window.createTerminal(name);
@@ -1311,11 +1317,11 @@ function startContainerBot(id: string, name: string, view: boolean, cb) {
         if (exists) {
             terminal.sendText('docker attach ' + name, true);
             setTimeout(function() {
-            docker.attachBot(name, function(result) {
-                cb();
-            });
-        }, 3000)
-    } else {
+                docker.attachBot(name, function(result) {
+                    cb();
+                });
+            }, 3000)
+        } else {
             var src = '/src';
 
             params = params.replace('$default-name', name);
