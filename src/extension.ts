@@ -830,6 +830,8 @@ function queryImages(refreshOnly: boolean) {
                 card.addItem(row);
             }
 
+            card.addAction("Refresh", "display-local-images", {});
+
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 handleAction(r);
             })
@@ -920,6 +922,8 @@ function queryContainers(refreshOnly: boolean) {
 
                 card.addItem(row);
             }
+
+            card.addAction("Refresh", "display-local-containers", {});
             
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 handleAction(r);
