@@ -76,7 +76,9 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('extension.testStuff', () => {
         
         startContainerBot("dockiot/ansible", "ansible", true, function(result) {            
-            terminal.sendText("hi!");
+            setTimeout(function() {
+                terminal.sendText("hi!");
+            }, 1000)
         });
 
     });
