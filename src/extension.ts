@@ -109,7 +109,9 @@ export function activate(context: vscode.ExtensionContext) {
     let api = {
         runBotContainer(image: string, name: string, options: any = {}) {
             startContainerBot(image, name, true, function(result) {
-                terminal.sendText("hi!");                
+                setTimeout(function() {
+                    terminal.sendText("hi!");
+                }, 1000)
             });
         }
     }
@@ -1074,7 +1076,7 @@ function installImage(id: string, description: string, pin: boolean) {
 }
 
 // XXX - fix this
-var collect: {};
+var collect = {};
 
 function logHandler(id: string, data: string) {
     out.append(data);
