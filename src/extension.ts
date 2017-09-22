@@ -1092,7 +1092,7 @@ function logHandler(id: string, data: string) {
             try {
             var activity: any = JSON.parse(part);
         
-            ac.createAdaptiveCardPreview(id, id, activity.data, 1, function(r) {
+            ac.createAdaptiveCardPreview(id, id, activity.data, 2, function(r) {
                 terminal.sendText(JSON.stringify(r), true);            
             });
             
