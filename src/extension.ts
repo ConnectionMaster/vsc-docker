@@ -889,7 +889,7 @@ function queryContainers(refreshOnly: boolean) {
                         },
                         {
                             "type": "Column",
-                            "size": 2,
+                            "size": 5,
                             "items": [
                                 {
                                     "type": "TextBlock",
@@ -919,7 +919,7 @@ function queryContainers(refreshOnly: boolean) {
                         },
                         {
                             "type": "Column",
-                            "size": 1,
+                            "size": 5,
                             "items": [
                                 {
                                     "type": "TextBlock",
