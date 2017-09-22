@@ -94,6 +94,15 @@ export function activate(context: vscode.ExtensionContext) {
     // show output channel
     out.show();
 
+
+    var item = vscode.window.createStatusBarItem();
+    
+    
+    
+    item.text = "\uD83D\uDC33";
+    item.command = "extension.openMainMenu";
+    item.show();
+
     // return our public API
     let api = {
         runBotContainer(image: string, name: string, options: any = {}) {
