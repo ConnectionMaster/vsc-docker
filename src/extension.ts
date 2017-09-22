@@ -425,7 +425,8 @@ function containerStop(r: any) {
 }
 
 function containerStopAndRemove(r: any) {
-    docker.rm([ r.id ], true, function(result) {
+    var l = (r.ids != undefined) ? r.ids : [ r.id ];
+    docker.rm(l, true, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ContainerStopRemoveSuccess');
         } else {
@@ -937,6 +938,14 @@ function queryContainers(refreshOnly: boolean) {
             }
 
             card.addAction("Refresh", "display-local-containers", {});
+
+            let ids: string[] = [];
+
+            for (var i of result["rows"]) {
+                ids.push(i["container id"]);
+            }
+
+            card.addAction("Remove All", "container-stop-and-remove", { ids: ids });
             
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 handleAction(r);
