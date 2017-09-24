@@ -643,7 +643,9 @@ function imageHistory(r: any) {
 }
 
 function imageRemove(r: any) {
-    docker.rmi(r["id"], function(result) {
+    var ids: string[] = (r["ids"] != undefined) ? r["ids"] : [ r["id"] ];
+
+    docker.rmi(ids, function(result) {
         if (result) {
             AppInsightsClient.sendEvent('ImageRemoveSuccess');
         } else {
@@ -846,6 +848,16 @@ function queryImages(refreshOnly: boolean) {
 
             card.addAction("Refresh", "display-local-images", {});
 
+            let ids: string[] = [];
+            
+            for (var i of result["rows"]) {
+                if (i["repository"] == "<none>") {
+                    ids.push(i["image id"]);
+                }
+            }
+
+            card.addAction("Clear Orphans", "image-remove", { ids: ids });
+            
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 handleAction(r);
             })
