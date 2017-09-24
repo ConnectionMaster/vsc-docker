@@ -4,8 +4,6 @@ Docker Runner source available in [GitHub repository here](https://github.com/zi
 
 Please join [Visual Studio Code LinkedIn Group](https://www.linkedin.com/groups/6974311).
 
-Version **0.17.0** uses Active Cards as user interface. Explorer view has been depreciated, also custom HTML view was depreciated.
-
 ## How to start?
 
 To Activate extension use:
@@ -21,7 +19,16 @@ To Activate extension use:
 
 **Alt+Ctrl+C** to search Docker Hub
 
-## Note
+# Major Updates
+
+Version **0.27.00**
+- kill all containers
+- clean "orphanded" images
+
+Version **0.17.0**
+ - uses Active Cards as user interface. Explorer view has been depreciated, also custom HTML view was depreciated.
+
+# Notes
 
 Please note this is an early alpha version, so it may have bugs and missing features.
 However I think it can be already very useful.
