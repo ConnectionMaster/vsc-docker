@@ -2,7 +2,7 @@
     "name": "vsc-docker",
     "displayName": "Docker Runner",
     "description": "Docker Integration for VSC",
-    "version": "0.26.0",
+    "version": "0.27.0",
     "publisher": "Zim",
     "repository": "https://github.com/zikalino/vsc-docker",
     "icon": "vsc-docker-icon.png",
