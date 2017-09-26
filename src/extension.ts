@@ -187,6 +187,9 @@ function handleAction(a: any) {
     case 'image-from-dockerfile':
         imageFromDockerfile(a);
         break;
+    case 'image-rebuild':
+        imageRebuild(a);
+        break;    
     case 'container-start':
         containerStart(a);
         break;
@@ -628,9 +631,34 @@ function displayImageOptions(r: object) {
     card.addAction('History', 'image-history', p);
     card.addAction('Remove', 'image-remove', p);
 
+    try {
+        let dockerfile: string = g_Config["images"][r["repository"]]["dockerfile"];
+        if (dockerfile != undefined) {
+            p["dockerfile"] = dockerfile; 
+            card.addAction('Rebuild from Dockerfile', 'image-rebuild', p);
+        }
+    } catch (e) {}
+
     ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
         handleAction(r);
     })
+}
+
+function imageRebuild(r: any) {
+    let oldDir = process.cwd();
+    process.chdir(r.dockerfile);
+    docker.build(r.repository, function(result) {
+        process.chdir(oldDir);
+        
+        if (result) {
+            AppInsightsClient.sendEvent('ImageRebuildSuccess');
+        } else {
+            AppInsightsClient.sendEvent('ImageRebuildFailure');
+            vscode.window.showErrorMessage('Rebuild failed');
+        }
+
+        queryImages(true);
+    });
 }
 
 function imageHistory(r: any) {
@@ -685,6 +713,17 @@ function imageFromDockerfile(r: any) {
             
             if (result) {
                 AppInsightsClient.sendEvent('ImageBuildSuccess');
+
+                if (g_Config["images"] == undefined) {
+                    g_Config["images"] = {};
+                }
+
+                if (g_Config["images"][r.tag] == undefined) {
+                    g_Config["images"][r.tag] = {};
+                }
+
+                g_Config["images"][r.tag]["dockerfile"] = r.path;
+                saveConfig();
             } else {
                 AppInsightsClient.sendEvent('ImageBuildFailure');
                 vscode.window.showErrorMessage('Build failed');

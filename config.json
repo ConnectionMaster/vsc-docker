@@ -10,5 +10,10 @@
       "command": "az logout",
       "name": "Azure Logout"
     }
-  ]
+  ],
+  "images": {
+    "dockiot/moomookfi": {
+      "dockerfile": "c:\\dev\\_ansible\\docker-ansible"
+    }
+  }
 }
