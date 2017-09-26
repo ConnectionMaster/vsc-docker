@@ -184,6 +184,9 @@ function handleAction(a: any) {
     case 'image-remove':
         imageRemove(a);
         break;
+    case 'image-from-dockerfile':
+        imageFromDockerfile(a);
+        break;
     case 'container-start':
         containerStart(a);
         break;
@@ -662,6 +665,36 @@ function imageRemove(r: any) {
     })
 }
 
+function imageFromDockerfile(r: any) {
+
+    if (r.tag == undefined) {
+        var card: AdaptiveCard = new AdaptiveCard();
+        
+        card.addTitleWithIcon("From Dockerfile", "");
+        card.addInputText("tag", "Tag");
+        card.addAction("Build", "image-from-dockerfile", { path: r.path });
+        
+        ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
+            handleAction(r);
+        })
+    } else {
+        let oldDir = process.cwd();
+        process.chdir(r.path);
+        docker.build(r.tag, function(result) {
+            process.chdir(oldDir);
+            
+            if (result) {
+                AppInsightsClient.sendEvent('ImageBuildSuccess');
+            } else {
+                AppInsightsClient.sendEvent('ImageBuildFailure');
+                vscode.window.showErrorMessage('Build failed');
+            }
+    
+            queryImages(true);
+        });
+    }
+}
+
 function imagePull(r: any) {
     docker.pull(r["repository"], function(result) {
         if (result) {
@@ -857,6 +890,10 @@ function queryImages(refreshOnly: boolean) {
             }
 
             card.addAction("Clear Orphans", "image-remove", { ids: ids });
+
+            if (fs.existsSync(vscode.workspace.rootPath + "/Dockerfile")) {
+                card.addAction("From Dockerfile", "image-from-dockerfile", { path: vscode.workspace.rootPath });
+            }
             
             ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
                 handleAction(r);

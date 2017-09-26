@@ -27,12 +27,12 @@ export class CliRunner {
     public execute(params: string[], parse: boolean, suppressOutput: boolean, cb) {
 
         if (!suppressOutput) {
-            this.m_OutputHandler('\n\u27a4 docker ' + params.join(' ') + '\n\n');
+            this.m_OutputHandler("Docker", '\n\u27a4 docker ' + params.join(' ') + '\n\n');
         }
 
         const child = cp.spawn('docker', params);
-        const stdout = this.collectData(child.stdout, 'utf8', '', suppressOutput);
-        const stderr = this.collectData(child.stderr, 'utf8', '', suppressOutput);
+        const stdout = this.collectData(child.stdout, 'utf8', 'Docker', suppressOutput);
+        const stderr = this.collectData(child.stderr, 'utf8', 'Docker', suppressOutput);
         child.on('error', err => {
             cb(false);
         });

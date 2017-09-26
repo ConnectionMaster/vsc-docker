@@ -305,6 +305,16 @@ export class Docker extends CliRunner {
     }
     
     /**
+     * Build image from DockerFile
+     * 
+     * @param tag 
+     * @param cb 
+     */
+    public build(tag: string, cb) {
+        this.execute(['build', '--tag', tag, '.'], false, false, cb)
+    }
+
+    /**
      * Remove (kill if necessary) containers
      * 
      * @param containers 
