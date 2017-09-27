@@ -883,6 +883,12 @@ function queryImages(refreshOnly: boolean) {
 
             card.addTitleWithIcon("Local Images", "");
 
+            result["rows"].sort(function(a: object, b: object) {
+                if (a["repository"] < b["repository"]) return -1;
+                else if (a["repository"] > b["repository"]) return 1;
+                else return 0;
+            });
+
             // add items
             for (var i of result["rows"]) {
                 var row = 
@@ -972,6 +978,12 @@ function queryContainers(refreshOnly: boolean) {
             
             card.addTitleWithIcon("Containers", "");
                     
+            result["rows"].sort(function(a: object, b: object) {
+                if (a["names"] < b["names"]) return -1;
+                else if (a["names"] > b["names"]) return 1;
+                else return 0;
+            });
+
             // add items
             for (var i of result["rows"]) {
 
