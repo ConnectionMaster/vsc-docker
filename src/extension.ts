@@ -645,6 +645,9 @@ function displayImageOptions(r: object) {
 }
 
 function imageRebuild(r: any) {
+
+    displayPleaseWait();
+
     let oldDir = process.cwd();
     process.chdir(r.dockerfile);
     docker.build(r.repository, function(result) {
@@ -724,6 +727,8 @@ function imageFromDockerfile(r: any) {
             handleAction(r);
         })
     } else {
+        displayPleaseWait();
+
         let oldDir = process.cwd();
         process.chdir(r.path);
         docker.build(r.tag, function(result) {
@@ -857,6 +862,16 @@ function registerCommand(context: vscode.ExtensionContext, name, func) {
     let disposable = vscode.commands.registerCommand(name, func);
     context.subscriptions.push(disposable);    
 }
+
+/**
+ * Display Please Wait
+ */
+function displayPleaseWait() {
+    var card: AdaptiveCard = new AdaptiveCard();
+    card.addTitleWithIcon("Please Wait...", "");
+    ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {});    
+}
+
 
 /**
  * Display general Docker information
