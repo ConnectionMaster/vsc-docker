@@ -648,38 +648,37 @@ function imageRebuild(r: any) {
 
     displayPleaseWait();
 
-    let oldDir = process.cwd();
-    process.chdir(r.dockerfile);
-    docker.build(r.repository, function(result) {
-        process.chdir(oldDir);
-        
-        if (result) {
-            AppInsightsClient.sendEvent('ImageRebuildSuccess');
+    let ids: string[] = [];
+    docker.ps(true, function (result) {
+        for (var i = 0; i < result.rows.length; i++) {
+            let id: string = result.rows[i]["container id"];
+            let image: string = result.rows[i]["image"];
 
-            let ids: string[] = [];
-            docker.ps(true, function (result) {
-                for (var i = 0; i < result.rows.length; i++) {
-                    let id: string = result.rows[i]["container id"];
-                    let image: string = result.rows[i]["image"];
-
-                    if (image.startsWith(r.repository)) {
-                        ids.push(id);
-                    }
-                }
-
-                if (ids.length > 0) {
-                    docker.rm(ids, true, function (result) {
-                        // don't care about the result
-                    })
-                }
-            })
-        } else {
-            AppInsightsClient.sendEvent('ImageRebuildFailure');
-            vscode.window.showErrorMessage('Rebuild failed');
+            if (image.startsWith(r.repository)) {
+                ids.push(id);
+            }
         }
 
-        queryImages(true);
-    });
+        if (ids.length > 0) {
+            docker.rm(ids, true, function (result) {
+                // don't care about the result
+                let oldDir = process.cwd();
+                process.chdir(r.dockerfile);
+                docker.build(r.repository, function(result) {
+                    process.chdir(oldDir);
+                    
+                    if (result) {
+                        AppInsightsClient.sendEvent('ImageRebuildSuccess');
+                    } else {
+                        AppInsightsClient.sendEvent('ImageRebuildFailure');
+                        vscode.window.showErrorMessage('Rebuild failed');
+                    }
+            
+                    queryImages(true);
+                });
+            })
+        }
+    })
 }
 
 function imageHistory(r: any) {
