@@ -17,7 +17,7 @@ To Activate extension use:
 
 **Alt+Ctrl+C** to display local containers
 
-**Alt+Ctrl+C** to search Docker Hub
+**Alt+Ctrl+S** to search Docker Hub
 
 # Major Updates
 
