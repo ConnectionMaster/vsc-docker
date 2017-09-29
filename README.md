@@ -21,6 +21,9 @@ To Activate extension use:
 
 # Major Updates
 
+Version **0.30.00**
+- Remove running images when image is rebuilt
+
 Version **0.28.00**
 - Build image from Dockerfile (if Dockerfile is available in current folder appropriate option will be displayed in local images)
 - Rebuild image (Docker Runner remembers Dockerfile location, so any image has additional Rebuild option)
