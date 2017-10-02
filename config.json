@@ -14,6 +14,9 @@
   "images": {
     "dockiot/moomookfi": {
       "dockerfile": "c:\\dev\\_ansible\\docker-ansible"
+    },
+    "dockiot/ansible": {
+      "dockerfile": "c:\\dev\\_ansible\\docker-ansible"
     }
   }
 }

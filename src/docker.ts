@@ -326,6 +326,34 @@ export class Docker extends CliRunner {
     }
 
     /**
+     * Remove (kill if necessary) containers for particular image
+     * 
+     * @param image
+     * @param cb 
+     */
+    public rmContainersForImage(image: string, cb) {
+
+        let _docker = this;
+        this.ps(true, function (result) {
+            let ids: string[] = [];
+
+            if (result) {
+                for (var i = 0; i < result.rows.length; i++) {
+                    if (result.rows[i]["image"].startsWith(image)) {
+                        ids.push(result.rows[i]["container id"]);
+                    }
+                }
+            }
+
+            if (ids.length > 0) {
+                _docker.rm(ids, true, cb);
+            } else {
+                cb(true);
+            }
+        });
+    }
+
+    /**
      * Display image history
      * 
      * @param name 

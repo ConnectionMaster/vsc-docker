@@ -648,36 +648,22 @@ function imageRebuild(r: any) {
 
     displayPleaseWait();
 
-    let ids: string[] = [];
-    docker.ps(true, function (result) {
-        for (var i = 0; i < result.rows.length; i++) {
-            let id: string = result.rows[i]["container id"];
-            let image: string = result.rows[i]["image"];
-
-            if (image.startsWith(r.repository)) {
-                ids.push(id);
-            }
-        }
-
-        if (ids.length > 0) {
-            docker.rm(ids, true, function (result) {
-                // don't care about the result
-                let oldDir = process.cwd();
-                process.chdir(r.dockerfile);
-                docker.build(r.repository, function(result) {
-                    process.chdir(oldDir);
-                    
-                    if (result) {
-                        AppInsightsClient.sendEvent('ImageRebuildSuccess');
-                    } else {
-                        AppInsightsClient.sendEvent('ImageRebuildFailure');
-                        vscode.window.showErrorMessage('Rebuild failed');
-                    }
+    docker.rmContainersForImage(r.repository, function (result) {
+        // don't care about the result
+        let oldDir = process.cwd();
+        process.chdir(r.dockerfile);
+        docker.build(r.repository, function(result) {
+            process.chdir(oldDir);
             
-                    queryImages(true);
-                });
-            })
-        }
+            if (result) {
+                AppInsightsClient.sendEvent('ImageRebuildSuccess');
+            } else {
+                AppInsightsClient.sendEvent('ImageRebuildFailure');
+                vscode.window.showErrorMessage('Rebuild failed');
+            }
+    
+            queryImages(true);
+        });
     })
 }
 
