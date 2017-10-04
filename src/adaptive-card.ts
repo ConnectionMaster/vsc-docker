@@ -111,6 +111,55 @@ export class AdaptiveCard
         );
     }
 
+    public addMulticolumnSelector(name: string, description: string, action: any) {
+        var row = 
+        {
+            "type": "ColumnSet",
+            "separation": "strong",
+            "columns": [
+                {
+                    "type": "Column",
+                    "size": 1,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "size": "medium",
+                            "color": "accent",
+                            "textweight": "bolder",
+                            "text": name
+                        }
+                    ],
+                    "selectAction":
+                    {
+                        "type": "Action.Submit",
+                        "data":
+                        {
+                            "action": action,
+                            "name": name,
+                            "description": description
+                        }
+                    }    
+                },
+                {
+                    "type": "Column",
+                    "size": 1,
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "size": "medium",
+                            "horizontalAlignment": "left",
+                            "text": description,
+                            "isSubtle": true,
+                            "wrap": true
+                        }
+                    ]
+                }
+            ]
+        }
+
+        this.addItem(row);
+    }
+
     public addAction(title: string, id: string, params: any) {
         let action =            {
             "type": "Action.Submit",

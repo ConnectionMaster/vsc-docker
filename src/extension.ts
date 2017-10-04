@@ -1096,53 +1096,7 @@ function searchImages() {
 
 
                 for (var i of result["rows"]) {
-                    
-                    var row = 
-                    {
-                        "type": "ColumnSet",
-                        "separation": "strong",
-                        "columns": [
-                            {
-                                "type": "Column",
-                                "size": 1,
-                                "items": [
-                                    {
-                                        "type": "TextBlock",
-                                        "size": "medium",
-                                        "color": "accent",
-                                        "textweight": "bolder",
-                                        "text": i["name"]
-                                    }
-                                ],
-                                "selectAction":
-                                {
-                                    "type": "Action.Submit",
-                                    "data":
-                                    {
-                                        "action": "image-search-select",
-                                        "name": i["name"],
-                                        "description": i["description"]
-                                    }
-                                }    
-                            },
-                            {
-                                "type": "Column",
-                                "size": 1,
-                                "items": [
-                                    {
-                                        "type": "TextBlock",
-                                        "size": "medium",
-                                        "horizontalAlignment": "left",
-                                        "text": i["description"],
-                                        "isSubtle": true,
-                                        "wrap": true
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-    
-                    card.addItem(row);
+                    card.addMulticolumnSelector(i["name"], i["description"], "image-search-select");                    
                 }
                     
                 ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {
