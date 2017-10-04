@@ -891,55 +891,18 @@ function queryImages(refreshOnly: boolean) {
 
             // add items
             for (var i of result["rows"]) {
-                var row = 
-                {
-                    "type": "ColumnSet",
-                    "separation": "strong",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "size": 2,
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "size": "medium",
-                                    "color": "accent",
-                                    "textweight": "bolder",
-                                    "text": i["repository"]
-                                }
-                            ],
-                            "selectAction":
-                            {
-                            "type": "Action.Submit",
-                            "data":
-                            {
-                                "action": "display-image-details",
-                                "id": i["image id"],
-                                "repository": i["repository"],
-                                "tag": i["tag"],
-                                "created": i["created"],
-                                "size": i["size"]
-                            }
-                        }
 
-                        },
-                        {
-                            "type": "Column",
-                            "size": 1,
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "size": "medium",
-                                    "horizontalAlignment": "left",
-                                    "text": i["tag"],
-                                    "isSubtle": true
-                                }
-                            ]
-                        }
-                    ]
-                }
+                card.addMulticolumnSelector(i["repository"], i["tag"],
+                    {
+                        "action": "display-image-details",
+                        "id": i["image id"],
+                        "repository": i["repository"],
+                        "tag": i["tag"],
+                        "created": i["created"],
+                        "size": i["size"]
+                    }
+                );
 
-                card.addItem(row);
             }
 
             card.addAction("Refresh", "display-local-images", {});
@@ -1096,7 +1059,13 @@ function searchImages() {
 
 
                 for (var i of result["rows"]) {
-                    card.addMulticolumnSelector(i["name"], i["description"], "image-search-select");                    
+                    card.addMulticolumnSelector(i["name"], i["description"],
+                        {
+                            "action": "image-search-select",
+                            "name": i["name"],
+                            "description": i["description"]
+                        }
+                    );                    
                 }
                     
                 ac.createAdaptiveCardPreview("DockerRunner", "Docker", card.getCard(), 2, function (r) {

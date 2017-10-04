@@ -132,12 +132,7 @@ export class AdaptiveCard
                     "selectAction":
                     {
                         "type": "Action.Submit",
-                        "data":
-                        {
-                            "action": action,
-                            "name": name,
-                            "description": description
-                        }
+                        "data": action
                     }    
                 },
                 {
