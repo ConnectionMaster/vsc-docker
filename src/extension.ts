@@ -892,7 +892,7 @@ function queryImages(refreshOnly: boolean) {
             // add items
             for (var i of result["rows"]) {
 
-                card.addMulticolumnSelector(i["repository"], i["tag"],
+                card.addMulticolumnSelector("", i["repository"], i["tag"],
                     {
                         "action": "display-image-details",
                         "id": i["image id"],
@@ -951,71 +951,21 @@ function queryContainers(refreshOnly: boolean) {
             for (var i of result["rows"]) {
 
                 var icon: string =   "file:///" + g_StoragePath + "//resources//" + (i['status'].startsWith("Up") ? (i['status'].indexOf('Paused') < 0 ? "container-on-small.png" : "container-paused-small.png") : "container-off-small.png");
-                var row = 
-                {
-                    "type": "ColumnSet",
-                    "separation": "strong",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "size": 1,
-                            "items": [
-                                {
-                                    "type": "Image",
-                                    "url": icon,
-                                    "size": "small"
-                                }
-                            ]
-                        
 
-                        },
-                        {
-                            "type": "Column",
-                            "size": 5,
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "size": "medium",
-                                    "color": "accent",
-                                    "textweight": "bolder",
-                                    "text": i["names"]
-                                }
-                            ],
-                            "selectAction":
-                            {
-                            "type": "Action.Submit",
-                            "data":
-                            {
-                                "action": "display-container-details",
-                                "id": i["container id"],
-                                "names": i["names"],
-                                "image": i["image"],
-                                "tag": i["tag"],
-                                "created": i["created"],
-                                "command": i["command"],
-                                "ports": i["ports"],
-                                "status": i["status"]
-                            }
-                        }
+                card.addMulticolumnSelector(icon, i["names"], i["container id"],
+                    {
+                        "action": "display-container-details",
+                        "id": i["container id"],
+                        "names": i["names"],
+                        "image": i["image"],
+                        "tag": i["tag"],
+                        "created": i["created"],
+                        "command": i["command"],
+                        "ports": i["ports"],
+                        "status": i["status"]
+                    }
+                );                    
 
-                        },
-                        {
-                            "type": "Column",
-                            "size": 5,
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "size": "medium",
-                                    "horizontalAlignment": "left",
-                                    "text": i["image"],
-                                    "isSubtle": true
-                                }
-                            ]
-                        }
-                    ]
-                }
-
-                card.addItem(row);
             }
 
             card.addAction("Refresh", "display-local-containers", {});
@@ -1059,7 +1009,7 @@ function searchImages() {
 
 
                 for (var i of result["rows"]) {
-                    card.addMulticolumnSelector(i["name"], i["description"],
+                    card.addMulticolumnSelector("", i["name"], i["description"],
                         {
                             "action": "image-search-select",
                             "name": i["name"],

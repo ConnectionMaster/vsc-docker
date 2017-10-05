@@ -111,45 +111,68 @@ export class AdaptiveCard
         );
     }
 
-    public addMulticolumnSelector(name: string, description: string, action: any) {
-        var row = 
-        {
-            "type": "ColumnSet",
-            "separation": "strong",
-            "columns": [
+    public addMulticolumnSelector(image: string, name: string, description: string, action: any) {
+        let columns: any[] = [];
+
+        if ((typeof image == "string") && (image != "")) {
+            columns.push(
                 {
                     "type": "Column",
                     "size": 1,
                     "items": [
                         {
-                            "type": "TextBlock",
-                            "size": "medium",
-                            "color": "accent",
-                            "textweight": "bolder",
-                            "text": name
-                        }
-                    ],
-                    "selectAction":
-                    {
-                        "type": "Action.Submit",
-                        "data": action
-                    }    
-                },
-                {
-                    "type": "Column",
-                    "size": 1,
-                    "items": [
-                        {
-                            "type": "TextBlock",
-                            "size": "medium",
-                            "horizontalAlignment": "left",
-                            "text": description,
-                            "isSubtle": true,
-                            "wrap": true
+                            "type": "Image",
+                            "url": image,
+                            "size": "small"
                         }
                     ]
                 }
-            ]
+            );    
+        }
+
+        columns.push(
+            {
+                "type": "Column",
+                "size": 5,
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "size": "medium",
+                        "color": "accent",
+                        "textweight": "bolder",
+                        "text": name
+                    }
+                ],
+                "selectAction":
+                {
+                    "type": "Action.Submit",
+                    "data": action
+                }    
+            }
+        );
+
+        columns.push(
+            {
+                "type": "Column",
+                "size": 5,
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "size": "medium",
+                        "horizontalAlignment": "left",
+                        "text": description,
+                        "isSubtle": true,
+                        "wrap": true
+                    }
+                ]
+            }
+        );
+
+        let row = 
+        {
+            "type": "ColumnSet",
+            "separation": "strong",
+            "columns": columns
         }
 
         this.addItem(row);
