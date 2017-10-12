@@ -10,7 +10,7 @@ import { vt100ToLines } from "./vt100-decode";
 import { AdaptiveCardDocumentContentProvider } from './adaptiveCardProvider';
 var opn = require('opn');
 
-var docker: Docker = new Docker(vscode.workspace.rootPath, logHandler, closeHandler);
+var docker: Docker = new Docker(vscode.workspace.rootPath, outputHandler, closeHandler);
 
 var ac: NewHtmlView = NewHtmlView.getInstance();
 
@@ -1078,29 +1078,31 @@ function installImage(id: string, description: string, pin: boolean) {
 // XXX - fix this
 var collect = {};
 
-function logHandler(id: string, data: string) {
-    out.append(data);
-
-    // XXX - check if collect contains member
+function outputHandler(id: string, data: string) {
 
     if (collect[id] != undefined) {
         collect[id] += data;
-        
-        var parts: string[] = collect[id].split('\n');
-        
-        for (var part of parts) {
-            try {
-            var activity: any = JSON.parse(part);
-        
-            ac.createAdaptiveCardPreview(id, id, activity.data, 2, function(r) {
-                terminal.sendText(JSON.stringify(r), true);            
-            });
+
+        let nextCr: number = -1;
+
+        while ((nextCr = collect[id].indexOf('\n')) >= 0) {
+
+            let l = collect[id].slice(0, nextCr);
+            collect[id] = collect[id].slice(nextCr + 1);
             
-            collect[id] = "";
-            return;
-                
-            } catch (e) {}
+            try {
+                var activity: any = JSON.parse(l);
+            
+                ac.createAdaptiveCardPreview(id, id, activity.data, 2, function(r) {
+                    terminal.sendText(JSON.stringify(r), true);            
+                });
+                                
+            } catch (e) {
+                out.append(l);
+            }
         }
+    } else {
+        out.append(data);        
     }
 }
 
