@@ -109,7 +109,7 @@ export class Docker extends CliRunner {
 
 
         // XXX - must get current local directory
-        const child = cp.spawn('docker', ['attach', '--no-stdin', id]);
+        const child = cp.spawn('docker', ['exec', '-i', id, "node",  "/bot/server-local.js"]);
         this.m_Containers[id] = child;
         child['xvsc'] = true;
 
@@ -206,11 +206,7 @@ export class Docker extends CliRunner {
      */
     public execCmd(id: string, command: any, cb) {
 
-        if (this.m_Containers[id].xvsc) {
-            this.m_Containers[id].stdin.write(JSON.stringify(command) + '\n');
-        } else {
-            this.m_Containers[id].stdin.write(command + '\n');
-        }
+        this.m_Containers[id].stdin.write(command + '\n');
     }
 
     /**

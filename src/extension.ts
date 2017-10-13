@@ -109,9 +109,9 @@ export function activate(context: vscode.ExtensionContext) {
     let api = {
         runBotContainer(image: string, name: string, options: any = {}) {
             startContainerBot(image, name, true, function(result) {
-                setTimeout(function() {
-                    terminal.sendText("hi!");
-                }, 1000)
+                //setTimeout(function() {
+                //    terminal.sendText("hi!");
+                //}, 1000)
             });
         }
     }
@@ -1094,7 +1094,8 @@ function outputHandler(id: string, data: string) {
                 var activity: any = JSON.parse(l);
             
                 ac.createAdaptiveCardPreview(id, id, activity.data, 2, function(r) {
-                    terminal.sendText(JSON.stringify(r), true);            
+                    docker.execCmd(id, JSON.stringify(r), function () {});
+                    //terminal.sendText(JSON.stringify(r), true);            
                 });
                                 
             } catch (e) {
@@ -1295,7 +1296,7 @@ function saveConfig() {
  */
 
 function startContainerBot(id: string, name: string, view: boolean, cb) {
-    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " node /bot/server-local.js";
+    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " bash";
 
     // create data collection buffer
     collect[name] = "";
@@ -1324,6 +1325,7 @@ function startContainerBot(id: string, name: string, view: boolean, cb) {
             terminal.sendText('docker attach ' + name, true);
             setTimeout(function() {
                 docker.attachBot(name, function(result) {
+                    docker.execCmd(name, "hi!", function() {});
                     cb();
                 });
             }, 3000)
@@ -1338,6 +1340,7 @@ function startContainerBot(id: string, name: string, view: boolean, cb) {
 
             setTimeout(function() {
                 docker.attachBot(name, function(result) {
+                    docker.execCmd(name, "hi!", function() {});
                     cb();
                 });
             }, 3000)
