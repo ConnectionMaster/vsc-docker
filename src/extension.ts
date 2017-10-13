@@ -1099,7 +1099,7 @@ function outputHandler(id: string, data: string) {
                 });
                                 
             } catch (e) {
-                out.append(l);
+                out.append(l + '\n');
             }
         }
     } else {
