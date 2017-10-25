@@ -1296,7 +1296,7 @@ function saveConfig() {
  */
 
 function startContainerBot(id: string, name: string, view: boolean, cb) {
-    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src " + id + " bash";
+    var params: string =  "-i -t --rm --name $default-name -v $workspace:$src -v /var/run/docker.sock:/var/run/docker.sock " + id + " bash";
 
     // create data collection buffer
     collect[name] = "";
